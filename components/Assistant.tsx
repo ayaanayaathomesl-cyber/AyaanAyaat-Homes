@@ -1,4 +1,3 @@
-
 /**
  * @license
  * SPDX-License-Identifier: Apache-2.0
@@ -15,7 +14,7 @@ interface AssistantProps {
 const Assistant: React.FC<AssistantProps> = ({ currentView }) => {
   const [isOpen, setIsOpen] = useState(false);
   const [messages, setMessages] = useState<ChatMessage[]>([
-    { role: 'model', text: 'আসসালামু আলাইকুম! আমি AyaanAyaat Homes-এর অফিসিয়াল এআই এসিস্ট্যান্ট। আমাদের হোস্টেল সার্ভিস, লোকেশন বা বুকিং নিয়ে যেকোনো প্রশ্ন থাকলে আমাকে করতে পারেন। আমি আপনাকে সেরা সমাধান দিতে প্রস্তুত।', timestamp: Date.now() }
+    { role: 'model', text: 'আসসালামু আলাইকুম! আমি AyaanAyaat Homes-এর অফিসিয়াল এআই এসিস্ট্যান্ট। আমাদের হোস্টেল সার্ভিস, লোকেশন বা বুকিং নিয়ে যেকোনো প্রশ্ন থাকলে আমাকে করতে পারেন।', timestamp: Date.now() }
   ]);
   const [inputValue, setInputValue] = useState('');
   const [isThinking, setIsThinking] = useState(false);
@@ -58,8 +57,24 @@ const Assistant: React.FC<AssistantProps> = ({ currentView }) => {
     setInputValue('');
     setIsThinking(true);
 
+    // Check if API Key exists
+    const apiKey = process.env.API_KEY;
+    if (!apiKey || apiKey === "") {
+        const hotline = getFloatingWaNumber();
+        setTimeout(() => {
+            const fallbackMsg: ChatMessage = { 
+                role: 'model', 
+                text: `ধন্যবাদ আপনার আগ্রহের জন্য। বর্তমানে অটোমেটেড চ্যাট সেবাটি বন্ধ আছে। অনুগ্রহ করে বিস্তারিত তথ্যের জন্য আমাদের হটলাইনে (${hotline}) কল করুন অথবা WhatsApp এ মেসেজ দিন।`, 
+                timestamp: Date.now() 
+            };
+            setMessages(prev => [...prev, fallbackMsg]);
+            setIsThinking(false);
+        }, 1000);
+        return;
+    }
+
     try {
-      const ai = new GoogleGenAI({ apiKey: process.env.API_KEY });
+      const ai = new GoogleGenAI({ apiKey: apiKey });
       
       if (!chatSessionRef.current) {
         chatSessionRef.current = ai.chats.create({
@@ -208,7 +223,7 @@ const Assistant: React.FC<AssistantProps> = ({ currentView }) => {
                 </svg>
               </div>
               <div>
-                <h4 className="text-[#D4AF37] font-bold text-sm tracking-tight leading-none uppercase">Senior Relationship AI</h4>
+                <h4 className="text-[#D4AF37] font-bold text-sm tracking-tight leading-none uppercase">Assistant</h4>
                 <p className="text-[10px] text-white/60 mt-1">Ready to help you</p>
               </div>
             </div>
@@ -238,7 +253,7 @@ const Assistant: React.FC<AssistantProps> = ({ currentView }) => {
                   <span className="w-1.5 h-1.5 bg-[#D4AF37] rounded-full animate-bounce [animation-delay:0.2s]"></span>
                   <span className="w-1.5 h-1.5 bg-[#D4AF37] rounded-full animate-bounce [animation-delay:0.4s]"></span>
                 </span>
-                Processing information...
+                Processing...
               </div>
             )}
           </div>
@@ -265,7 +280,7 @@ const Assistant: React.FC<AssistantProps> = ({ currentView }) => {
                 </svg>
               </button>
             </div>
-            <p className="text-[10px] text-center text-gray-400 mt-3 font-medium">AyaanAyaat Smart AI Support v2.0</p>
+            <p className="text-[10px] text-center text-gray-400 mt-3 font-medium">AyaanAyaat Smart Support</p>
           </div>
         </div>
       )}
