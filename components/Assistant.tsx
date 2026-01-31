@@ -123,15 +123,16 @@ const Assistant: React.FC<AssistantProps> = ({ currentView }) => {
     setIsThinking(true);
     setHasError(false);
 
-    // Hardcoded Key for Production Reliability
-    const apiKey = "AIzaSyC0rVB7ydv3sPmabf3IoKAnpToEXV40nAQ";
+    // Retrieve API Key from Environment Variable (Injected by Vite at build time)
+    // Make sure to set 'API_KEY' in your Netlify Environment Variables
+    const apiKey = process.env.API_KEY;
 
     if (!apiKey || apiKey.length < 5) {
       console.error("Missing API Key");
       setTimeout(() => {
         setMessages(prev => [...prev, { 
           role: 'model', 
-          text: 'দুঃখিত, বর্তমানে সার্ভার মেইনটেনেন্স চলছে। অনুগ্রহ করে আমাদের হটলাইনে কল করুন: ০১৯৭৫-২০৭০০০', 
+          text: 'দুঃখিত, সিস্টেম কনফিগারেশন ত্রুটির কারণে সংযোগ করা যাচ্ছে না। (API Key Missing)', 
           timestamp: Date.now() 
         }]);
         setIsThinking(false);
@@ -144,7 +145,7 @@ const Assistant: React.FC<AssistantProps> = ({ currentView }) => {
       if (!chatSessionRef.current) {
         const ai = new GoogleGenAI({ apiKey: apiKey });
         chatSessionRef.current = ai.chats.create({
-          model: 'gemini-2.0-flash', // Using 2.0 Flash as it is the current standard for speed/reliability
+          model: 'gemini-1.5-flash', // Stable model
           config: {
             systemInstruction: getKnowledgeBase(),
             temperature: 0.7,
