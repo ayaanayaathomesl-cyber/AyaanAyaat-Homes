@@ -123,8 +123,7 @@ const Assistant: React.FC<AssistantProps> = ({ currentView }) => {
     setIsThinking(true);
     setHasError(false);
 
-    // Directly using the provided key to ensure functionality
-    // This resolves the issue where process.env might be undefined in production
+    // Hardcoded Key for Production Reliability
     const apiKey = "AIzaSyC0rVB7ydv3sPmabf3IoKAnpToEXV40nAQ";
 
     if (!apiKey || apiKey.length < 5) {
@@ -145,7 +144,7 @@ const Assistant: React.FC<AssistantProps> = ({ currentView }) => {
       if (!chatSessionRef.current) {
         const ai = new GoogleGenAI({ apiKey: apiKey });
         chatSessionRef.current = ai.chats.create({
-          model: 'gemini-2.5-flash', // Using 2.5 Flash as it is stable and fast for this purpose
+          model: 'gemini-2.0-flash', // Using 2.0 Flash as it is the current standard for speed/reliability
           config: {
             systemInstruction: getKnowledgeBase(),
             temperature: 0.7,

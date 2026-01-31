@@ -6,16 +6,19 @@ export default defineConfig(({ mode }) => {
   // Load env file based on `mode` in the current working directory.
   const env = loadEnv(mode, (process as any).cwd(), '');
   
-  // We set the API key here for compatibility, though the component also has a hardcoded fallback now for maximum reliability
+  // Hardcoded fallback for reliability
   const apiKey = "AIzaSyC0rVB7ydv3sPmabf3IoKAnpToEXV40nAQ";
 
   return {
     plugins: [react()],
     build: {
       outDir: 'dist',
+      // CRITICAL FIX: Disable sourcemaps to prevent Netlify post-processing from hanging
+      sourcemap: false,
+      // Minify output to speed up processing
+      minify: 'esbuild',
     },
     define: {
-      // Prioritize the specific key replacement
       'process.env.API_KEY': JSON.stringify(apiKey),
     }
   };
