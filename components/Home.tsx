@@ -27,50 +27,50 @@ const Home: React.FC<HomeProps> = ({ onNavigate }) => {
         </div>
 
         {/* Content Container */}
-        <div className="max-w-7xl mx-auto px-6 md:px-12 relative z-20 w-full pt-20">
+        <div className="max-w-7xl mx-auto px-5 md:px-12 relative z-20 w-full pt-20">
           <div className="max-w-3xl space-y-6 md:space-y-8">
             
             {/* Tagline */}
             <div className="flex items-center gap-2 mb-4">
-              <span className="bg-[#D4AF37]/20 text-[#D4AF37] text-[10px] font-black uppercase tracking-widest px-3 py-1 rounded-sm border border-[#D4AF37]/30 flex items-center gap-2">
-                <span className="w-2 h-2 bg-[#D4AF37] rounded-full animate-pulse"></span>
+              <span className="bg-[#D4AF37]/20 text-[#D4AF37] text-[9px] md:text-[10px] font-black uppercase tracking-widest px-3 py-1 rounded-sm border border-[#D4AF37]/30 flex items-center gap-2">
+                <span className="w-1.5 h-1.5 md:w-2 md:h-2 bg-[#D4AF37] rounded-full animate-pulse"></span>
                 Premium Hostel Living
               </span>
             </div>
 
             {/* Main Brand & Headline with Vertical Gold Line */}
-            <div className="relative pl-6 md:pl-8">
+            <div className="relative pl-5 md:pl-8">
               {/* The Vertical Gold Bar */}
               <div className="absolute left-0 top-0 bottom-0 w-1 md:w-1.5 bg-[#D4AF37] rounded-full shadow-[0_0_15px_rgba(212,175,55,0.5)]"></div>
               
-              <div className="space-y-2">
-                <h1 className="text-6xl md:text-8xl lg:text-9xl font-bold text-white leading-none tracking-tight">
+              <div className="space-y-1 md:space-y-2">
+                <h1 className="text-5xl sm:text-6xl md:text-8xl lg:text-9xl font-bold text-white leading-none tracking-tight">
                   AyaanAyaat
                 </h1>
-                <h2 className="text-4xl md:text-6xl lg:text-7xl font-serif italic text-white/90 font-light -mt-2 md:-mt-4">
+                <h2 className="text-3xl sm:text-4xl md:text-6xl lg:text-7xl font-serif italic text-white/90 font-light -mt-1 md:-mt-4">
                   Homes
                 </h2>
               </div>
 
               {/* Integrated Sub-headline & Micro Description */}
-              <div className="mt-6 md:mt-8">
+              <div className="mt-5 md:mt-8">
                 <div className="space-y-1">
-                  <h3 className="text-[#D4AF37] text-2xl md:text-5xl lg:text-6xl font-black tracking-tight drop-shadow-md">
+                  <h3 className="text-[#D4AF37] text-xl sm:text-3xl md:text-5xl lg:text-6xl font-black tracking-tight drop-shadow-md leading-tight">
                     ছাত্র ও চাকুরিজীবীদের জন্য
                   </h3>
-                  <h3 className="text-white text-2xl md:text-5xl lg:text-6xl font-black tracking-tight drop-shadow-md">
+                  <h3 className="text-white text-xl sm:text-3xl md:text-5xl lg:text-6xl font-black tracking-tight drop-shadow-md leading-tight">
                     আধুনিক সুপার হোস্টেল সল্যুশন
                   </h3>
                 </div>
-                <p className="text-white/60 text-[11px] md:text-[15px] font-medium tracking-wide mt-2 whitespace-nowrap overflow-visible drop-shadow-sm">
+                <p className="text-white/60 text-[11px] md:text-[15px] font-medium tracking-wide mt-3 md:mt-2 whitespace-normal md:whitespace-nowrap overflow-visible drop-shadow-sm leading-relaxed max-w-xs md:max-w-none">
                   এক ছাদের নিচে থাকা, খাওয়া ও বিনোদনের সকল সুবিধা।
                 </p>
               </div>
             </div>
 
             {/* Unique Action Button - "আমাদের ব্রাঞ্চসমূহ" */}
-            <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-4 pt-8 pl-6 md:pl-8">
-              <div className="relative animate-float">
+            <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-4 pt-6 md:pt-8 pl-5 md:pl-8">
+              <div className="relative animate-float mr-auto sm:mr-0">
                 <div className="absolute -inset-2 bg-gradient-to-r from-[#D4AF37] to-[#D4AF37]/0 rounded-full blur-xl opacity-30 animate-pulse"></div>
                 
                 <button 
@@ -78,11 +78,11 @@ const Home: React.FC<HomeProps> = ({ onNavigate }) => {
                     const el = document.getElementById('our-branches');
                     if (el) el.scrollIntoView({ behavior: 'smooth' });
                   }}
-                  className="pulse-ring-btn animate-shimmer relative bg-[#D4AF37] text-[#002147] px-8 py-4 text-sm font-black uppercase rounded-full flex items-center justify-center gap-4 hover:bg-white hover:text-[#002147] hover:scale-105 active:scale-95 transition-all duration-500 shadow-[0_20px_50px_-10px_rgba(212,175,55,0.4)] z-10 overflow-hidden"
+                  className="pulse-ring-btn animate-shimmer relative bg-[#D4AF37] text-[#002147] px-6 py-3 md:px-8 md:py-4 text-xs md:text-sm font-black uppercase rounded-full flex items-center justify-center gap-3 md:gap-4 hover:bg-white hover:text-[#002147] hover:scale-105 active:scale-95 transition-all duration-500 shadow-[0_20px_50px_-10px_rgba(212,175,55,0.4)] z-10 overflow-hidden"
                 >
                   <span className="relative z-10 drop-shadow-sm">আমাদের ব্রাঞ্চ-সমূহ</span>
-                  <div className="relative z-10 w-6 h-6 bg-[#002147] rounded-full flex items-center justify-center text-white shadow-inner group-hover:rotate-12 transition-transform">
-                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={3} stroke="currentColor" className="w-3.5 h-3.5">
+                  <div className="relative z-10 w-5 h-5 md:w-6 md:h-6 bg-[#002147] rounded-full flex items-center justify-center text-white shadow-inner group-hover:rotate-12 transition-transform">
+                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={3} stroke="currentColor" className="w-3 h-3 md:w-3.5 md:h-3.5">
                       <path strokeLinecap="round" strokeLinejoin="round" d="M13.5 4.5L21 12m0 0l-7.5 7.5M21 12H3" />
                     </svg>
                   </div>

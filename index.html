@@ -29,110 +29,46 @@
         font-family: 'Playfair Display', serif;
       }
 
-      .bg-navy { background-color: var(--navy); }
-      .text-gold { color: var(--gold); }
-      .border-gold { border-color: var(--gold); }
-      .bg-gold { background-color: var(--gold); }
-
-      .navy-gradient {
-        background: linear-gradient(135deg, #002147 0%, #00152e 100%);
-      }
-
       /* Custom Animations */
       @keyframes fade-in-up {
         0% { opacity: 0; transform: translateY(20px); }
         100% { opacity: 1; transform: translateY(0); }
       }
-
-      @keyframes whatsapp-ripple {
-        0% { box-shadow: 0 0 0 0 rgba(37, 211, 102, 0.5); }
-        70% { box-shadow: 0 0 0 15px rgba(37, 211, 102, 0); }
-        100% { box-shadow: 0 0 0 0 rgba(37, 211, 102, 0); }
-      }
-
-      @keyframes facebook-pulse {
-        0% { transform: scale(1); filter: drop-shadow(0 0 0 rgba(24, 119, 242, 0)); }
-        50% { transform: scale(1.02); filter: drop-shadow(0 0 10px rgba(24, 119, 242, 0.4)); }
-        100% { transform: scale(1); filter: drop-shadow(0 0 0 rgba(24, 119, 242, 0)); }
-      }
-
-      @keyframes float-mini {
-        0%, 100% { transform: translateY(0); }
-        50% { transform: translateY(-5px); }
-      }
-
-      @keyframes pulse-slow {
-        0%, 100% { transform: scale(1); opacity: 1; }
-        50% { transform: scale(1.03); opacity: 0.95; }
-      }
-
-      @keyframes marquee {
-        0% { transform: translateX(0); }
-        100% { transform: translateX(-50%); }
-      }
-
-      .animate-marquee {
-        display: flex;
-        width: max-content;
-        animation: marquee 30s linear infinite;
-      }
-
-      .animate-marquee:hover {
-        animation-play-state: paused;
+      
+      @keyframes slide-in-right {
+        0% { opacity: 0; transform: translateX(20px); }
+        100% { opacity: 1; transform: translateX(0); }
       }
 
       .animate-fade-in-up {
-        animation: fade-in-up 0.8s cubic-bezier(0.2, 1, 0.3, 1) forwards;
+        animation: fade-in-up 0.5s ease-out forwards;
+      }
+      
+      .animate-slide-in-right {
+        animation: slide-in-right 0.4s ease-out forwards;
       }
 
-      .animate-whatsapp {
-        animation: whatsapp-ripple 2s infinite;
+      /* Chat Bubble Animations */
+      .typing-dot {
+        animation: typing 1.4s infinite ease-in-out both;
+      }
+      .typing-dot:nth-child(1) { animation-delay: -0.32s; }
+      .typing-dot:nth-child(2) { animation-delay: -0.16s; }
+      
+      @keyframes typing {
+        0%, 80%, 100% { transform: scale(0); }
+        40% { transform: scale(1); }
       }
 
-      .animate-facebook {
-        animation: facebook-pulse 3s infinite ease-in-out;
+      .scrollbar-thin::-webkit-scrollbar {
+        width: 6px;
       }
-
-      .animate-float-mini {
-        animation: float-mini 3s infinite ease-in-out;
+      .scrollbar-thin::-webkit-scrollbar-track {
+        background: #f1f1f1;
       }
-
-      .animate-pulse-slow {
-        animation: pulse-slow 3s infinite ease-in-out;
-      }
-
-      .scrollbar-hide::-webkit-scrollbar {
-        display: none;
-      }
-      .scrollbar-hide {
-        -ms-overflow-style: none;
-        scrollbar-width: none;
-      }
-
-      .shimmer-btn {
-        position: relative;
-        overflow: hidden;
-      }
-      .shimmer-btn::after {
-        content: "";
-        position: absolute;
-        top: -50%;
-        left: -50%;
-        width: 200%;
-        height: 200%;
-        background: linear-gradient(
-          to bottom right,
-          rgba(255, 255, 255, 0) 0%,
-          rgba(255, 255, 255, 0.3) 50%,
-          rgba(255, 255, 255, 0) 100%
-        );
-        transform: rotate(45deg);
-        animation: shimmer-sweep 4s infinite;
-      }
-
-      @keyframes shimmer-sweep {
-        0% { transform: translateX(-150%) rotate(45deg); }
-        20%, 100% { transform: translateX(150%) rotate(45deg); }
+      .scrollbar-thin::-webkit-scrollbar-thumb {
+        background: #D4AF37;
+        border-radius: 3px;
       }
     </style>
   <script type="importmap">
