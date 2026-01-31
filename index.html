@@ -1,0 +1,154 @@
+
+<!DOCTYPE html>
+<html lang="bn">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>AyaanAyaat Homes - Modern Hostel Solutions</title>
+    <meta name="description" content="AyaanAyaat Homes - Modern and affordable hostel solutions for students and professionals." />
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+      @import url('https://fonts.googleapis.com/css2?family=Hind+Siliguri:wght@300;400;500;600;700&family=Playfair+Display:ital,wght@0,400;0,700;1,400&family=Inter:wght@300;400;500;600&display=swap');
+      
+      :root {
+        --navy: #002147;
+        --gold: #D4AF37;
+      }
+
+      html {
+        scroll-behavior: smooth;
+        scroll-padding-top: 80px;
+      }
+
+      body {
+        font-family: 'Hind Siliguri', 'Inter', sans-serif;
+        background-color: #fcfcfc;
+        color: #1a1a1a;
+      }
+      
+      .font-serif {
+        font-family: 'Playfair Display', serif;
+      }
+
+      .bg-navy { background-color: var(--navy); }
+      .text-gold { color: var(--gold); }
+      .border-gold { border-color: var(--gold); }
+      .bg-gold { background-color: var(--gold); }
+
+      .navy-gradient {
+        background: linear-gradient(135deg, #002147 0%, #00152e 100%);
+      }
+
+      /* Custom Animations */
+      @keyframes fade-in-up {
+        0% { opacity: 0; transform: translateY(20px); }
+        100% { opacity: 1; transform: translateY(0); }
+      }
+
+      @keyframes whatsapp-ripple {
+        0% { box-shadow: 0 0 0 0 rgba(37, 211, 102, 0.5); }
+        70% { box-shadow: 0 0 0 15px rgba(37, 211, 102, 0); }
+        100% { box-shadow: 0 0 0 0 rgba(37, 211, 102, 0); }
+      }
+
+      @keyframes facebook-pulse {
+        0% { transform: scale(1); filter: drop-shadow(0 0 0 rgba(24, 119, 242, 0)); }
+        50% { transform: scale(1.02); filter: drop-shadow(0 0 10px rgba(24, 119, 242, 0.4)); }
+        100% { transform: scale(1); filter: drop-shadow(0 0 0 rgba(24, 119, 242, 0)); }
+      }
+
+      @keyframes float-mini {
+        0%, 100% { transform: translateY(0); }
+        50% { transform: translateY(-5px); }
+      }
+
+      @keyframes pulse-slow {
+        0%, 100% { transform: scale(1); opacity: 1; }
+        50% { transform: scale(1.03); opacity: 0.95; }
+      }
+
+      @keyframes marquee {
+        0% { transform: translateX(0); }
+        100% { transform: translateX(-50%); }
+      }
+
+      .animate-marquee {
+        display: flex;
+        width: max-content;
+        animation: marquee 30s linear infinite;
+      }
+
+      .animate-marquee:hover {
+        animation-play-state: paused;
+      }
+
+      .animate-fade-in-up {
+        animation: fade-in-up 0.8s cubic-bezier(0.2, 1, 0.3, 1) forwards;
+      }
+
+      .animate-whatsapp {
+        animation: whatsapp-ripple 2s infinite;
+      }
+
+      .animate-facebook {
+        animation: facebook-pulse 3s infinite ease-in-out;
+      }
+
+      .animate-float-mini {
+        animation: float-mini 3s infinite ease-in-out;
+      }
+
+      .animate-pulse-slow {
+        animation: pulse-slow 3s infinite ease-in-out;
+      }
+
+      .scrollbar-hide::-webkit-scrollbar {
+        display: none;
+      }
+      .scrollbar-hide {
+        -ms-overflow-style: none;
+        scrollbar-width: none;
+      }
+
+      /* Shimmer effect for buttons */
+      .shimmer-btn {
+        position: relative;
+        overflow: hidden;
+      }
+      .shimmer-btn::after {
+        content: "";
+        position: absolute;
+        top: -50%;
+        left: -50%;
+        width: 200%;
+        height: 200%;
+        background: linear-gradient(
+          to bottom right,
+          rgba(255, 255, 255, 0) 0%,
+          rgba(255, 255, 255, 0.3) 50%,
+          rgba(255, 255, 255, 0) 100%
+        );
+        transform: rotate(45deg);
+        animation: shimmer-sweep 4s infinite;
+      }
+
+      @keyframes shimmer-sweep {
+        0% { transform: translateX(-150%) rotate(45deg); }
+        20%, 100% { transform: translateX(150%) rotate(45deg); }
+      }
+    </style>
+  <script type="importmap">
+{
+  "imports": {
+    "@google/genai": "https://aistudiocdn.com/@google/genai@^1.29.0",
+    "react/": "https://aistudiocdn.com/react@^19.2.0/",
+    "react": "https://aistudiocdn.com/react@^19.2.0",
+    "react-dom/": "https://aistudiocdn.com/react-dom@^19.2.0/"
+  }
+}
+</script>
+</head>
+  <body>
+    <div id="root"></div>
+  </body>
+</html>
