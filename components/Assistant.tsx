@@ -59,12 +59,15 @@ const Assistant: React.FC<AssistantProps> = ({ currentView }) => {
 
     // Check if API Key exists
     const apiKey = process.env.API_KEY;
+    
+    // Debugging: Check console to see if key is loaded
     if (!apiKey || apiKey === "") {
+        console.warn("AI Assistant: API Key is missing in the build.");
         const hotline = getFloatingWaNumber();
         setTimeout(() => {
             const fallbackMsg: ChatMessage = { 
                 role: 'model', 
-                text: `ধন্যবাদ আপনার আগ্রহের জন্য। বর্তমানে অটোমেটেড চ্যাট সেবাটি বন্ধ আছে। অনুগ্রহ করে বিস্তারিত তথ্যের জন্য আমাদের হটলাইনে (${hotline}) কল করুন অথবা WhatsApp এ মেসেজ দিন।`, 
+                text: `ধন্যবাদ আপনার আগ্রহের জন্য। বর্তমানে অটোমেটেড চ্যাট সেবাটি বন্ধ আছে (System Config)। অনুগ্রহ করে বিস্তারিত তথ্যের জন্য আমাদের হটলাইনে (${hotline}) কল করুন অথবা WhatsApp এ মেসেজ দিন।`, 
                 timestamp: Date.now() 
             };
             setMessages(prev => [...prev, fallbackMsg]);
@@ -74,6 +77,7 @@ const Assistant: React.FC<AssistantProps> = ({ currentView }) => {
     }
 
     try {
+      // Always create a new instance to ensure fresh config, but reuse chat session if possible
       const ai = new GoogleGenAI({ apiKey: apiKey });
       
       if (!chatSessionRef.current) {
