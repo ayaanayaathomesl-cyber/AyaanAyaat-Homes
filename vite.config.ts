@@ -3,19 +3,20 @@ import react from '@vitejs/plugin-react';
 
 export default defineConfig(({ mode }) => {
   // Load env file based on `mode` in the current working directory.
-  // Set the third parameter to '' to load all env regardless of the `VITE_` prefix.
   const env = loadEnv(mode, (process as any).cwd(), '');
   
+  // Prioritize process.env for Netlify, then fallback to loaded env
+  const apiKey = process.env.API_KEY || env.API_KEY || "";
+
   return {
     plugins: [react()],
     build: {
       outDir: 'dist',
     },
     define: {
-      // Explicitly inject the API key. If env.API_KEY is undefined, it sets it to empty string.
-      // This is critical for the Assistant component to detect if the key is missing.
-      'process.env.API_KEY': JSON.stringify(env.API_KEY || ""),
-      // Polyfill process.env for other libraries that might expect it
+      // Explicitly inject the API key into the client-side code
+      'process.env.API_KEY': JSON.stringify(apiKey),
+      // Polyfill process.env for safety
       'process.env': {}
     }
   };
