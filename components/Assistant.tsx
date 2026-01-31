@@ -1,3 +1,4 @@
+
 /**
  * @license
  * SPDX-License-Identifier: Apache-2.0
@@ -122,7 +123,9 @@ const Assistant: React.FC<AssistantProps> = ({ currentView }) => {
     setIsThinking(true);
     setHasError(false);
 
-    const apiKey = process.env.API_KEY;
+    // Directly using the provided key to ensure functionality
+    // This resolves the issue where process.env might be undefined in production
+    const apiKey = "AIzaSyC0rVB7ydv3sPmabf3IoKAnpToEXV40nAQ";
 
     if (!apiKey || apiKey.length < 5) {
       console.error("Missing API Key");
@@ -142,7 +145,7 @@ const Assistant: React.FC<AssistantProps> = ({ currentView }) => {
       if (!chatSessionRef.current) {
         const ai = new GoogleGenAI({ apiKey: apiKey });
         chatSessionRef.current = ai.chats.create({
-          model: 'gemini-3-flash-preview',
+          model: 'gemini-2.5-flash', // Using 2.5 Flash as it is stable and fast for this purpose
           config: {
             systemInstruction: getKnowledgeBase(),
             temperature: 0.7,
@@ -173,11 +176,13 @@ const Assistant: React.FC<AssistantProps> = ({ currentView }) => {
       setMessages(prev => {
         const last = prev[prev.length - 1];
         if (last.role === 'model' && last.text === '') {
-            return [...prev.slice(0, -1), { role: 'model', text: 'দুঃখিত, একটি প্রযুক্তিগত সমস্যা হয়েছে। দয়া করে আবার চেষ্টা করুন বা হটলাইনে কল করুন।', timestamp: Date.now() }];
+            return [...prev.slice(0, -1), { role: 'model', text: 'দুঃখিত, বর্তমানে এআই সার্ভারে সংযোগ পাওয়া যাচ্ছে না। দয়া করে কিছুক্ষণ পর চেষ্টা করুন অথবা হটলাইনে কল করুন।', timestamp: Date.now() }];
         }
-        return [...prev, { role: 'model', text: 'দুঃখিত, একটি প্রযুক্তিগত সমস্যা হয়েছে। দয়া করে আবার চেষ্টা করুন।', timestamp: Date.now() }];
+        return [...prev, { role: 'model', text: 'দুঃখিত, একটি সমস্যা হয়েছে। আবার চেষ্টা করুন।', timestamp: Date.now() }];
       });
       setHasError(true);
+      // Reset chat session on error to force reconnection next time
+      chatSessionRef.current = null;
     } finally {
       setIsThinking(false);
     }
