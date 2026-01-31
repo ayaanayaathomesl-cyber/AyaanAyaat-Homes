@@ -39,15 +39,15 @@ const Home: React.FC<HomeProps> = ({ onNavigate }) => {
             </div>
 
             {/* Main Brand & Headline with Vertical Gold Line */}
-            <div className="relative pl-5 md:pl-8">
+            <div className="relative pl-4 md:pl-8">
               {/* The Vertical Gold Bar */}
               <div className="absolute left-0 top-0 bottom-0 w-1 md:w-1.5 bg-[#D4AF37] rounded-full shadow-[0_0_15px_rgba(212,175,55,0.5)]"></div>
               
               <div className="space-y-1 md:space-y-2">
-                <h1 className="text-5xl sm:text-6xl md:text-8xl lg:text-9xl font-bold text-white leading-none tracking-tight">
+                <h1 className="text-4xl sm:text-6xl md:text-8xl lg:text-9xl font-bold text-white leading-none tracking-tight">
                   AyaanAyaat
                 </h1>
-                <h2 className="text-3xl sm:text-4xl md:text-6xl lg:text-7xl font-serif italic text-white/90 font-light -mt-1 md:-mt-4">
+                <h2 className="text-2xl sm:text-4xl md:text-6xl lg:text-7xl font-serif italic text-white/90 font-light -mt-1 md:-mt-4">
                   Homes
                 </h2>
               </div>
@@ -55,10 +55,10 @@ const Home: React.FC<HomeProps> = ({ onNavigate }) => {
               {/* Integrated Sub-headline & Micro Description */}
               <div className="mt-5 md:mt-8">
                 <div className="space-y-1">
-                  <h3 className="text-[#D4AF37] text-xl sm:text-3xl md:text-5xl lg:text-6xl font-black tracking-tight drop-shadow-md leading-tight">
+                  <h3 className="text-[#D4AF37] text-lg sm:text-3xl md:text-5xl lg:text-6xl font-black tracking-tight drop-shadow-md leading-tight">
                     ছাত্র ও চাকুরিজীবীদের জন্য
                   </h3>
-                  <h3 className="text-white text-xl sm:text-3xl md:text-5xl lg:text-6xl font-black tracking-tight drop-shadow-md leading-tight">
+                  <h3 className="text-white text-lg sm:text-3xl md:text-5xl lg:text-6xl font-black tracking-tight drop-shadow-md leading-tight">
                     আধুনিক সুপার হোস্টেল সল্যুশন
                   </h3>
                 </div>
@@ -69,7 +69,7 @@ const Home: React.FC<HomeProps> = ({ onNavigate }) => {
             </div>
 
             {/* Unique Action Button - "আমাদের ব্রাঞ্চসমূহ" */}
-            <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-4 pt-6 md:pt-8 pl-5 md:pl-8">
+            <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-4 pt-6 md:pt-8 pl-4 md:pl-8">
               <div className="relative animate-float mr-auto sm:mr-0">
                 <div className="absolute -inset-2 bg-gradient-to-r from-[#D4AF37] to-[#D4AF37]/0 rounded-full blur-xl opacity-30 animate-pulse"></div>
                 
