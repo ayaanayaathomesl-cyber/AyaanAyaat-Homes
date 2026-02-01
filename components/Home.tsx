@@ -141,17 +141,16 @@ const Home: React.FC<HomeProps> = ({ onNavigate }) => {
                 alt="Queens Point"
               />
               <div className="absolute inset-0 bg-gradient-to-t from-[#002147] via-[#002147]/20 to-transparent"></div>
-              <div className="absolute bottom-0 left-0 right-0 p-10 md:p-14 space-y-6">
+              
+              {/* Changed: Padding reduced slightly on mobile */}
+              <div className="absolute bottom-0 left-0 right-0 p-6 md:p-14 space-y-6">
                 <h3 className="text-4xl md:text-6xl font-serif text-white leading-none">Queens Point</h3>
                 <p className="text-white/70 text-base md:text-lg max-w-sm">নিরাপত্তা ও হাইজিন বজায় রেখে নারীদের জন্য আধুনিক ও রুচিশীল জীবনযাত্রার নিশ্চয়তা।</p>
-                <div className="flex items-center gap-4">
-                  <button 
-                    className="bg-[#D4AF37] text-[#002147] px-8 py-4 text-xs font-bold uppercase rounded-full hover:bg-white transition-all shadow-lg active:scale-95"
-                  >
-                    বিস্তারিত দেখুন
-                  </button>
-
-                  <div className="flex gap-3">
+                
+                {/* Changed: justify-between, button on right, social on left */}
+                <div className="flex items-center justify-between gap-4 w-full">
+                  
+                  <div className="flex gap-2 md:gap-3">
                     <a 
                       href="https://www.facebook.com/share/1AZyBMJreP/" 
                       target="_blank" 
@@ -170,14 +169,23 @@ const Home: React.FC<HomeProps> = ({ onNavigate }) => {
                       target="_blank" 
                       rel="noopener noreferrer"
                       onClick={(e) => e.stopPropagation()}
-                      className="w-12 h-12 md:w-14 md:h-14 bg-[#EA4335] text-white rounded-2xl flex items-center justify-center hover:scale-110 transition-all shadow-xl active:scale-95 group"
+                      className="w-12 h-12 md:w-14 md:h-14 bg-white rounded-2xl flex items-center justify-center hover:scale-110 transition-all shadow-xl active:scale-95 group"
                       title="Google Maps Location"
                     >
-                      <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="currentColor" viewBox="0 0 16 16">
-                        <path d="M8 16s6-5.686 6-10A6 6 0 0 0 2 6c0 4.314 6 10 6 10zm0-7a3 3 0 1 1 0-6 3 3 0 0 1 0 6z"/>
-                      </svg>
+                      <img 
+                        src="https://upload.wikimedia.org/wikipedia/commons/a/aa/Google_Maps_icon_%282020%29.svg" 
+                        alt="Google Maps" 
+                        className="w-6 h-6 md:w-8 md:h-8"
+                      />
                     </a>
                   </div>
+
+                  {/* Changed: Added whitespace-nowrap and moved to end */}
+                  <button 
+                    className="bg-[#D4AF37] text-[#002147] px-6 py-4 md:px-8 text-xs font-bold uppercase rounded-full hover:bg-white transition-all shadow-lg active:scale-95 whitespace-nowrap shrink-0"
+                  >
+                    বিস্তারিত দেখুন
+                  </button>
                 </div>
               </div>
             </div>
@@ -202,17 +210,16 @@ const Home: React.FC<HomeProps> = ({ onNavigate }) => {
                 alt="Bachelor Point"
               />
               <div className="absolute inset-0 bg-gradient-to-t from-[#002147] via-[#002147]/20 to-transparent"></div>
-              <div className="absolute bottom-0 left-0 right-0 p-10 md:p-14 space-y-6">
+              
+              {/* Changed: Padding reduced slightly on mobile */}
+              <div className="absolute bottom-0 left-0 right-0 p-6 md:p-14 space-y-6">
                 <h3 className="text-4xl md:text-6xl font-serif text-white leading-none">Bachelor Point</h3>
                 <p className="text-white/70 text-base md:text-lg max-sm">ব্যাচেলর ও ছাত্রদের জন্য ঢাকার প্রাণকেন্দ্রে প্রিমিয়াম সুযোগ-সুবিধা সম্বলিত স্মার্ট আবাসন সল্যুশন।</p>
-                <div className="flex items-center gap-4">
-                  <button 
-                    className="bg-[#D4AF37] text-[#002147] px-8 py-4 text-xs font-bold uppercase rounded-full hover:bg-white transition-all shadow-lg active:scale-95"
-                  >
-                    বিস্তারিত দেখুন
-                  </button>
-
-                  <div className="flex gap-3">
+                
+                {/* Changed: justify-between, button on right, social on left */}
+                <div className="flex items-center justify-between gap-4 w-full">
+                  
+                  <div className="flex gap-2 md:gap-3">
                     <a 
                       href="https://www.facebook.com/share/1CwaVA5WXK/" 
                       target="_blank" 
@@ -231,14 +238,23 @@ const Home: React.FC<HomeProps> = ({ onNavigate }) => {
                       target="_blank" 
                       rel="noopener noreferrer"
                       onClick={(e) => e.stopPropagation()}
-                      className="w-12 h-12 md:w-14 md:h-14 bg-[#EA4335] text-white rounded-2xl flex items-center justify-center hover:scale-110 transition-all shadow-xl active:scale-95 group"
+                      className="w-12 h-12 md:w-14 md:h-14 bg-white rounded-2xl flex items-center justify-center hover:scale-110 transition-all shadow-xl active:scale-95 group"
                       title="Google Maps Location"
                     >
-                      <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="currentColor" viewBox="0 0 16 16">
-                        <path d="M8 16s6-5.686 6-10A6 6 0 0 0 2 6c0 4.314 6 10 6 10zm0-7a3 3 0 1 1 0-6 3 3 0 0 1 0 6z"/>
-                      </svg>
+                      <img 
+                        src="https://upload.wikimedia.org/wikipedia/commons/a/aa/Google_Maps_icon_%282020%29.svg" 
+                        alt="Google Maps" 
+                        className="w-6 h-6 md:w-8 md:h-8"
+                      />
                     </a>
                   </div>
+
+                  {/* Changed: Added whitespace-nowrap and moved to end */}
+                  <button 
+                    className="bg-[#D4AF37] text-[#002147] px-6 py-4 md:px-8 text-xs font-bold uppercase rounded-full hover:bg-white transition-all shadow-lg active:scale-95 whitespace-nowrap shrink-0"
+                  >
+                    বিস্তারিত দেখুন
+                  </button>
                 </div>
               </div>
             </div>
