@@ -406,7 +406,7 @@ const FemaleHostel: React.FC<{ onNavigate: (view: ViewState) => void }> = ({ onN
         <div className="max-w-7xl mx-auto">
           <div className="text-center mb-12 md:mb-20">
              <span className="text-[#D4AF37] text-[10px] md:text-xs font-bold uppercase tracking-[0.4em] block mb-2">ALL FEATURES</span>
-             <h2 className="text-3xl md:text-5xl font-serif font-bold">সব সুযোগ-সুবিধা এক নটরে</h2>
+             <h2 className="text-3xl md:text-5xl font-serif font-bold">সব সুযোগ-সুবিধা এক নজরে</h2>
              <div className="w-16 h-1 bg-[#D4AF37] mx-auto mt-4"></div>
           </div>
 

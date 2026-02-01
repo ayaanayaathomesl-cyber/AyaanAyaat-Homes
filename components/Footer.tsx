@@ -62,19 +62,27 @@ const Footer: React.FC<FooterProps> = ({ onNavigate }) => {
               href={queensSocials.fb} 
               target="_blank" 
               rel="noopener noreferrer" 
-              className="w-14 h-14 border-2 border-white/20 flex items-center justify-center rounded-full hover:bg-[#1877F2] hover:border-[#1877F2] text-white transition-all duration-300 group shadow-lg"
+              className="w-14 h-14 rounded-full flex items-center justify-center transition-transform duration-300 hover:scale-110 shadow-lg bg-white"
               title="Queens Point Facebook"
             >
-              <span className="font-black text-xs group-hover:scale-110 transition-transform">FB</span>
+              <img 
+                src="https://upload.wikimedia.org/wikipedia/commons/b/b8/2021_Facebook_icon.svg" 
+                alt="Facebook" 
+                className="w-full h-full rounded-full"
+              />
             </a>
             <a 
               href={queensSocials.wa} 
               target="_blank" 
               rel="noopener noreferrer" 
-              className="w-14 h-14 border-2 border-white/20 flex items-center justify-center rounded-full hover:bg-[#25D366] hover:border-[#25D366] text-white transition-all duration-300 group shadow-lg"
+              className="w-14 h-14 rounded-full flex items-center justify-center transition-transform duration-300 hover:scale-110 shadow-lg bg-white"
               title="Queens Point WhatsApp"
             >
-              <span className="font-black text-xs group-hover:scale-110 transition-transform">WA</span>
+              <img 
+                 src="https://upload.wikimedia.org/wikipedia/commons/6/6b/WhatsApp.svg" 
+                 alt="WhatsApp" 
+                 className="w-full h-full"
+              />
             </a>
           </div>
           <p className="mt-6 text-[10px] text-white/40 uppercase tracking-widest font-bold">For Female Branch</p>
@@ -88,19 +96,27 @@ const Footer: React.FC<FooterProps> = ({ onNavigate }) => {
               href={bachelorSocials.fb} 
               target="_blank" 
               rel="noopener noreferrer" 
-              className="w-14 h-14 border-2 border-white/20 flex items-center justify-center rounded-full hover:bg-[#1877F2] hover:border-[#1877F2] text-white transition-all duration-300 group shadow-lg"
+              className="w-14 h-14 rounded-full flex items-center justify-center transition-transform duration-300 hover:scale-110 shadow-lg bg-white"
               title="Bachelor Point Facebook"
             >
-              <span className="font-black text-xs group-hover:scale-110 transition-transform">FB</span>
+              <img 
+                src="https://upload.wikimedia.org/wikipedia/commons/b/b8/2021_Facebook_icon.svg" 
+                alt="Facebook" 
+                className="w-full h-full rounded-full"
+              />
             </a>
             <a 
               href={bachelorSocials.wa} 
               target="_blank" 
               rel="noopener noreferrer" 
-              className="w-14 h-14 border-2 border-white/20 flex items-center justify-center rounded-full hover:bg-[#25D366] hover:border-[#25D366] text-white transition-all duration-300 group shadow-lg"
+              className="w-14 h-14 rounded-full flex items-center justify-center transition-transform duration-300 hover:scale-110 shadow-lg bg-white"
               title="Bachelor Point WhatsApp"
             >
-              <span className="font-black text-xs group-hover:scale-110 transition-transform">WA</span>
+              <img 
+                 src="https://upload.wikimedia.org/wikipedia/commons/6/6b/WhatsApp.svg" 
+                 alt="WhatsApp" 
+                 className="w-full h-full"
+              />
             </a>
           </div>
           <p className="mt-6 text-[10px] text-white/40 uppercase tracking-widest font-bold">For Male Branch</p>

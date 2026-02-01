@@ -47,7 +47,7 @@ const Home: React.FC<HomeProps> = ({ onNavigate }) => {
                 <h1 className="text-4xl sm:text-6xl md:text-8xl lg:text-9xl font-bold text-white leading-none tracking-tight">
                   AyaanAyaat
                 </h1>
-                <h2 className="text-2xl sm:text-4xl md:text-6xl lg:text-7xl font-serif italic text-white/90 font-light -mt-1 md:-mt-4">
+                <h2 className="text-2xl sm:text-4xl md:text-6xl lg:text-7xl font-light text-white/90 -mt-1 md:-mt-4">
                   Homes
                 </h2>
               </div>
@@ -56,10 +56,10 @@ const Home: React.FC<HomeProps> = ({ onNavigate }) => {
               <div className="mt-5 md:mt-8">
                 <div className="space-y-1">
                   <h3 className="text-[#D4AF37] text-lg sm:text-3xl md:text-5xl lg:text-6xl font-black tracking-tight drop-shadow-md leading-tight">
-                    ছাত্র ও চাকুরিজীবীদের জন্য
+                    ছাত্র ছাত্রী এবং সকল পেশার মানুষের জন্য
                   </h3>
                   <h3 className="text-white text-lg sm:text-3xl md:text-5xl lg:text-6xl font-black tracking-tight drop-shadow-md leading-tight">
-                    আধুনিক সুপার হোস্টেল সল্যুশন
+                    আধুনিক হোষ্টেল সল্যুশন
                   </h3>
                 </div>
                 <p className="text-white/60 text-[11px] md:text-[15px] font-medium tracking-wide mt-3 md:mt-2 whitespace-normal md:whitespace-nowrap overflow-visible drop-shadow-sm leading-relaxed max-w-xs md:max-w-none">
@@ -97,7 +97,7 @@ const Home: React.FC<HomeProps> = ({ onNavigate }) => {
       <section className="py-20 md:py-24 bg-white px-6">
         <div className="max-w-4xl mx-auto text-center space-y-8">
            <span className="text-[#D4AF37] text-xs font-bold uppercase tracking-[0.5em] block">Our Philosophy</span>
-           <h2 className="text-3xl md:text-5xl font-serif text-[#002147] leading-tight italic">"আমরা বিলাসিতা নয়, সাধ্যের মধ্যে আধুনিক জীবনযাত্রার নিশ্চয়তা দিই।"</h2>
+           <h2 className="text-3xl md:text-5xl font-bold text-[#002147] leading-tight">"আমরা বিলাসিতা নয়, সাধ্যের মধ্যে আধুনিক জীবনযাত্রার নিশ্চয়তা দিই।"</h2>
            <p className="text-lg text-gray-500 font-light leading-relaxed">
              ঢাকার ব্যস্ত জীবনে আপনার থাকার জায়গাটি হওয়া চাই একটি শান্তির নীড়। AyaanAyaat Homes-এর প্রতিটি প্রজেক্ট ডিজাইন করা হয়েছে আপনার কাজের উদ্দীপনা এবং ব্যক্তিগত প্রশান্তির কথা মাথায় রেখে।
            </p>

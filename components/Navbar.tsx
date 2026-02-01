@@ -48,7 +48,7 @@ const Navbar: React.FC<NavbarProps> = ({ currentView, onNavigate }) => {
           </div>
           <div className="text-left">
             <h2 className="text-lg font-bold text-white leading-none">
-              AyaanAyaat <span className="text-[#D4AF37]">Homes</span>
+              AyaanAyaat Homes
             </h2>
             <p className="text-[8px] uppercase tracking-[0.2em] text-white/60 font-medium">The Mother Brand</p>
           </div>
