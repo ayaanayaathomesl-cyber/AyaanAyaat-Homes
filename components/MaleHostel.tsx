@@ -121,7 +121,7 @@ const MaleHostel: React.FC<MaleHostelProps> = ({ onNavigate }) => {
           alt="Bachelor Point Interior"
         />
         <div className="absolute inset-0 bg-gradient-to-b from-[#002147]/60 via-transparent to-[#002147]"></div>
-        <div className="relative z-10 px-6 max-w-4xl -translate-y-10">
+        <div className="relative z-10 px-4 md:px-6 max-w-4xl -translate-y-10">
           <span className="text-[#D4AF37] uppercase tracking-[0.4em] text-[10px] md:text-sm font-bold block mb-4 animate-fade-in-up">Managed by AyaanAyaat Homes</span>
           <h1 className="text-4xl md:text-6xl lg:text-8xl font-serif text-white mb-4 md:mb-6 leading-tight drop-shadow-2xl">Bachelor Point</h1>
           <p className="text-white/90 text-sm md:text-xl max-w-2xl mx-auto leading-relaxed font-light mb-8">
@@ -129,12 +129,12 @@ const MaleHostel: React.FC<MaleHostelProps> = ({ onNavigate }) => {
           </p>
 
           <div className="flex flex-col items-center gap-4 animate-fade-in-up">
-            <div className="flex flex-wrap items-center justify-center gap-3 md:gap-5">
+            <div className="flex items-center justify-center gap-2 md:gap-5 w-full md:w-auto">
               <a 
                 href={facebookLink} 
                 target="_blank" 
                 rel="noopener noreferrer"
-                className="group animate-facebook shimmer-btn flex items-center gap-2 md:gap-3 bg-[#1877F2] text-white px-4 py-2.5 md:px-7 md:py-4 rounded-xl md:rounded-2xl text-[9px] md:text-xs font-black uppercase tracking-widest hover:brightness-110 transition-all shadow-[0_10px_30px_-5px_rgba(24,119,242,0.5)] active:scale-95"
+                className="group animate-facebook shimmer-btn flex flex-1 md:flex-none items-center justify-center gap-2 md:gap-3 bg-[#1877F2] text-white px-2 py-3 md:px-7 md:py-4 rounded-xl md:rounded-2xl text-[10px] md:text-xs font-black uppercase tracking-widest hover:brightness-110 transition-all shadow-[0_10px_30px_-5px_rgba(24,119,242,0.5)] active:scale-95"
               >
                 Facebook
               </a>
@@ -143,7 +143,7 @@ const MaleHostel: React.FC<MaleHostelProps> = ({ onNavigate }) => {
                 href={`https://wa.me/88${branchPhoneRaw}?text=${waMessage}`}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="group animate-whatsapp animate-float-mini shimmer-btn flex items-center gap-2 md:gap-3 bg-[#25D366] text-white px-4 py-2.5 md:px-7 md:py-4 rounded-xl md:rounded-2xl text-[9px] md:text-xs font-black uppercase tracking-widest hover:brightness-110 transition-all shadow-[0_15px_35px_-10px_rgba(37,211,102,0.6)] active:scale-95"
+                className="group animate-whatsapp animate-float-mini shimmer-btn flex flex-1 md:flex-none items-center justify-center gap-2 md:gap-3 bg-[#25D366] text-white px-2 py-3 md:px-7 md:py-4 rounded-xl md:rounded-2xl text-[10px] md:text-xs font-black uppercase tracking-widest hover:brightness-110 transition-all shadow-[0_15px_35px_-10px_rgba(37,211,102,0.6)] active:scale-95"
               >
                 <svg xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 16 16" className="w-4 h-4 md:w-5 md:h-5 group-hover:scale-110 transition-transform">
                   <path d="M13.601 2.326A7.854 7.854 0 0 0 7.994 0C3.627 0 .068 3.558.064 7.926c0 1.399.366 2.76 1.061 3.978l-1.127 4.121 4.212-1.105a7.959 7.959 0 0 0 3.785.959h.004c4.367 0 7.927-3.558 7.931-7.927a7.863 7.863 0 0 0-2.327-5.621zM7.994 14.521a6.573 6.573 0 0 1-3.356-.92l-.24-.144-2.494.654.666-2.433-.156-.251a6.56 6.56 0 0 1-1.007-3.501c.004-3.623 2.961-6.58 6.586-6.58a6.547 6.547 0 0 1 4.646 1.929 6.547 6.547 0 0 1 1.929 4.646c-.004 3.624-2.963 6.58-6.585 6.58z"/>
@@ -249,6 +249,93 @@ const MaleHostel: React.FC<MaleHostelProps> = ({ onNavigate }) => {
                 </div>
               );
             })}
+          </div>
+        </div>
+      </section>
+
+      {/* Gallery Section */}
+      <section id="gallery" className="py-16 md:py-24 bg-white px-6">
+        <div className="max-w-7xl mx-auto">
+          <div className="text-center mb-10 md:mb-16">
+            <span className="text-[#D4AF37] text-[10px] md:text-xs font-bold uppercase tracking-[0.4em] block mb-2">GALLERY</span>
+            <h2 className="text-2xl md:text-5xl font-serif text-[#002147] font-bold">গ্যালারি</h2>
+            <p className="text-gray-500 text-[10px] md:text-sm mt-3">আমাদের আধুনিক ও আরামদায়ক পরিবেশের কিছু মুহূর্ত</p>
+            <div className="w-12 md:w-16 h-1 bg-[#D4AF37] mx-auto mt-4"></div>
+          </div>
+
+          <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3 md:gap-4">
+            {maleGalleryImages.map((src, idx) => (
+              <div 
+                key={idx} 
+                className="group relative aspect-[4/5] md:aspect-square overflow-hidden rounded-xl bg-gray-100 shadow-md cursor-zoom-in"
+                onClick={() => setSelectedImage(src)}
+              >
+                <img 
+                  src={src} 
+                  alt={`Gallery ${idx + 1}`} 
+                  className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110"
+                />
+                <div className="absolute inset-0 bg-[#002147]/20 opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none flex items-center justify-center">
+                   <div className="w-8 h-8 md:w-10 md:h-10 border border-white/50 rounded-full flex items-center justify-center text-white bg-white/10 backdrop-blur-sm">
+                      <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={2.5} stroke="currentColor" className="w-5 h-5">
+                         <path strokeLinecap="round" strokeLinejoin="round" d="M21 21l-5.197-5.197m0 0A7.5 7.5 0 105.196 5.196a7.5 7.5 0 0010.607 10.607z" />
+                      </svg>
+                   </div>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* Weekly Menu Section */}
+      <section className="py-16 md:py-24 bg-[#FAFAFA] px-2 md:px-6">
+        <div className="max-w-6xl mx-auto bg-white shadow-2xl rounded-sm border border-gray-200 overflow-hidden relative">
+          <div className="p-4 md:p-10 text-center relative z-10">
+             <div className="flex flex-col md:flex-row items-center justify-center gap-4 mb-4">
+                <div className="w-16 h-16 md:w-20 md:h-20 border-2 border-[#D4AF37] rounded-full p-1 bg-white shadow-sm overflow-hidden">
+                   <img src="https://lh3.googleusercontent.com/d/1cjIYSZDiCig4kN1FbLxGIoEUTcdcCU1C" className="w-full h-full object-cover rounded-full" alt="Bachelor Point Logo" />
+                </div>
+                <div className="text-center">
+                   <h2 className="text-3xl md:text-6xl font-black text-[#002147] tracking-tighter">ব্যাচেলর পয়েন্ট</h2>
+                   <p className="text-lg md:text-2xl font-bold text-gray-600 mt-1 uppercase tracking-widest">সাপ্তাহিক খাবারের তালিকা</p>
+                </div>
+             </div>
+          </div>
+
+          <div className="overflow-x-auto relative z-10">
+            <table className="w-full border-collapse text-center">
+              <thead>
+                <tr className="bg-[#E3F2FD] border-y-2 border-gray-300">
+                  <th className="py-4 md:py-6 px-2 md:px-4 text-sm md:text-xl font-black text-[#002147] border-r-2 border-gray-300">দিন</th>
+                  <th className="py-4 md:py-6 px-2 md:px-4 text-sm md:text-xl font-black text-[#002147] border-r-2 border-gray-300">
+                    সকালের নাস্তা
+                  </th>
+                  <th className="py-4 md:py-6 px-2 md:px-4 text-sm md:text-xl font-black text-[#002147] border-r-2 border-gray-300">
+                    দুপুরের খাবার
+                  </th>
+                  <th className="py-4 md:py-6 px-2 md:px-4 text-sm md:text-xl font-black text-[#002147]">
+                    রাতের খাবার
+                  </th>
+                </tr>
+              </thead>
+              <tbody>
+                {maleWeeklyMenu.map((item, idx) => (
+                  <tr key={idx} className="border-b-2 border-gray-200 hover:bg-gray-50 transition-colors">
+                    <td className="py-5 px-2 md:px-6 font-black text-[#002147] text-sm md:text-lg border-r-2 border-gray-300 bg-[#FDFDFD]">{item.day}</td>
+                    <td className="py-5 px-2 md:px-6 font-bold text-gray-700 text-[11px] md:text-base border-r-2 border-gray-300">{item.breakfast}</td>
+                    <td className="py-5 px-2 md:px-6 font-bold text-gray-700 text-[11px] md:text-base border-r-2 border-gray-300">{item.lunch}</td>
+                    <td className="py-5 px-2 md:px-6 font-bold text-gray-700 text-[11px] md:text-base">{item.dinner}</td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+          
+          <div className="p-4 md:p-8 text-center bg-gray-50 border-t-2 border-gray-200 relative z-10">
+               <p className="text-xs md:text-sm font-bold text-gray-500">
+                  * বাজার দরের উপর ভিত্তি করে কর্তৃপক্ষ যে কোনো সময় মেন্যু পরিবর্তন করতে পারে।
+               </p>
           </div>
         </div>
       </section>

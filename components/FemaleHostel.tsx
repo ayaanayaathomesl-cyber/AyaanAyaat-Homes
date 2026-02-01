@@ -117,7 +117,7 @@ const FemaleHostel: React.FC<{ onNavigate: (view: ViewState) => void }> = ({ onN
           alt="Queens Point Interior"
         />
         <div className="absolute inset-0 bg-gradient-to-b from-[#002147]/70 via-transparent to-[#002147]"></div>
-        <div className="relative z-10 px-6 max-w-4xl -translate-y-6">
+        <div className="relative z-10 px-4 md:px-6 max-w-4xl -translate-y-6">
           <span className="text-[#D4AF37] uppercase tracking-[0.4em] text-[10px] md:text-sm font-bold block mb-4 animate-fade-in-up">FEEL THE ROYALTY WITH SAFETY</span>
           <h1 className="text-5xl md:text-7xl lg:text-9xl font-serif text-white mb-4 md:mb-6 leading-tight drop-shadow-2xl">Queens Point</h1>
           <p className="text-white/90 text-[13px] md:text-xl max-w-2xl mx-auto leading-relaxed font-light mb-10 md:mb-12">
@@ -125,12 +125,12 @@ const FemaleHostel: React.FC<{ onNavigate: (view: ViewState) => void }> = ({ onN
           </p>
 
           <div className="flex flex-col items-center gap-5 md:gap-6 animate-fade-in-up">
-            <div className="flex flex-wrap items-center justify-center gap-3 md:gap-5">
+            <div className="flex items-center justify-center gap-2 md:gap-5 w-full md:w-auto">
               <a 
                 href="https://www.facebook.com/share/1AZyBMJreP/" 
                 target="_blank" 
                 rel="noopener noreferrer"
-                className="group animate-facebook bg-[#1877F2] text-white px-5 py-3 md:px-8 md:py-4 rounded-xl md:rounded-2xl text-[10px] md:text-xs font-black uppercase tracking-widest hover:brightness-110 transition-all shadow-[0_10px_30px_rgba(24,119,242,0.4)] active:scale-95 flex items-center gap-2"
+                className="group animate-facebook bg-[#1877F2] text-white px-2 py-3 md:px-8 md:py-4 rounded-xl md:rounded-2xl text-[10px] md:text-xs font-black uppercase tracking-widest hover:brightness-110 transition-all shadow-[0_10px_30px_rgba(24,119,242,0.4)] active:scale-95 flex flex-1 md:flex-none items-center justify-center gap-2"
               >
                 <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" fill="currentColor" viewBox="0 0 16 16">
                   <path d="M16 8.049c0-4.446-3.582-8.05-8-8.05C3.58 0-.002 3.603-.002 8.05c0 4.017 2.926 7.347 6.75 7.951v-5.625h-2.03V8.05H6.75V6.275c0-2.017 1.195-3.131 3.022-3.131.876 0 1.791.157 1.791.157v1.98h-1.009c-.993 0-1.303.621-1.303 1.258v1.51h2.218l-.354 2.326H9.25V16c3.824-.604 6.75-3.934 6.75-7.951z"/>
@@ -141,7 +141,7 @@ const FemaleHostel: React.FC<{ onNavigate: (view: ViewState) => void }> = ({ onN
                 href={`https://wa.me/88${branchWaNumber}?text=${waBranchMessage}`}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="group animate-whatsapp bg-[#25D366] text-white px-5 py-3 md:px-8 md:py-4 rounded-xl md:rounded-2xl text-[10px] md:text-xs font-black uppercase tracking-widest hover:brightness-110 transition-all shadow-[0_15px_35px_-10px_rgba(37,211,102,0.5)] active:scale-95 flex items-center gap-2"
+                className="group animate-whatsapp bg-[#25D366] text-white px-2 py-3 md:px-8 md:py-4 rounded-xl md:rounded-2xl text-[10px] md:text-xs font-black uppercase tracking-widest hover:brightness-110 transition-all shadow-[0_15px_35px_-10px_rgba(37,211,102,0.5)] active:scale-95 flex flex-1 md:flex-none items-center justify-center gap-2"
               >
                 <svg xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 16 16" className="w-4 h-4 md:w-5 md:h-5">
                   <path d="M13.601 2.326A7.854 7.854 0 0 0 7.994 0C3.627 0 .068 3.558.064 7.926c0 1.399.366 2.76 1.061 3.978l-1.127 4.121 4.212-1.105a7.959 7.959 0 0 0 3.785.959h.004c4.367 0 7.927-3.558 7.931-7.927a7.863 7.863 0 0 0-2.327-5.621zM7.994 14.521a6.573 6.573 0 0 1-3.356-.92l-.24-.144-2.494.654.666-2.433-.156-.251a6.56 6.56 0 0 1-1.007-3.501c.004-3.623 2.961-6.58 6.586-6.58a6.547 6.547 0 0 1 4.646 1.929 6.547 6.547 0 0 1 1.929 4.646c-.004 3.624-2.963 6.58-6.585 6.58z"/>
