@@ -15,7 +15,10 @@ export type ViewState =
   | { type: 'home' }
   | { type: 'male-hostel' }
   | { type: 'female-hostel' }
-  | { type: 'contact' };
+  | { type: 'contact' }
+  | { type: 'privacy' }
+  | { type: 'terms' }
+  | { type: 'cookies' };
 
 export interface Package {
   name: string;
