@@ -29,7 +29,7 @@ const ProductGrid: React.FC<ProductGridProps> = ({ onProductClick }) => {
         
         {/* Header Area */}
         <div className="flex flex-col items-center text-center mb-24 space-y-8">
-          <h2 className="text-4xl md:text-6xl font-serif text-[#2C2A26]">The Collection</h2>
+          <h2 className="text-4xl md:text-6xl text-[#2C2A26]">The Collection</h2>
           
           {/* Minimal Filter */}
           <div className="flex flex-wrap justify-center gap-8 pt-4 border-t border-[#D6D1C7]/50 w-full max-w-2xl">

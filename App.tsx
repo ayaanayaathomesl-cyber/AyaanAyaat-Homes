@@ -5,9 +5,11 @@
 
 import React, { useState, useEffect } from 'react';
 import Navbar from './components/Navbar';
+import MobileNav from './components/MobileNav';
 import Home from './components/Home';
 import MaleHostel from './components/MaleHostel';
 import FemaleHostel from './components/FemaleHostel';
+import Admin from './components/Admin';
 import Footer from './components/Footer';
 import Assistant from './components/Assistant';
 import { PrivacyPolicy } from './components/PrivacyPolicy';
@@ -29,6 +31,8 @@ function App() {
       return { type: 'terms' };
     } else if (path === '/cookies') {
       return { type: 'cookies' };
+    } else if (path === '/admin') {
+      return { type: 'admin' };
     }
     return { type: 'home' };
   });
@@ -53,6 +57,8 @@ function App() {
           setView({ type: 'terms' });
         } else if (path === '/cookies') {
           setView({ type: 'cookies' });
+        } else if (path === '/admin') {
+          setView({ type: 'admin' });
         } else {
           setView({ type: 'home' });
         }
@@ -75,6 +81,7 @@ function App() {
       if (target.type === 'privacy') newPath = '/privacy';
       if (target.type === 'terms') newPath = '/terms';
       if (target.type === 'cookies') newPath = '/cookies';
+      if (target.type === 'admin') newPath = '/admin';
       window.history.pushState({ type: target.type }, '', newPath);
     }
   };
@@ -98,8 +105,9 @@ function App() {
   };
 
   return (
-    <div className="min-h-screen bg-[#fcfcfc] font-sans selection:bg-[#D4AF37] selection:text-white flex flex-col relative overflow-x-hidden">
-      <Navbar currentView={view} onNavigate={handleNavClick} />
+    <div className="min-h-screen bg-[#fcfcfc] font-sans selection:bg-[#D4AF37] selection:text-white flex flex-col relative overflow-x-hidden pb-12 lg:pb-0">
+      {view.type !== 'admin' && <Navbar currentView={view} onNavigate={handleNavClick} />}
+      {view.type !== 'admin' && <MobileNav currentView={view} onNavigate={handleNavClick} />}
       
       <main className="flex-grow flex flex-col relative">
         <AnimatePresence mode="wait" onExitComplete={() => window.scrollTo({ top: 0, behavior: 'smooth' })}>
@@ -175,11 +183,23 @@ function App() {
               <CookiePolicy />
             </motion.div>
           )}
+          {view.type === 'admin' && (
+            <motion.div
+              key="admin"
+              variants={pageVariants}
+              initial="initial"
+              animate="animate"
+              exit="exit"
+              className="w-full flex-grow flex flex-col"
+            >
+              <Admin onNavigate={handleNavClick} />
+            </motion.div>
+          )}
         </AnimatePresence>
       </main>
 
-      <Footer onNavigate={handleNavClick} />
-      <Assistant currentView={view} />
+      {view.type !== 'admin' && <Footer onNavigate={handleNavClick} />}
+      {view.type !== 'admin' && <Assistant currentView={view} />}
     </div>
   );
 }

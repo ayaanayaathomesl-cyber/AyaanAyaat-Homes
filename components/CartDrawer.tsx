@@ -36,7 +36,7 @@ const CartDrawer: React.FC<CartDrawerProps> = ({ isOpen, onClose, items, onRemov
       >
         {/* Header */}
         <div className="flex items-center justify-between p-6 border-b border-[#D6D1C7]">
-          <h2 className="text-xl font-serif text-[#2C2A26]">Your Cart ({items.length})</h2>
+          <h2 className="text-xl text-[#2C2A26]">Your Cart ({items.length})</h2>
           <button 
             onClick={onClose} 
             className="text-[#A8A29E] hover:text-[#2C2A26] transition-colors"
@@ -65,7 +65,7 @@ const CartDrawer: React.FC<CartDrawerProps> = ({ isOpen, onClose, items, onRemov
                 <div className="flex-1 flex flex-col justify-between">
                   <div>
                     <div className="flex justify-between items-start">
-                        <h3 className="font-serif text-[#2C2A26]">{item.name}</h3>
+                        <h3 className="text-[#2C2A26]">{item.name}</h3>
                         <span className="text-sm font-light text-[#2C2A26]">${item.price}</span>
                     </div>
                     <p className="text-xs text-[#A8A29E] uppercase tracking-widest mt-1">{item.category}</p>
@@ -86,7 +86,7 @@ const CartDrawer: React.FC<CartDrawerProps> = ({ isOpen, onClose, items, onRemov
         <div className="p-6 border-t border-[#D6D1C7] bg-[#EBE7DE]/30">
           <div className="flex justify-between items-center mb-6">
             <span className="text-sm font-medium uppercase tracking-widest text-[#5D5A53]">Subtotal</span>
-            <span className="text-xl font-serif text-[#2C2A26]">${total}</span>
+            <span className="text-xl text-[#2C2A26]">${total}</span>
           </div>
           <p className="text-xs text-[#A8A29E] mb-6 text-center">Shipping and taxes calculated at checkout.</p>
           <button 

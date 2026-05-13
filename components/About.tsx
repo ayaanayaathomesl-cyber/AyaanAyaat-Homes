@@ -13,7 +13,7 @@ const About: React.FC = () => {
       {/* Introduction / Story */}
       <div className="py-24 px-6 md:px-12 max-w-[1800px] mx-auto flex flex-col md:flex-row items-start gap-16 md:gap-32">
         <div className="md:w-1/3">
-          <h2 className="text-4xl md:text-6xl font-serif text-[#2C2A26] leading-tight">
+          <h2 className="text-4xl md:text-6xl text-[#2C2A26] leading-tight">
             Born from the earth, <br/> built for the mind.
           </h2>
         </div>
@@ -46,7 +46,7 @@ const About: React.FC = () => {
         </div>
         <div className="order-1 lg:order-2 flex flex-col justify-center p-12 lg:p-24 bg-[#D6D1C7]">
            <span className="text-xs font-bold uppercase tracking-[0.2em] text-[#5D5A53] mb-6">Materiality</span>
-           <h3 className="text-4xl md:text-5xl font-serif mb-8 text-[#2C2A26] leading-tight">
+           <h3 className="text-4xl md:text-5xl mb-8 text-[#2C2A26] leading-tight">
              Materials that age <br/> with grace.
            </h3>
            <p className="text-lg text-[#5D5A53] font-light leading-relaxed mb-12 max-w-md">
@@ -58,7 +58,7 @@ const About: React.FC = () => {
       <div className="grid grid-cols-1 lg:grid-cols-2 min-h-[80vh]">
         <div className="flex flex-col justify-center p-12 lg:p-24 bg-[#2C2A26] text-[#F5F2EB]">
            <span className="text-xs font-bold uppercase tracking-[0.2em] text-[#A8A29E] mb-6">The Ecosystem</span>
-           <h3 className="text-4xl md:text-5xl font-serif mb-8 text-[#F5F2EB] leading-tight">
+           <h3 className="text-4xl md:text-5xl mb-8 text-[#F5F2EB] leading-tight">
              Silence by default.
            </h3>
            <p className="text-lg text-[#A8A29E] font-light leading-relaxed mb-12 max-w-md">

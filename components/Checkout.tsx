@@ -35,13 +35,13 @@ const Checkout: React.FC<CheckoutProps> = ({ items, onBack }) => {
           
           {/* Left Column: Form */}
           <div>
-            <h1 className="text-3xl font-serif text-[#2C2A26] mb-4">Checkout</h1>
+            <h1 className="text-3xl text-[#2C2A26] mb-4">Checkout</h1>
             <p className="text-sm text-[#5D5A53] mb-12">This is a sample site. Purchasing is disabled.</p>
             
             <div className="space-y-12">
               {/* Section 1: Contact */}
               <div>
-                <h2 className="text-xl font-serif text-[#2C2A26] mb-6">Contact Information</h2>
+                <h2 className="text-xl text-[#2C2A26] mb-6">Contact Information</h2>
                 <div className="space-y-4">
                    <input type="email" placeholder="Email address" className="w-full bg-transparent border-b border-[#D6D1C7] py-3 text-[#2C2A26] placeholder-[#A8A29E] outline-none focus:border-[#2C2A26] transition-colors cursor-not-allowed" disabled />
                    <div className="flex items-center gap-2">
@@ -53,7 +53,7 @@ const Checkout: React.FC<CheckoutProps> = ({ items, onBack }) => {
 
               {/* Section 2: Shipping */}
               <div>
-                <h2 className="text-xl font-serif text-[#2C2A26] mb-6">Shipping Address</h2>
+                <h2 className="text-xl text-[#2C2A26] mb-6">Shipping Address</h2>
                 <div className="space-y-4">
                    <div className="grid grid-cols-2 gap-4">
                       <input type="text" placeholder="First name" className="w-full bg-transparent border-b border-[#D6D1C7] py-3 text-[#2C2A26] placeholder-[#A8A29E] outline-none focus:border-[#2C2A26] transition-colors cursor-not-allowed" disabled />
@@ -70,7 +70,7 @@ const Checkout: React.FC<CheckoutProps> = ({ items, onBack }) => {
 
                {/* Section 3: Payment (Mock) */}
               <div>
-                <h2 className="text-xl font-serif text-[#2C2A26] mb-6">Payment</h2>
+                <h2 className="text-xl text-[#2C2A26] mb-6">Payment</h2>
                 <div className="p-6 border border-[#D6D1C7] bg-white/50 space-y-4">
                    <p className="text-sm text-[#5D5A53] mb-2">All transactions are secure and encrypted.</p>
                    <input type="text" placeholder="Card number" className="w-full bg-transparent border-b border-[#D6D1C7] py-3 text-[#2C2A26] placeholder-[#A8A29E] outline-none focus:border-[#2C2A26] transition-colors cursor-not-allowed" disabled />
@@ -94,7 +94,7 @@ const Checkout: React.FC<CheckoutProps> = ({ items, onBack }) => {
 
           {/* Right Column: Summary */}
           <div className="lg:pl-12 lg:border-l border-[#D6D1C7]">
-            <h2 className="text-xl font-serif text-[#2C2A26] mb-8">Order Summary</h2>
+            <h2 className="text-xl text-[#2C2A26] mb-8">Order Summary</h2>
             
             <div className="space-y-6 mb-8">
                {items.map((item, idx) => (
@@ -104,7 +104,7 @@ const Checkout: React.FC<CheckoutProps> = ({ items, onBack }) => {
                        <span className="absolute -top-2 -right-2 w-5 h-5 bg-[#2C2A26] text-white text-[10px] flex items-center justify-center rounded-full">1</span>
                     </div>
                     <div className="flex-1">
-                       <h3 className="font-serif text-[#2C2A26] text-base">{item.name}</h3>
+                       <h3 className="text-[#2C2A26] text-base">{item.name}</h3>
                        <p className="text-xs text-[#A8A29E]">{item.category}</p>
                     </div>
                     <span className="text-sm text-[#5D5A53]">${item.price}</span>
@@ -125,10 +125,10 @@ const Checkout: React.FC<CheckoutProps> = ({ items, onBack }) => {
             
             <div className="border-t border-[#D6D1C7] mt-6 pt-6">
                <div className="flex justify-between items-center">
-                 <span className="font-serif text-xl text-[#2C2A26]">Total</span>
+                 <span className="text-xl text-[#2C2A26]">Total</span>
                  <div className="flex items-end gap-2">
                    <span className="text-xs text-[#A8A29E] mb-1">USD</span>
-                   <span className="font-serif text-2xl text-[#2C2A26]">${total}</span>
+                   <span className="text-2xl text-[#2C2A26]">${total}</span>
                  </div>
                </div>
             </div>

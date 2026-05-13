@@ -51,7 +51,7 @@ const ProductDetail: React.FC<ProductDetailProps> = ({ product, onBack, onAddToC
           {/* Right: Details */}
           <div className="flex flex-col justify-center max-w-xl">
              <span className="text-sm font-medium text-[#A8A29E] uppercase tracking-widest mb-2">{product.category}</span>
-             <h1 className="text-4xl md:text-5xl font-serif text-[#2C2A26] mb-4">{product.name}</h1>
+             <h1 className="text-4xl md:text-5xl text-[#2C2A26] mb-4">{product.name}</h1>
              <span className="text-2xl font-light text-[#2C2A26] mb-8">${product.price}</span>
              
              <p className="text-[#5D5A53] leading-relaxed font-light text-lg mb-8 border-b border-[#D6D1C7] pb-8">

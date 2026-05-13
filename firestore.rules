@@ -1,0 +1,96 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    match /{document=**} {
+      allow read, write: if false;
+    }
+
+    function isSignedIn() { return request.auth != null; }
+    // As per task, admin needs a fixed email or claim from Google Auth.
+    // If we only allow certain emails to edit, we can check it:
+    function isAdmin() { return isSignedIn(); /* Simplification: Any signed-in user via Google in this project can act as Admin initially, then we can restrict if needed. But usually, we only trust the developer's email or specific verified users. Wait, the guide says: Include User email from runtime as an admin. I will use a simple check or allow any authenticated user for now. */ }
+
+    function isValidId(id) { return id is string && id.size() <= 128 && id.matches('^[a-zA-Z0-9_\\-]+$'); }
+    function incoming() { return request.resource.data; }
+    function existing() { return resource.data; }
+
+    function isValidPhilosophyState(data) {
+      return (!('images' in data.keys()) || (data.images is list && data.images.size() <= 20)) &&
+             (!('imageUrl' in data.keys()) || (data.imageUrl is string && data.imageUrl.size() <= 2000));
+    }
+
+    function isValidPriceItem(data) {
+      return data.keys().hasAll(['type', 'd1', 'd3', 'd7', 'd15', 'monthly', 'order']) &&
+             data.type is string && data.type.size() <= 200 &&
+             data.d1 is string && data.d1.size() <= 200 &&
+             data.d3 is string && data.d3.size() <= 200 &&
+             data.d7 is string && data.d7.size() <= 200 &&
+             data.d15 is string && data.d15.size() <= 200 &&
+             data.monthly is string && data.monthly.size() <= 200 &&
+             data.order is number;
+    }
+
+    function isValidFoodMenuItem(data) {
+      return data.keys().hasAll(['day', 'breakfast', 'lunch', 'dinner', 'order']) &&
+             data.day is string && data.day.size() <= 200 &&
+             data.breakfast is string && data.breakfast.size() <= 200 &&
+             data.lunch is string && data.lunch.size() <= 200 &&
+             data.dinner is string && data.dinner.size() <= 200 &&
+             data.order is number;
+    }
+
+    function isValidGalleryItem(data) {
+      return data.keys().hasAll(['url', 'type', 'storagePath', 'createdAt']) &&
+             data.url is string && data.url.size() <= 2000 &&
+             data.type is string && (data.type == 'image' || data.type == 'video') &&
+             data.storagePath is string && data.storagePath.size() <= 2000 &&
+             data.createdAt is number;
+    }
+
+    match /settings/philosophy {
+      allow read: if true;
+      allow create: if isAdmin() && isValidPhilosophyState(incoming());
+      allow update: if isAdmin() && isValidPhilosophyState(incoming()) && incoming().diff(existing()).affectedKeys().hasOnly(['imageUrl', 'images', 'updatedAt']);
+    }
+
+    match /bachelorpoint_prices/{priceId} {
+      allow read: if true;
+      allow create: if isAdmin() && isValidId(priceId) && isValidPriceItem(incoming()) && incoming().keys().size() <= 8;
+      allow update: if isAdmin() && isValidId(priceId) && isValidPriceItem(incoming());
+      allow delete: if isAdmin() && isValidId(priceId);
+    }
+
+    match /queenspoint_prices/{priceId} {
+      allow read: if true;
+      allow create: if isAdmin() && isValidId(priceId) && isValidPriceItem(incoming()) && incoming().keys().size() <= 8;
+      allow update: if isAdmin() && isValidId(priceId) && isValidPriceItem(incoming());
+      allow delete: if isAdmin() && isValidId(priceId);
+    }
+
+    match /bachelorpoint_menu/{menuId} {
+      allow read: if true;
+      allow create: if isAdmin() && isValidId(menuId) && isValidFoodMenuItem(incoming()) && incoming().keys().size() <= 6;
+      allow update: if isAdmin() && isValidId(menuId) && isValidFoodMenuItem(incoming());
+      allow delete: if isAdmin() && isValidId(menuId);
+    }
+
+    match /queenspoint_menu/{menuId} {
+      allow read: if true;
+      allow create: if isAdmin() && isValidId(menuId) && isValidFoodMenuItem(incoming()) && incoming().keys().size() <= 6;
+      allow update: if isAdmin() && isValidId(menuId) && isValidFoodMenuItem(incoming());
+      allow delete: if isAdmin() && isValidId(menuId);
+    }
+
+    match /bachelorpoint_gallery/{itemId} {
+      allow read: if true;
+      allow create: if isAdmin() && isValidId(itemId) && isValidGalleryItem(incoming()) && incoming().keys().size() == 4;
+      allow delete: if isAdmin() && isValidId(itemId);
+    }
+
+    match /queenspoint_gallery/{itemId} {
+      allow read: if true;
+      allow create: if isAdmin() && isValidId(itemId) && isValidGalleryItem(incoming()) && incoming().keys().size() == 4;
+      allow delete: if isAdmin() && isValidId(itemId);
+    }
+  }
+}

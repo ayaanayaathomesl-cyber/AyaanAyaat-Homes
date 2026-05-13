@@ -40,7 +40,7 @@ const JournalDetail: React.FC<JournalDetailProps> = ({ article, onBack }) => {
                 <span className="text-xs font-medium uppercase tracking-widest text-[#A8A29E]">{article.date}</span>
              </div>
 
-             <h1 className="text-4xl md:text-6xl font-serif text-[#2C2A26] mb-12 leading-tight text-center">
+             <h1 className="text-4xl md:text-6xl text-[#2C2A26] mb-12 leading-tight text-center">
                {article.title}
              </h1>
 
@@ -49,7 +49,7 @@ const JournalDetail: React.FC<JournalDetailProps> = ({ article, onBack }) => {
              </div>
              
              <div className="mt-16 pt-12 border-t border-[#D6D1C7] flex justify-center">
-                 <span className="text-2xl font-serif italic text-[#2C2A26]">Aura</span>
+                 <span className="text-2xl text-[#2C2A26]">Aura</span>
              </div>
           </div>
        </div>

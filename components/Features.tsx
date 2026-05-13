@@ -20,7 +20,7 @@ const Features: React.FC = () => {
         </div>
         <div className="order-1 lg:order-2 flex flex-col justify-center p-12 lg:p-24 bg-[#EBE7DE]">
            <span className="text-xs font-bold uppercase tracking-[0.2em] text-[#A8A29E] mb-6">Our Philosophy</span>
-           <h3 className="text-4xl md:text-5xl font-serif mb-8 text-[#2C2A26] leading-tight">
+           <h3 className="text-4xl md:text-5xl mb-8 text-[#2C2A26] leading-tight">
              Materials that age <br/> with grace.
            </h3>
            <p className="text-lg text-[#5D5A53] font-light leading-relaxed mb-12 max-w-md">
@@ -34,7 +34,7 @@ const Features: React.FC = () => {
       <div className="grid grid-cols-1 lg:grid-cols-2 min-h-[80vh]">
         <div className="flex flex-col justify-center p-12 lg:p-24 bg-[#2C2A26] text-[#F5F2EB]">
            <span className="text-xs font-bold uppercase tracking-[0.2em] text-[#A8A29E] mb-6">The Ecosystem</span>
-           <h3 className="text-4xl md:text-5xl font-serif mb-8 text-[#F5F2EB] leading-tight">
+           <h3 className="text-4xl md:text-5xl mb-8 text-[#F5F2EB] leading-tight">
              Silence by default.
            </h3>
            <p className="text-lg text-[#A8A29E] font-light leading-relaxed mb-12 max-w-md">

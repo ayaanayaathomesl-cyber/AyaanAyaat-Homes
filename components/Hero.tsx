@@ -52,8 +52,8 @@ const Hero: React.FC = () => {
           <span className="block text-xs md:text-sm font-medium uppercase tracking-[0.2em] text-white/90 mb-6 backdrop-blur-sm bg-white/10 px-4 py-2 rounded-full mx-0 md:mx-auto w-fit">
             Spring Collection 2025
           </span>
-          <h1 className="text-6xl md:text-8xl lg:text-9xl font-serif font-normal text-white tracking-tight mb-8 drop-shadow-sm">
-            Quiet <span className="italic text-[#F5F2EB]">living.</span>
+          <h1 className="text-6xl md:text-8xl lg:text-9xl font-normal text-white tracking-tight mb-8 drop-shadow-sm">
+            Quiet <span className="text-[#F5F2EB]">living.</span>
           </h1>
           <p className="max-w-lg mx-0 md:mx-auto text-lg md:text-xl text-white/90 font-light leading-relaxed mb-12 text-shadow-sm">
             Technology designed to disappear into your life. <br/>

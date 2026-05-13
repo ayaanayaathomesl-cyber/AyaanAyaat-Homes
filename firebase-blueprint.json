@@ -1,0 +1,90 @@
+{
+  "entities": {
+    "PhilosophyState": {
+      "title": "Philosophy State",
+      "description": "Global state for the philosophy section.",
+      "type": "object",
+      "properties": {
+        "imageUrl": {
+          "type": "string"
+        },
+        "updatedAt": {
+          "type": "number"
+        }
+      },
+      "required": ["imageUrl"]
+    },
+    "PriceItem": {
+      "title": "Price Item",
+      "description": "A pricing table row.",
+      "type": "object",
+      "properties": {
+        "type": { "type": "string" },
+        "d1": { "type": "string" },
+        "d3": { "type": "string" },
+        "d7": { "type": "string" },
+        "d15": { "type": "string" },
+        "monthly": { "type": "string" },
+        "updatedAt": { "type": "number" },
+        "order": { "type": "number" }
+      },
+      "required": ["type", "d1", "d3", "d7", "d15", "monthly", "order"]
+    },
+    "FoodMenuItem": {
+      "title": "Food Menu Item",
+      "description": "A food menu table row.",
+      "type": "object",
+      "properties": {
+        "day": { "type": "string" },
+        "breakfast": { "type": "string" },
+        "lunch": { "type": "string" },
+        "dinner": { "type": "string" },
+        "updatedAt": { "type": "number" },
+        "order": { "type": "number" }
+      },
+      "required": ["day", "breakfast", "lunch", "dinner", "order"]
+    },
+    "GalleryItem": {
+      "title": "Gallery Item",
+      "description": "An image or video in the gallery.",
+      "type": "object",
+      "properties": {
+        "url": { "type": "string" },
+        "type": { "type": "string", "enum": ["image", "video"] },
+        "storagePath": { "type": "string" },
+        "createdAt": { "type": "number" }
+      },
+      "required": ["url", "type", "storagePath", "createdAt"]
+    }
+  },
+  "firestore": {
+    "/settings/philosophy": {
+      "schema": { "$ref": "#/entities/PhilosophyState" },
+      "description": "Singleton configuration for the 'Our Philosophy' section."
+    },
+    "/bachelorpoint_prices/{priceId}": {
+      "schema": { "$ref": "#/entities/PriceItem" },
+      "description": "Bachelor point pricing packages."
+    },
+    "/queenspoint_prices/{priceId}": {
+      "schema": { "$ref": "#/entities/PriceItem" },
+      "description": "Queens point pricing packages."
+    },
+    "/bachelorpoint_menu/{menuId}": {
+      "schema": { "$ref": "#/entities/FoodMenuItem" },
+      "description": "Bachelor point weekly menu."
+    },
+    "/queenspoint_menu/{menuId}": {
+      "schema": { "$ref": "#/entities/FoodMenuItem" },
+      "description": "Queens point weekly menu."
+    },
+    "/bachelorpoint_gallery/{itemId}": {
+      "schema": { "$ref": "#/entities/GalleryItem" },
+      "description": "Bachelor point gallery media."
+    },
+    "/queenspoint_gallery/{itemId}": {
+      "schema": { "$ref": "#/entities/GalleryItem" },
+      "description": "Queens point gallery media."
+    }
+  }
+}

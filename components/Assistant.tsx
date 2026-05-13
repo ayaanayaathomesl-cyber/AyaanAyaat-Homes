@@ -42,7 +42,7 @@ const Assistant: React.FC<AssistantProps> = ({ currentView }) => {
   const tooltipText = getTooltipText();
 
   return (
-    <div className="fixed bottom-6 right-6 z-[100] flex flex-col items-end gap-4 font-sans">
+    <div className="fixed bottom-[60px] lg:bottom-6 right-4 lg:right-6 z-[100] flex flex-col items-end gap-3 lg:gap-4 font-sans">
       
       {/* Location Button - Only shows on Branch Views */}
       {isBranchView && (
