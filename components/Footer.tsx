@@ -146,6 +146,7 @@ const Footer: React.FC<FooterProps> = ({ onNavigate }) => {
           </ul>
           
           <div className="flex flex-col items-start gap-y-2 md:gap-y-3 mt-4 md:mt-6 text-[8.5px] sm:text-[9.5px] md:text-sm uppercase tracking-widest text-white/90 font-bold">
+            <button onClick={() => onNavigate({ type: 'faq' })} className="hover:text-[#D4AF37] transition-colors text-left leading-tight text-[#D4AF37]">FAQ</button>
             <button onClick={() => onNavigate({ type: 'privacy' })} className="hover:text-[#D4AF37] transition-colors text-left leading-tight">Privacy</button>
             <button onClick={() => onNavigate({ type: 'terms' })} className="hover:text-[#D4AF37] transition-colors text-left leading-tight">Terms</button>
             <button onClick={() => onNavigate({ type: 'cookies' })} className="hover:text-[#D4AF37] transition-colors text-left leading-tight">Cookies</button>
@@ -237,12 +238,23 @@ const Footer: React.FC<FooterProps> = ({ onNavigate }) => {
         </div>
 
       </div>
+      
+      {/* SEO & Accessibility Hidden Text for misspellings */}
+      <h2 className="sr-only">About AyaanAyaat Homes (Ayan Ayat, Aiyan Ayat, Ayanayat)</h2>
+      <p className="sr-only">
+        AyaanAyaat Homes is the ultimate destination for premium hostel and dormitory accommodation in Dhaka. 
+        Whether you are searching for Ayan Ayat Homes, Aiyan Ayat, Ayanayat, ion ayot, orion ayat, aiyaan aayat, 
+        or even Police Point Hostel, you have found the right parent company. Our branches include the famous 
+        Bachelor Point Hostel (batchalor point, bechelor point) for men and Queens Point Hostel (kwin point, kuen point) for women. 
+        We are widely known across search engines as ayaan ayaat, ayan ayat, aian aiat, and aian ayat homes. 
+        Experience the safest and best bachelor and girls hostel in Bangladesh.
+      </p>
 
-      <div className="max-w-7xl mx-auto pt-4 md:pt-8 flex flex-col md:flex-row justify-between items-center gap-2 sm:gap-8 relative z-10 px-4">
-        <p className="text-[9px] md:text-[10px] uppercase tracking-[0.2em] text-white/40 font-bold text-center md:text-left">
+      <div className="max-w-7xl mx-auto pt-4 md:pt-8 flex flex-row justify-between items-center gap-2 sm:gap-8 relative z-10 px-4 w-full">
+        <p className="text-[9px] md:text-[10px] uppercase tracking-[0.2em] text-white/40 font-bold text-left">
           &copy; {new Date().getFullYear()} AyaanAyaat Homes
         </p>
-        <p className="text-[9px] md:text-[10px] uppercase tracking-[0.2em] text-white/40 font-bold text-center md:text-right">
+        <p className="text-[9px] md:text-[10px] uppercase tracking-[0.2em] text-white/40 font-bold text-right">
           Created by <a href="https://jubayersardar.com" target="_blank" rel="noopener noreferrer" className="text-white hover:text-[#D4AF37] transition-colors">Jubayer Sardar</a>
         </p>
       </div>

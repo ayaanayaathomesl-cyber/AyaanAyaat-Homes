@@ -15,6 +15,7 @@ import Assistant from './components/Assistant';
 import { PrivacyPolicy } from './components/PrivacyPolicy';
 import { TermsOfService } from './components/TermsOfService';
 import { CookiePolicy } from './components/CookiePolicy';
+import { FAQ } from './components/FAQ';
 import { ViewState } from './types';
 import { AnimatePresence, motion } from 'motion/react';
 
@@ -31,6 +32,8 @@ function App() {
       return { type: 'terms' };
     } else if (path === '/cookies') {
       return { type: 'cookies' };
+    } else if (path === '/faq') {
+      return { type: 'faq' };
     } else if (path === '/admin') {
       return { type: 'admin' };
     }
@@ -57,6 +60,8 @@ function App() {
           setView({ type: 'terms' });
         } else if (path === '/cookies') {
           setView({ type: 'cookies' });
+        } else if (path === '/faq') {
+          setView({ type: 'faq' });
         } else if (path === '/admin') {
           setView({ type: 'admin' });
         } else {
@@ -81,6 +86,7 @@ function App() {
       if (target.type === 'privacy') newPath = '/privacy';
       if (target.type === 'terms') newPath = '/terms';
       if (target.type === 'cookies') newPath = '/cookies';
+      if (target.type === 'faq') newPath = '/faq';
       if (target.type === 'admin') newPath = '/admin';
       window.history.pushState({ type: target.type }, '', newPath);
     }
@@ -181,6 +187,18 @@ function App() {
               className="w-full flex-grow flex flex-col"
             >
               <CookiePolicy />
+            </motion.div>
+          )}
+          {view.type === 'faq' && (
+            <motion.div
+              key="faq"
+              variants={pageVariants}
+              initial="initial"
+              animate="animate"
+              exit="exit"
+              className="w-full flex-grow flex flex-col"
+            >
+              <FAQ />
             </motion.div>
           )}
           {view.type === 'admin' && (

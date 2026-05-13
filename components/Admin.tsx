@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { motion } from 'motion/react';
 import { auth, db, storage, handleFirestoreError, OperationType } from '../src/lib/firebase';
 import { GoogleAuthProvider, signInWithPopup, signOut, onAuthStateChanged, User, signInWithEmailAndPassword, sendPasswordResetEmail } from 'firebase/auth';
-import { collection, doc, onSnapshot, setDoc, deleteDoc, updateDoc } from 'firebase/firestore';
+import { collection, doc, onSnapshot, setDoc, deleteDoc, updateDoc, getDoc } from 'firebase/firestore';
 import { ref, deleteObject } from 'firebase/storage';
 import { Settings, LogOut, Upload, Plus, Trash2, Save, Image as ImageIcon, FileVideo, Home, ArrowLeft, Edit, X } from 'lucide-react';
 import { ViewState } from '../types';
@@ -64,6 +64,15 @@ function CloudinaryConfigModal() {
   const [uploadPreset, setUploadPreset] = useState('');
 
   useEffect(() => {
+    // Attempt to fetch once on mount to populate localStorage
+    getDoc(doc(db, 'settings', 'cloudinary')).then(snap => {
+      if(snap.exists()) {
+        const data = snap.data();
+        if(data.cloudName) localStorage.setItem('cloudinary_cloud_name', data.cloudName);
+        if(data.uploadPreset) localStorage.setItem('cloudinary_upload_preset', data.uploadPreset);
+      }
+    }).catch(() => {});
+
     const onOpen = () => {
       setCloudName(localStorage.getItem('cloudinary_cloud_name') || '');
       setUploadPreset(localStorage.getItem('cloudinary_upload_preset') || '');
@@ -73,10 +82,17 @@ function CloudinaryConfigModal() {
     return () => window.removeEventListener('open-cloudinary-config', onOpen);
   }, []);
 
-  const handleSave = () => {
+  const handleSave = async () => {
     if (cloudName && uploadPreset) {
       localStorage.setItem('cloudinary_cloud_name', cloudName);
       localStorage.setItem('cloudinary_upload_preset', uploadPreset);
+      try {
+        await setDoc(doc(db, 'settings', 'cloudinary'), {
+          cloudName, uploadPreset, updatedAt: Date.now()
+        }, { merge: true });
+      } catch (e) {
+        console.error("Failed to save cloudinary config", e);
+      }
       setIsOpen(false);
       if (resolvePrompt) resolvePrompt({cloudName, uploadPreset});
     } else {
@@ -286,29 +302,38 @@ export default function Admin({ onNavigate }: AdminProps) {
     <div className="fixed inset-0 bg-gray-50 flex flex-col md:flex-row z-[100] overflow-hidden">
       <CloudinaryConfigModal />
       <ConfirmModal />
-      {/* Sidebar */}
-      <div className="w-full md:w-64 bg-[#002147] text-white flex-shrink-0 flex flex-col relative h-auto md:h-full z-[70] shadow-2xl">
-        <div className="p-6 border-b border-white/10 flex items-center justify-between md:block">
-          <div className="flex items-center gap-3">
-            <Settings className="w-6 h-6 text-[#D4AF37]" />
-            <h1 className="font-black text-xl tracking-tight">Admin</h1>
+      
+      {/* Top Header / Sidebar */}
+      <div className="w-full md:w-64 bg-[#002147] text-white flex-shrink-0 flex flex-col relative h-auto md:h-full z-[70] shadow-xl md:shadow-2xl">
+        <div className="p-4 md:p-6 border-b border-white/10 flex items-center justify-between md:block">
+          <div className="flex items-center gap-2 md:gap-3">
+            <Settings className="w-5 h-5 md:w-6 md:h-6 text-[#D4AF37]" />
+            <h1 className="font-black text-lg md:text-xl tracking-tight">Admin</h1>
           </div>
-          <div className="md:hidden flex gap-2">
+          
+          {/* Mobile Actions in Header */}
+          <div className="flex md:hidden items-center gap-2">
             {onNavigate && (
-              <button 
-                onClick={() => onNavigate({ type: 'home' })} 
-                className="p-2 text-white/70 hover:text-white rounded-lg bg-white/5"
+              <button
+                onClick={() => onNavigate({ type: 'home' })}
+                className="p-2 text-white/70 hover:text-white bg-white/5 hover:bg-white/10 rounded-lg transition-colors"
+                title="Return to Website"
               >
                 <Home className="w-5 h-5" />
               </button>
             )}
-            <button onClick={handleLogout} className="p-2 text-white/70 hover:text-white rounded-lg bg-white/5">
+            <button
+              onClick={handleLogout}
+              className="p-2 text-white/70 hover:text-[#ff4d4d] bg-white/5 hover:bg-white/10 rounded-lg transition-colors"
+              title="Sign Out"
+            >
               <LogOut className="w-5 h-5" />
             </button>
           </div>
         </div>
         
-        <div className="flex-1 overflow-y-auto px-4 py-6 flex space-x-2 md:space-x-0 md:flex-col md:space-y-2 overflow-x-auto md:overflow-x-visible">
+        {/* Navigation Tabs - Horizontal on Mobile, Vertical on Desktop */}
+        <div className="flex-none md:flex-1 overflow-x-auto md:overflow-y-auto px-4 py-3 md:py-6 flex flex-row md:flex-col gap-2 md:space-y-2 hide-scrollbar border-b border-white/10 md:border-b-0">
           {[
             { id: 'home', label: 'Home Page' },
             { id: 'bachelor', label: 'Bachelor Point' },
@@ -317,7 +342,7 @@ export default function Admin({ onNavigate }: AdminProps) {
              <button
               key={tab.id}
               onClick={() => setActiveTab(tab.id as any)}
-              className={`text-left px-4 py-3 rounded-xl transition-all whitespace-nowrap ${
+              className={`text-sm md:text-base text-left px-4 py-2 md:py-3 rounded-lg md:rounded-xl transition-all whitespace-nowrap ${
                 activeTab === tab.id 
                   ? 'bg-[#D4AF37] font-bold shadow-lg text-white' 
                   : 'text-white/70 hover:bg-white/10 hover:text-white font-medium'
@@ -328,7 +353,8 @@ export default function Admin({ onNavigate }: AdminProps) {
           ))}
         </div>
         
-        <div className="p-4 border-t border-white/10 hidden md:flex flex-col gap-2">
+        {/* Desktop Actions */}
+        <div className="hidden md:flex p-4 border-t border-white/10 flex-col gap-2">
            {onNavigate && (
              <button
               onClick={() => onNavigate({ type: 'home' })}
@@ -349,13 +375,13 @@ export default function Admin({ onNavigate }: AdminProps) {
       </div>
 
       {/* Main Content */}
-      <div className="flex-1 p-4 md:p-8 overflow-y-auto min-w-0">
-        <div className="max-w-6xl mx-auto space-y-8">
-           <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-6">
-             {activeTab === 'home' && <HomeSettings />}
-             {activeTab === 'bachelor' && <BranchSettings branch="bachelor" prefix="bachelorpoint" />}
-             {activeTab === 'queens' && <BranchSettings branch="queens" prefix="queenspoint" />}
-           </div>
+      <div className="flex-1 w-full p-4 md:p-8 overflow-y-auto min-w-0 bg-gray-50 h-full">
+        <div className="max-w-6xl mx-auto space-y-6 md:space-y-8 pb-20 md:pb-0">
+          <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-4 md:p-6">
+            {activeTab === 'home' && <HomeSettings />}
+            {activeTab === 'bachelor' && <BranchSettings branch="bachelor" prefix="bachelorpoint" />}
+            {activeTab === 'queens' && <BranchSettings branch="queens" prefix="queenspoint" />}
+          </div>
         </div>
       </div>
     </div>
@@ -397,6 +423,18 @@ function HomeSettings() {
       let cloudName = import.meta.env.VITE_CLOUDINARY_CLOUD_NAME || localStorage.getItem('cloudinary_cloud_name');
       let uploadPreset = import.meta.env.VITE_CLOUDINARY_UPLOAD_PRESET || localStorage.getItem('cloudinary_upload_preset');
       
+      if (!cloudName || !uploadPreset) {
+        try {
+          const snap = await getDoc(doc(db, 'settings', 'cloudinary'));
+          if (snap.exists() && snap.data().cloudName && snap.data().uploadPreset) {
+            cloudName = snap.data().cloudName;
+            uploadPreset = snap.data().uploadPreset;
+            localStorage.setItem('cloudinary_cloud_name', cloudName as string);
+            localStorage.setItem('cloudinary_upload_preset', uploadPreset as string);
+          }
+        } catch (e) {}
+      }
+
       if (!cloudName || !uploadPreset) {
         const config = await requestCloudinaryConfig();
         if (!config) { setUploading(false); e.target.value = ''; return; }
@@ -780,6 +818,18 @@ function GallerySettings({ prefix }: { prefix: string }) {
       let cloudName = import.meta.env.VITE_CLOUDINARY_CLOUD_NAME || localStorage.getItem('cloudinary_cloud_name');
       let uploadPreset = import.meta.env.VITE_CLOUDINARY_UPLOAD_PRESET || localStorage.getItem('cloudinary_upload_preset');
       
+      if (!cloudName || !uploadPreset) {
+        try {
+          const snap = await getDoc(doc(db, 'settings', 'cloudinary'));
+          if (snap.exists() && snap.data().cloudName && snap.data().uploadPreset) {
+            cloudName = snap.data().cloudName;
+            uploadPreset = snap.data().uploadPreset;
+            localStorage.setItem('cloudinary_cloud_name', cloudName as string);
+            localStorage.setItem('cloudinary_upload_preset', uploadPreset as string);
+          }
+        } catch (e) {}
+      }
+
       if (!cloudName || !uploadPreset) {
         const config = await requestCloudinaryConfig();
         if (!config) { setUploading(false); e.target.value = ''; return; }

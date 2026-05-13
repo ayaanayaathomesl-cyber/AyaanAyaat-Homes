@@ -79,7 +79,9 @@ const MaleHostel: React.FC<MaleHostelProps> = ({ onNavigate }) => {
   
   const [prices, setPrices] = useState<any[]>([]);
   const [menu, setMenu] = useState<any[]>([]);
-  const [gallery, setGallery] = useState<any[]>([]);
+  const [gallery, setGallery] = useState<any[]>(() =>
+    maleGalleryImages.map((url) => ({ type: 'image', url }))
+  );
 
   useEffect(() => {
     const unsubPrices = onSnapshot(collection(db, 'bachelorpoint_prices'), (snapshot) => {
@@ -89,7 +91,10 @@ const MaleHostel: React.FC<MaleHostelProps> = ({ onNavigate }) => {
       setMenu(snapshot.docs.map(doc => doc.data() as any).sort((a,b)=>a.order-b.order));
     });
     const unsubGallery = onSnapshot(collection(db, 'bachelorpoint_gallery'), (snapshot) => {
-      setGallery(snapshot.docs.map(doc => doc.data() as any).sort((a,b)=>b.createdAt-a.createdAt));
+      const items = snapshot.docs.map(doc => doc.data() as any).sort((a,b)=>b.createdAt-a.createdAt);
+      if (items.length > 0) {
+        setGallery(items);
+      }
     });
     return () => { unsubPrices(); unsubMenu(); unsubGallery(); };
   }, []);
@@ -198,6 +203,7 @@ const MaleHostel: React.FC<MaleHostelProps> = ({ onNavigate }) => {
             className="text-[44px] sm:text-6xl md:text-7xl lg:text-9xl text-white mb-6 leading-[1.1] md:leading-[0.9] drop-shadow-2xl"
           >
             Bachelor Point
+            <span className="sr-only"> Hostel, a subsidiary of AyaanAyaat Homes. Quality accommodation similar to Police Point.</span>
           </motion.h1>
           
           <motion.p 
@@ -438,7 +444,7 @@ const MaleHostel: React.FC<MaleHostelProps> = ({ onNavigate }) => {
                   visible: { opacity: 1, scale: 1, transition: { duration: 0.6 } }
                 }}
                 key={idx} 
-                className="group relative aspect-[4/5] md:aspect-square overflow-hidden rounded-md sm:rounded-xl md:rounded-3xl bg-gray-100 shadow-sm hover:shadow-md cursor-zoom-in transition-shadow duration-500"
+                className="group relative aspect-[4/5] md:aspect-square overflow-hidden rounded-md sm:rounded-xl md:rounded-3xl bg-gray-200 animate-pulse shadow-sm hover:shadow-md cursor-zoom-in transition-shadow duration-500"
                 onClick={() => setSelectedMedia(item)}
               >
                 {item.type === 'video' ? (
@@ -453,6 +459,10 @@ const MaleHostel: React.FC<MaleHostelProps> = ({ onNavigate }) => {
                   <img 
                     src={item.url} 
                     alt={`Gallery ${idx + 1}`} 
+                    loading="lazy"
+                    onLoad={(e) => {
+                      (e.target as HTMLElement).parentElement?.classList.remove('animate-pulse');
+                    }}
                     className="w-full h-full object-cover transition-transform duration-[2s] group-hover:scale-110"
                   />
                 )}

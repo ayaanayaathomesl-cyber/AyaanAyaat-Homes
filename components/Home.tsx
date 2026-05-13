@@ -217,6 +217,7 @@ const Home: React.FC<HomeProps> = ({ onNavigate }) => {
           >
             AyaanAyaat <br/>
             <span className="font-light bg-gradient-to-r from-[#D4AF37] via-[#fff3cc] to-[#D4AF37] text-transparent bg-clip-text animate-text-shine inline-block pb-4">Homes</span>
+            <span className="sr-only"> - Premium Hostel, Bachelor Point, Queens Point, and Police Point in Dhaka</span>
           </motion.h1>
           
           <motion.div 
@@ -402,9 +403,9 @@ const Home: React.FC<HomeProps> = ({ onNavigate }) => {
               <span className="text-[#D4AF37] text-[8px] sm:text-xs font-bold uppercase tracking-[0.4em] block mb-1 md:mb-3 group-hover:tracking-[0.5em] transition-all duration-500 origin-center md:origin-left">Our Premium Locations</span>
               <h2 className="text-2xl sm:text-4xl md:text-5xl lg:text-6xl text-[#002147] group-hover:text-[#003b80] transition-colors duration-300">আমাদের <span className="text-[#D4AF37]">ব্রাঞ্চ-সমূহ</span></h2>
             </div>
-            <div className="text-right hidden md:block border-l-2 border-[#D4AF37] pl-8 py-2">
-              <p className="text-[#002147]/70 text-sm max-w-xs leading-relaxed uppercase tracking-widest font-semibold">
-                Discover our premium locations designed for your comfort and safety.
+            <div className="text-center md:text-left md:border-l-2 md:border-[#D4AF37] md:pl-8 md:py-2">
+              <p className="text-[#002147]/80 text-[11px] md:text-sm max-w-lg leading-relaxed font-semibold">
+                <strong>AyaanAyaat Homes</strong>-এর দুটি স্বনামধন্য প্রজেক্ট—ছেলেদের জন্য <span className="text-[#D4AF37]">ব্যাচেলর পয়েন্ট</span> এবং মেয়েদের জন্য <span className="text-[#D4AF37]">কুইন পয়েন্ট</span>। ঢাকা শহরে ছাত্র-ছাত্রী ও চাকরিজীবীদের নিরাপদ এবং আরামদায়ক আবাসন নিশ্চিতে আমরা প্রতিশ্রুতিবদ্ধ।
               </p>
             </div>
           </div>

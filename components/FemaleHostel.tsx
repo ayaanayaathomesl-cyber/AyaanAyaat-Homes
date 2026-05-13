@@ -150,7 +150,9 @@ const FemaleHostel: React.FC<{ onNavigate: (view: ViewState) => void }> = ({
 
   const [prices, setPrices] = useState<any[]>([]);
   const [menu, setMenu] = useState<any[]>([]);
-  const [gallery, setGallery] = useState<any[]>([]);
+  const [gallery, setGallery] = useState<any[]>(() =>
+    galleryImages.map((url) => ({ type: 'image', url }))
+  );
 
   useEffect(() => {
     const unsubPrices = onSnapshot(collection(db, 'queenspoint_prices'), (snapshot) => {
@@ -160,7 +162,10 @@ const FemaleHostel: React.FC<{ onNavigate: (view: ViewState) => void }> = ({
       setMenu(snapshot.docs.map(doc => doc.data() as any).sort((a,b)=>a.order-b.order));
     });
     const unsubGallery = onSnapshot(collection(db, 'queenspoint_gallery'), (snapshot) => {
-      setGallery(snapshot.docs.map(doc => doc.data() as any).sort((a,b)=>b.createdAt-a.createdAt));
+      const items = snapshot.docs.map(doc => doc.data() as any).sort((a,b)=>b.createdAt-a.createdAt);
+      if (items.length > 0) {
+        setGallery(items);
+      }
     });
     return () => { unsubPrices(); unsubMenu(); unsubGallery(); };
   }, []);
@@ -300,6 +305,7 @@ const FemaleHostel: React.FC<{ onNavigate: (view: ViewState) => void }> = ({
           
           <motion.h1 variants={fadeInUp} className="text-[44px] sm:text-6xl md:text-7xl lg:text-[7.5rem] text-white mb-6 md:mb-8 leading-[1.1] tracking-tight drop-shadow-2xl">
             Queens Point
+            <span className="sr-only"> Girls Hostel, by AyaanAyaat Homes. Safe and premium accommodation.</span>
           </motion.h1>
           
           <motion.p variants={fadeInUp} className="text-gray-300 text-sm md:text-xl md:text-2xl max-w-3xl mx-auto leading-relaxed md:leading-snug font-light mb-10 md:mb-14">
@@ -543,12 +549,6 @@ const FemaleHostel: React.FC<{ onNavigate: (view: ViewState) => void }> = ({
             viewport={{ once: true }}
             className="bg-white shadow-[0_20px_50px_-20px_rgba(0,33,71,0.15)] rounded-3xl border border-gray-100 overflow-hidden relative"
           >
-             <div className="absolute right-0 top-0 hidden md:block">
-               <div className="bg-[#ff4d4d] text-white px-6 py-2 rounded-bl-3xl font-bold text-xs shadow-lg">
-                 নির্ধারিত সময়ের বাইরে খাবার পরিবেশন করা হবে না
-               </div>
-             </div>
-
             <div className="overflow-hidden pb-2 w-full">
               <table className="w-full text-center">
                 <thead>
@@ -603,7 +603,7 @@ const FemaleHostel: React.FC<{ onNavigate: (view: ViewState) => void }> = ({
               <motion.div
                 variants={fadeInUp}
                 key={idx}
-                className="group relative aspect-[4/5] md:aspect-square overflow-hidden rounded-md sm:rounded-xl md:rounded-3xl bg-white shadow-sm hover:shadow-md cursor-zoom-in border border-gray-100"
+                className="group relative aspect-[4/5] md:aspect-square overflow-hidden rounded-md sm:rounded-xl md:rounded-3xl bg-gray-200 animate-pulse shadow-sm hover:shadow-md cursor-zoom-in border border-gray-100"
                 onClick={() => setSelectedMedia(item)}
               >
                 {item.type === 'video' ? (
@@ -618,6 +618,10 @@ const FemaleHostel: React.FC<{ onNavigate: (view: ViewState) => void }> = ({
                   <img 
                     src={item.url} 
                     alt={`Gallery ${idx + 1}`} 
+                    loading="lazy"
+                    onLoad={(e) => {
+                      (e.target as HTMLElement).parentElement?.classList.remove('animate-pulse');
+                    }}
                     className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110"
                   />
                 )}

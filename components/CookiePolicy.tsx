@@ -3,7 +3,18 @@ import { motion } from 'motion/react';
 
 export const CookiePolicy: React.FC = () => {
   return (
-    <div className="pt-32 pb-24 px-6 md:px-12 max-w-4xl mx-auto flex-grow w-full">
+    <div className="pt-32 pb-24 px-6 md:px-12 max-w-4xl mx-auto flex-grow w-full relative">
+      <div className="flex justify-end mb-6 relative z-10 w-full">
+        <a href="/" onClick={(e) => {
+          e.preventDefault();
+          window.history.pushState({ type: 'home' }, '', '/');
+          window.dispatchEvent(new PopStateEvent('popstate', { state: { type: 'home' }}));
+        }} className="bg-white text-[#002147] hover:bg-gray-100 p-2 md:p-3 rounded-full shadow-md border border-[#002147]/10 transition-colors inline-flex items-center justify-center group" aria-label="Close">
+          <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor" className="w-5 h-5 md:w-6 md:h-6 group-hover:scale-110 transition-transform">
+            <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
+          </svg>
+        </a>
+      </div>
       <motion.div
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}

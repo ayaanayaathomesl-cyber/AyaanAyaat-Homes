@@ -19,6 +19,7 @@ export type ViewState =
   | { type: 'privacy' }
   | { type: 'terms' }
   | { type: 'cookies' }
+  | { type: 'faq' }
   | { type: 'admin' };
 
 export interface Package {

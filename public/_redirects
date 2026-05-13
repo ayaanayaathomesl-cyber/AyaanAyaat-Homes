@@ -1,1 +1,18 @@
+# 301 Redirects for common misspellings (SEO standard practice)
+/batchalorpoint /bachelorpoint 301
+/batchalor-point /bachelorpoint 301
+/bachelor-point /bachelorpoint 301
+/policepoint /bachelorpoint 301
+/police-point /bachelorpoint 301
+/kwinpoint /queenspoint 301
+/kwin-point /queenspoint 301
+/kuenpoint /queenspoint 301
+/queens-point /queenspoint 301
+/ayanayat / 301
+/ayaanayat / 301
+/ayan-ayat / 301
+/aiyaanayat / 301
+/ayaanayyat / 301
+
+# SPA Routing Fallback
 /* /index.html 200
