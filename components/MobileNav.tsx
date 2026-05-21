@@ -13,7 +13,7 @@ const MobileNav: React.FC<MobileNavProps> = ({ currentView, onNavigate }) => {
         <button
           onClick={() => onNavigate({ type: 'home' })}
           className={`relative flex flex-col items-center justify-center w-full py-1 transition-all duration-300 ${
-            currentView.type === 'home' ? 'text-[#D4AF37]' : 'text-[#002147]/40 hover:text-[#002147]/70'
+            currentView.type === 'home' ? 'text-[#D4AF37]' : 'text-[#4a3426]/40 hover:text-[#4a3426]/70'
           }`}
         >
           <div className={`flex flex-col items-center transition-transform duration-300 ${currentView.type === 'home' ? '-translate-y-0.5' : ''}`}>
@@ -30,7 +30,7 @@ const MobileNav: React.FC<MobileNavProps> = ({ currentView, onNavigate }) => {
         <button
           onClick={() => onNavigate({ type: 'female-hostel' })}
           className={`relative flex flex-col items-center justify-center w-full py-1 transition-all duration-300 ${
-            currentView.type === 'female-hostel' ? 'text-[#D4AF37]' : 'text-[#002147]/40 hover:text-[#002147]/70'
+            currentView.type === 'female-hostel' ? 'text-[#D4AF37]' : 'text-[#4a3426]/40 hover:text-[#4a3426]/70'
           }`}
         >
           <div className={`flex flex-col items-center transition-transform duration-300 ${currentView.type === 'female-hostel' ? '-translate-y-0.5' : ''}`}>
@@ -47,7 +47,7 @@ const MobileNav: React.FC<MobileNavProps> = ({ currentView, onNavigate }) => {
         <button
           onClick={() => onNavigate({ type: 'male-hostel' })}
           className={`relative flex flex-col items-center justify-center w-full py-1 transition-all duration-300 ${
-            currentView.type === 'male-hostel' ? 'text-[#D4AF37]' : 'text-[#002147]/40 hover:text-[#002147]/70'
+            currentView.type === 'male-hostel' ? 'text-[#D4AF37]' : 'text-[#4a3426]/40 hover:text-[#4a3426]/70'
           }`}
         >
           <div className={`flex flex-col items-center transition-transform duration-300 ${currentView.type === 'male-hostel' ? '-translate-y-0.5' : ''}`}>

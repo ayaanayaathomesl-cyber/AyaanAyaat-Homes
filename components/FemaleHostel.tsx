@@ -3,6 +3,7 @@ import { ViewState } from "../types";
 import { motion, AnimatePresence } from "motion/react";
 import { collection, onSnapshot } from 'firebase/firestore';
 import { db } from '../src/lib/firebase';
+import { getEmbedUrl } from './Admin';
 
 const weeklyMenuData = [
   {
@@ -153,6 +154,7 @@ const FemaleHostel: React.FC<{ onNavigate: (view: ViewState) => void }> = ({
   const [gallery, setGallery] = useState<any[]>(() =>
     galleryImages.map((url) => ({ type: 'image', url }))
   );
+  const [videos, setVideos] = useState<any[]>([]);
 
   useEffect(() => {
     const unsubPrices = onSnapshot(collection(db, 'queenspoint_prices'), (snapshot) => {
@@ -167,7 +169,11 @@ const FemaleHostel: React.FC<{ onNavigate: (view: ViewState) => void }> = ({
         setGallery(items);
       }
     });
-    return () => { unsubPrices(); unsubMenu(); unsubGallery(); };
+    const unsubVideos = onSnapshot(collection(db, 'queenspoint_videos'), (snapshot) => {
+      const items = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() as any })).sort((a,b)=>a.order-b.order);
+      setVideos(items);
+    });
+    return () => { unsubPrices(); unsubMenu(); unsubGallery(); unsubVideos(); };
   }, []);
 
   const scrollToPricing = () => {
@@ -191,7 +197,7 @@ const FemaleHostel: React.FC<{ onNavigate: (view: ViewState) => void }> = ({
   };
 
   return (
-    <div className="relative font-sans text-[#002147] bg-[#f8f9fa] overflow-hidden">
+    <div className="relative font-sans text-[#4a3426] bg-[#f8f6f0] overflow-hidden">
       {/* Back Button */}
       <motion.div 
         initial={{ opacity: 0, x: -20 }}
@@ -207,7 +213,7 @@ const FemaleHostel: React.FC<{ onNavigate: (view: ViewState) => void }> = ({
               if (el) el.scrollIntoView({ behavior: 'smooth', block: 'start' });
             }, 600);
           }}
-          className="group flex items-center justify-center gap-2 bg-black/40 hover:bg-[#D4AF37] backdrop-blur-md border border-white/20 hover:border-[#D4AF37] text-white px-4 py-2.5 md:px-5 md:py-3 rounded-full shadow-lg transition-all duration-300"
+          className="group flex items-center justify-center gap-2 bg-black/40 hover:bg-[#C9A84C] backdrop-blur-md border border-white/20 hover:border-[#C9A84C] text-white px-4 py-2.5 md:px-5 md:py-3 rounded-full shadow-lg transition-all duration-300"
         >
           <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={2.5} stroke="currentColor" className="w-4 h-4 md:w-5 md:h-5 transition-transform duration-300 group-hover:-translate-x-1">
             <path strokeLinecap="round" strokeLinejoin="round" d="M10.5 19.5L3 12m0 0l7.5-7.5M3 12h18" />
@@ -257,10 +263,12 @@ const FemaleHostel: React.FC<{ onNavigate: (view: ViewState) => void }> = ({
       </AnimatePresence>
 
       {/* Header Space */}
-      <div className="h-20 md:h-24 bg-[#002147]"></div>
+      <div className="h-20 md:h-24 bg-[#4a3426]"></div>
 
       {/* Hero Section */}
-      <section className="relative h-[80vh] md:h-[90vh] bg-[#002147] flex items-center justify-center text-center overflow-hidden">
+      <section className="relative h-[80vh] md:h-[90vh] bg-black flex items-center justify-center text-center overflow-hidden">
+        {/* Dark overlay to make text highly readable without blocking the beautiful image details */}
+        <div className="absolute inset-0 bg-[#000000]/45 z-[1] pointer-events-none"></div>
         <motion.div
            initial={{ scale: 1.1 }}
            animate={{ scale: 1 }}
@@ -269,36 +277,20 @@ const FemaleHostel: React.FC<{ onNavigate: (view: ViewState) => void }> = ({
         >
           <img
             src="https://lh3.googleusercontent.com/d/1XVpXrYorEp471NKLuuQ124m-mDd5_ah6"
-            className="w-full h-full object-cover opacity-60 object-center"
+            className="w-full h-full object-cover opacity-100 object-center"
             alt="Queens Point Interior"
           />
         </motion.div>
-        
-        {/* Layered Gradients for Depth */}
-        <div className="absolute inset-0 bg-gradient-to-b from-[#002147]/60 via-transparent to-[#002147]/80"></div>
-        <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_center,transparent_20%,#002147_90%)]"></div>
-
-        {/* Animated Orbs */}
-        <motion.div 
-          animate={{ x: [0, 50, 0], y: [0, -50, 0], opacity: [0.3, 0.5, 0.3] }}
-          transition={{ duration: 8, repeat: Infinity, ease: "easeInOut" }}
-          className="absolute top-1/4 -left-20 w-96 h-96 bg-[#D4AF37]/20 rounded-full blur-[100px] pointer-events-none"
-        />
-        <motion.div 
-          animate={{ x: [0, -50, 0], y: [0, 50, 0], opacity: [0.2, 0.4, 0.2] }}
-          transition={{ duration: 10, repeat: Infinity, ease: "easeInOut", delay: 1 }}
-          className="absolute bottom-1/4 -right-20 w-[30rem] h-[30rem] bg-pink-500/10 rounded-full blur-[120px] pointer-events-none"
-        />
         
         <motion.div 
           variants={staggerContainer}
           initial="hidden"
           animate="show"
-          className="relative z-10 px-4 md:px-6 max-w-5xl"
+          className="relative z-10 px-6 py-8 md:px-12 md:py-12 max-w-4xl mx-4"
         >
-          <motion.div variants={fadeInUp} className="inline-flex items-center gap-2 px-4 py-2 rounded-full border border-[#D4AF37]/30 bg-[#002147]/50 backdrop-blur-md mb-6 md:mb-8">
-             <div className="w-1.5 h-1.5 rounded-full bg-[#D4AF37] animate-pulse"></div>
-             <span className="text-[#D4AF37] uppercase tracking-[0.3em] text-[9px] md:text-xs font-bold leading-none mt-0.5">
+          <motion.div variants={fadeInUp} className="inline-flex items-center gap-2 px-4 py-2 rounded-full border border-[#C9A84C]/30 bg-[#4a3426]/50 backdrop-blur-md mb-6 md:mb-8">
+             <div className="w-1.5 h-1.5 rounded-full bg-[#C9A84C] animate-pulse"></div>
+             <span className="text-[#C9A84C] uppercase tracking-[0.3em] text-[9px] md:text-xs font-bold leading-none mt-0.5">
                FEEL THE ROYALTY WITH SAFETY
              </span>
           </motion.div>
@@ -308,14 +300,14 @@ const FemaleHostel: React.FC<{ onNavigate: (view: ViewState) => void }> = ({
             <span className="sr-only"> Girls Hostel, by AyaanAyaat Homes. Safe and premium accommodation.</span>
           </motion.h1>
           
-          <motion.p variants={fadeInUp} className="text-gray-300 text-sm md:text-xl md:text-2xl max-w-3xl mx-auto leading-relaxed md:leading-snug font-light mb-10 md:mb-14">
+          <motion.p variants={fadeInUp} className="text-gray-200 text-sm md:text-xl md:text-2xl max-w-3xl mx-auto leading-relaxed md:leading-snug font-light mb-10 md:mb-14">
             নারীদের জন্য ঢাকার সেরা ও নিরাপদ আবাসন। রাজকীয় পরিবেশ আর আধুনিক সুযোগ-সুবিধার এক অনন্য সমন্বয়।
           </motion.p>
 
           <motion.div variants={fadeInUp} className="flex flex-row items-center justify-center gap-2 sm:gap-4 md:gap-5 w-full">
             <button
               onClick={scrollToPricing}
-              className="w-auto overflow-hidden relative group bg-[#D4AF37] text-[#002147] px-4 py-2 sm:px-10 sm:py-4 md:py-4 md:px-12 rounded-full text-[8px] sm:text-xs md:text-sm font-black uppercase tracking-[0.1em] sm:tracking-widest shadow-[0_15px_45px_-5px_rgba(212,175,55,0.4)] hover:shadow-[0_20px_50px_-5px_rgba(212,175,55,0.6)] hover:-translate-y-1 active:translate-y-0 transition-all duration-300 whitespace-nowrap flex-1 md:flex-none"
+              className="w-auto overflow-hidden relative group bg-[#C9A84C] text-white px-4 py-2 sm:px-10 sm:py-4 md:py-4 md:px-12 rounded-full text-[8px] sm:text-xs md:text-sm font-black uppercase tracking-[0.1em] sm:tracking-widest shadow-[0_15px_45px_-5px_rgba(201,168,76,0.4)] hover:shadow-[0_20px_50px_-5px_rgba(201,168,76,0.6)] hover:-translate-y-1 active:translate-y-0 transition-all duration-300 whitespace-nowrap flex-1 md:flex-none"
             >
               <div className="absolute inset-0 w-full h-full bg-gradient-to-r from-transparent via-white/40 to-transparent translate-x-[-150%] group-hover:translate-x-[150%] transition-transform duration-700 ease-in-out"></div>
               <span>প্যাকেজ-সমূহ</span>
@@ -355,19 +347,19 @@ const FemaleHostel: React.FC<{ onNavigate: (view: ViewState) => void }> = ({
           viewport={{ once: true }}
           className="max-w-6xl mx-auto bg-white rounded-2xl md:rounded-[2.5rem] shadow-[0_20px_60px_rgba(0,33,71,0.12)] p-2.5 sm:p-4 md:p-8 border border-white/50 backdrop-blur-xl flex flex-row items-center gap-3 sm:gap-6 justify-between relative overflow-hidden group"
         >
-          <div className="absolute inset-0 bg-gradient-to-r from-pink-50/50 via-transparent to-[#D4AF37]/5 opacity-0 group-hover:opacity-100 transition-opacity duration-700 pointer-events-none"></div>
+          <div className="absolute inset-0 bg-gradient-to-r from-pink-50/50 via-transparent to-[#C9A84C]/5 opacity-0 group-hover:opacity-100 transition-opacity duration-700 pointer-events-none"></div>
           
           <div className="flex flex-row items-center gap-3 sm:gap-6 text-left w-full relative z-10 flex-1">
-            <div className="w-10 h-10 sm:w-16 sm:h-16 md:w-20 md:h-20 bg-gradient-to-br from-[#002147] to-[#003b80] rounded-full flex items-center justify-center text-[#D4AF37] shrink-0 shadow-lg relative overflow-hidden group/icon">
-              <div className="absolute inset-0 bg-[#D4AF37] scale-0 group-hover/icon:scale-100 transition-transform duration-500 rounded-full"></div>
-              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" className="w-4 h-4 sm:w-6 sm:h-6 md:w-8 md:h-8 relative z-10 group-hover/icon:text-[#002147] transition-colors duration-500 animate-bounce">
+            <div className="w-10 h-10 sm:w-16 sm:h-16 md:w-20 md:h-20 bg-gradient-to-br from-[#4a3426] to-[#3d2b1f] rounded-full flex items-center justify-center text-[#C9A84C] shrink-0 shadow-lg relative overflow-hidden group/icon">
+              <div className="absolute inset-0 bg-[#C9A84C] scale-0 group-hover/icon:scale-100 transition-transform duration-500 rounded-full"></div>
+              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" className="w-4 h-4 sm:w-6 sm:h-6 md:w-8 md:h-8 relative z-10 group-hover/icon:text-[#4a3426] transition-colors duration-500 animate-bounce">
                 <path fillRule="evenodd" d="M11.54 22.351l.07.04.028.016a.76.76 0 00.723 0l.028-.015.071-.041a16.975 16.975 0 001.152-.722c1.102-.736 2.531-1.748 3.82-3.114 1.256-1.337 2.162-2.715 2.162-4.565 0-4.639-3.76-8.5-8.5-8.5s-8.5 3.861-8.5 8.5c0 1.85 1.006 3.228 2.262 4.565 1.289 1.366 2.718 2.378 4.02 3.114a16.707 16.707 0 001.152.722zM12 14.5a2.5 2.5 0 100-5 2.5 2.5 0 000 5z" clipRule="evenodd" />
               </svg>
             </div>
             
             <div className="flex-1 max-w-2xl overflow-hidden">
-              <span className="text-[#D4AF37] text-[6px] sm:text-[10px] md:text-[11px] font-black uppercase tracking-[0.2em] md:tracking-[0.3em] block mb-0.5 md:mb-3">OUR LOCATION</span>
-              <h3 className="text-[#002147] text-[8px] sm:text-sm md:text-2xl font-bold leading-tight md:leading-snug truncate md:whitespace-normal">
+              <span className="text-[#C9A84C] text-[6px] sm:text-[10px] md:text-[11px] font-black uppercase tracking-[0.2em] md:tracking-[0.3em] block mb-0.5 md:mb-3">OUR LOCATION</span>
+              <h3 className="text-[#4a3426] text-[8px] sm:text-sm md:text-2xl font-bold leading-tight md:leading-snug truncate md:whitespace-normal">
                 বাড়ি# ১৮৯, রোড# ১৩, সেক্টর# ১০, রানাভোলা এভিনিউ, কামারপাড়া, উত্তরা, ঢাকা
               </h3>
             </div>
@@ -377,7 +369,7 @@ const FemaleHostel: React.FC<{ onNavigate: (view: ViewState) => void }> = ({
             href="https://maps.app.goo.gl/wAa3pBmE6b6SVWks9" 
             target="_blank" 
             rel="noopener noreferrer"
-            className="w-auto shrink-0 flex items-center justify-center gap-1 md:gap-2 bg-[#f8f9fa] hover:bg-[#D4AF37] hover:text-[#002147] text-[#002147] border border-[#002147]/10 px-3 py-2 sm:px-6 sm:py-3 rounded-full text-[7px] sm:text-xs font-bold uppercase tracking-widest transition-colors duration-300 group relative z-10 whitespace-nowrap"
+            className="w-auto shrink-0 flex items-center justify-center gap-1 md:gap-2 bg-[#f8f6f0] hover:bg-[#C9A84C] hover:text-[#4a3426] text-[#4a3426] border border-[#4a3426]/10 px-3 py-2 sm:px-6 sm:py-3 rounded-full text-[7px] sm:text-xs font-bold uppercase tracking-widest transition-colors duration-300 group relative z-10 whitespace-nowrap"
           >
             <span className="hidden sm:inline">Google </span><span>Maps</span>
             <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={2.5} stroke="currentColor" className="w-2.5 h-2.5 sm:w-4 sm:h-4 group-hover:translate-x-1 transition-transform">
@@ -398,13 +390,13 @@ const FemaleHostel: React.FC<{ onNavigate: (view: ViewState) => void }> = ({
             className="flex-1"
           >
             <div className="flex items-center gap-3 mb-4">
-              <div className="w-10 h-[2px] bg-[#D4AF37]"></div>
-              <span className="text-[#D4AF37] text-[10px] md:text-xs font-bold uppercase tracking-[0.3em]">Our Priority</span>
+              <div className="w-10 h-[2px] bg-[#C9A84C]"></div>
+              <span className="text-[#C9A84C] text-[10px] md:text-xs font-bold uppercase tracking-[0.3em]">Our Priority</span>
             </div>
-            <h2 className="text-3xl md:text-5xl text-[#002147] mb-6 leading-tight font-bold">
+            <h2 className="text-3xl md:text-5xl text-[#4a3426] mb-6 leading-tight font-bold">
               সর্বোচ্চ নিরাপত্তা নিশ্চিতকরণ
             </h2>
-            <p className="text-[14px] md:text-lg text-[#002147]/70 mb-8 leading-relaxed">
+            <p className="text-[14px] md:text-lg text-[#4a3426]/70 mb-8 leading-relaxed">
               Queens Point-এ আমরা আপনার নিরাপত্তাকে সবথেকে বেশি গুরুত্ব দিই। আমাদের প্রাঙ্গণ ২৪/৭ অভিজ্ঞ মহিলা সিকিউরিটি এবং সিসিটিভি ক্যামেরা দ্বারা নিয়ন্ত্রিত।
             </p>
             <div className="grid grid-cols-2 gap-4 md:gap-6">
@@ -416,13 +408,13 @@ const FemaleHostel: React.FC<{ onNavigate: (view: ViewState) => void }> = ({
                 "ভিজিটর নীতিমালা",
                 "সুরক্ষিত পথ",
               ].map((item, idx) => (
-                <div key={idx} className="flex items-center gap-3 bg-white p-4 rounded-xl shadow-sm border border-gray-100 group hover:border-[#D4AF37]/50 transition-colors">
-                  <div className="w-8 h-8 rounded-full bg-[#D4AF37]/10 flex items-center justify-center shrink-0 group-hover:bg-[#D4AF37] transition-colors">
-                    <svg className="w-4 h-4 text-[#D4AF37] group-hover:text-white transition-colors" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <div key={idx} className="flex items-center gap-3 bg-white p-4 rounded-xl shadow-sm border border-gray-100 group hover:border-[#C9A84C]/50 transition-colors">
+                  <div className="w-8 h-8 rounded-full bg-[#C9A84C]/10 flex items-center justify-center shrink-0 group-hover:bg-[#C9A84C] transition-colors">
+                    <svg className="w-4 h-4 text-[#C9A84C] group-hover:text-white transition-colors" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="3" d="M5 13l4 4L19 7"></path>
                     </svg>
                   </div>
-                  <span className="font-bold text-[#002147] text-xs md:text-sm">{item}</span>
+                  <span className="font-bold text-[#4a3426] text-xs md:text-sm">{item}</span>
                 </div>
               ))}
             </div>
@@ -435,18 +427,18 @@ const FemaleHostel: React.FC<{ onNavigate: (view: ViewState) => void }> = ({
             transition={{ duration: 0.8 }}
             className="flex-1 w-full"
           >
-            <div className="w-full aspect-video bg-[#002147] rounded-3xl overflow-hidden relative shadow-[0_20px_50px_-20px_rgba(0,33,71,0.5)] border-4 border-white/40">
+            <div className="w-full aspect-video bg-[#4a3426] rounded-3xl overflow-hidden relative shadow-[0_20px_50px_-20px_rgba(0,33,71,0.5)] border-4 border-white/40">
               {!isVideoPlaying ? (
                 <div
-                  className="w-full h-full cursor-pointer flex items-center justify-center relative bg-gradient-to-br from-[#002147] to-gray-900 overflow-hidden group"
+                  className="w-full h-full cursor-pointer flex items-center justify-center relative bg-gradient-to-br from-[#4a3426] to-gray-900 overflow-hidden group"
                   onClick={() => setIsVideoPlaying(true)}
                 >
                   <img src="https://lh3.googleusercontent.com/d/1XVpXrYorEp471NKLuuQ124m-mDd5_ah6" className="absolute inset-0 w-full h-full object-cover opacity-40 group-hover:opacity-50 transition-opacity duration-700 group-hover:scale-105" alt="Video thumbnail" />
-                  <div className="relative w-20 h-20 bg-[#D4AF37] text-white rounded-full flex items-center justify-center shadow-2xl group-hover:scale-110 transition-transform duration-300">
+                  <div className="relative w-20 h-20 bg-[#C9A84C] text-white rounded-full flex items-center justify-center shadow-2xl group-hover:scale-110 transition-transform duration-300">
                     <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" className="w-10 h-10 ml-1">
                       <path d="M4.5 5.653c0-1.426 1.529-2.33 2.779-1.643l11.54 6.348c1.295.712 1.295 2.573 0 3.285L7.28 19.991c-1.25.687-2.779-.217-2.779-1.643V5.653z" />
                     </svg>
-                    <div className="absolute inset-0 rounded-full border-4 border-[#D4AF37] animate-[ping_2s_ease-out_infinite] opacity-50"></div>
+                    <div className="absolute inset-0 rounded-full border-4 border-[#C9A84C] animate-[ping_2s_ease-out_infinite] opacity-50"></div>
                   </div>
                 </div>
               ) : (
@@ -476,7 +468,7 @@ const FemaleHostel: React.FC<{ onNavigate: (view: ViewState) => void }> = ({
       </section>
 
       {/* Pricing Section */}
-      <section id="pricing-section" className="py-6 md:py-32 bg-[#f8f9fa] px-4 md:px-6 scroll-mt-24">
+      <section id="pricing-section" className="py-6 md:py-32 bg-[#f8f6f0] px-4 md:px-6 scroll-mt-24">
         <div className="max-w-[85rem] mx-auto">
           <motion.div 
             initial={{ opacity: 0, y: 20 }}
@@ -484,16 +476,16 @@ const FemaleHostel: React.FC<{ onNavigate: (view: ViewState) => void }> = ({
             viewport={{ once: true }}
             className="text-center mb-6 md:mb-20"
           >
-            <span className="text-[#D4AF37] text-[10px] md:text-xs font-bold uppercase tracking-[0.4em] block mb-3">ROOM RATES</span>
-            <h2 className="text-3xl md:text-5xl text-[#002147] font-bold">সিট এর ধরন এবং ভাড়ার তালিকা</h2>
-            <p className="text-[#002147]/60 text-sm md:text-base mt-4 max-w-2xl mx-auto">(৩ বেলা খাবার ও অন্যান্য সকল সুবিধাসহ)</p>
-            <div className="w-16 h-1 bg-[#D4AF37] mx-auto mt-6 rounded-full"></div>
+            <span className="text-[#C9A84C] text-[10px] md:text-xs font-bold uppercase tracking-[0.4em] block mb-3">ROOM RATES</span>
+            <h2 className="text-3xl md:text-5xl text-[#4a3426] font-bold">সিট এর ধরন এবং ভাড়ার তালিকা</h2>
+            <p className="text-[#4a3426]/60 text-sm md:text-base mt-4 max-w-2xl mx-auto">(৩ বেলা খাবার ও অন্যান্য সকল সুবিধাসহ)</p>
+            <div className="w-16 h-1 bg-[#C9A84C] mx-auto mt-6 rounded-full"></div>
             
             {/* Quick Badges */}
             <div className="flex flex-wrap items-center justify-center gap-3 mt-8">
-              <div className="bg-[#002147] text-white px-4 py-2 rounded-lg text-xs font-bold tracking-wider">৩০০০৳ ফেরতযোগ্য সিকিউরিটি ডিপোজিট</div>
-              <div className="bg-white border border-[#D4AF37] text-[#002147] px-4 py-2 rounded-lg text-xs font-bold tracking-wider shadow-sm">স্কুটি পার্কিং - ১০০০/-</div>
-              <div className="bg-white border border-[#D4AF37] text-[#002147] px-4 py-2 rounded-lg text-xs font-bold tracking-wider shadow-sm">কার পার্কিং - ৩০০০/-</div>
+              <div className="bg-[#4a3426] text-white px-4 py-2 rounded-lg text-xs font-bold tracking-wider">৩০০০৳ ফেরতযোগ্য সিকিউরিটি ডিপোজিট</div>
+              <div className="bg-white border border-[#C9A84C] text-[#4a3426] px-4 py-2 rounded-lg text-xs font-bold tracking-wider shadow-sm">স্কুটি পার্কিং - ১০০০/-</div>
+              <div className="bg-white border border-[#C9A84C] text-[#4a3426] px-4 py-2 rounded-lg text-xs font-bold tracking-wider shadow-sm">কার পার্কিং - ৩০০০/-</div>
             </div>
           </motion.div>
 
@@ -506,22 +498,22 @@ const FemaleHostel: React.FC<{ onNavigate: (view: ViewState) => void }> = ({
           >
             <table className="w-full text-center">
               <thead>
-                <tr className="bg-[#002147] text-white">
+                <tr className="bg-[#4a3426] text-white">
                   <th className="py-2 px-1 text-left pl-2 md:pl-10 text-[9px] sm:text-xs md:text-lg font-bold border-r border-white/10 w-1/3">সিট এর ধরন</th>
-                  <th className="py-2 px-1 text-[8px] sm:text-[10px] md:text-base font-black tracking-widest text-[#D4AF37] border-r border-white/10">১ দিন</th>
-                  <th className="py-2 px-1 text-[8px] sm:text-[10px] md:text-base font-black tracking-widest text-[#D4AF37] border-r border-white/10">৭ দিন</th>
-                  <th className="py-2 px-1 text-[8px] sm:text-[10px] md:text-base font-black tracking-widest text-[#D4AF37] border-r border-white/10">১৫ দিন</th>
-                  <th className="py-2 px-1 text-[8px] sm:text-[10px] md:text-base font-black tracking-widest text-[#D4AF37]">৩০ দিন</th>
+                  <th className="py-2 px-1 text-[8px] sm:text-[10px] md:text-base font-black tracking-widest text-[#C9A84C] border-r border-white/10">১ দিন</th>
+                  <th className="py-2 px-1 text-[8px] sm:text-[10px] md:text-base font-black tracking-widest text-[#C9A84C] border-r border-white/10">৭ দিন</th>
+                  <th className="py-2 px-1 text-[8px] sm:text-[10px] md:text-base font-black tracking-widest text-[#C9A84C] border-r border-white/10">১৫ দিন</th>
+                  <th className="py-2 px-1 text-[8px] sm:text-[10px] md:text-base font-black tracking-widest text-[#C9A84C]">৩০ দিন</th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-gray-100">
                 {prices.map((row, idx) => (
-                  <tr key={idx} className="hover:bg-[#f8f9fa] transition-colors group">
-                    <td className="py-2 md:py-5 px-1 text-left pl-2 md:pl-10 font-bold text-[#002147] border-r border-gray-100 text-[9px] sm:text-xs md:text-lg">{row.type}</td>
-                    <td className="py-2 md:py-5 px-1 font-black text-gray-600 text-[8px] sm:text-[10px] md:text-base group-hover:text-[#D4AF37] transition-colors border-r border-gray-100">{row.d1}</td>
-                    <td className="py-2 md:py-5 px-1 font-black text-gray-600 text-[8px] sm:text-[10px] md:text-base group-hover:text-[#D4AF37] transition-colors border-r border-gray-100">{row.d7}</td>
-                    <td className="py-2 md:py-5 px-1 font-black text-gray-600 text-[8px] sm:text-[10px] md:text-base group-hover:text-[#D4AF37] transition-colors border-r border-gray-100">{row.d15}</td>
-                    <td className="py-2 md:py-5 px-1 font-black text-gray-800 text-[9px] sm:text-xs md:text-lg group-hover:text-[#002147] transition-colors">{row.d30 || row.monthly}</td>
+                  <tr key={idx} className="hover:bg-[#f8f6f0] transition-colors group">
+                    <td className="py-2 md:py-5 px-1 text-left pl-2 md:pl-10 font-bold text-[#4a3426] border-r border-gray-100 text-[9px] sm:text-xs md:text-lg">{row.type}</td>
+                    <td className="py-2 md:py-5 px-1 font-black text-gray-600 text-[8px] sm:text-[10px] md:text-base group-hover:text-[#C9A84C] transition-colors border-r border-gray-100">{row.d1}</td>
+                    <td className="py-2 md:py-5 px-1 font-black text-gray-600 text-[8px] sm:text-[10px] md:text-base group-hover:text-[#C9A84C] transition-colors border-r border-gray-100">{row.d7}</td>
+                    <td className="py-2 md:py-5 px-1 font-black text-gray-600 text-[8px] sm:text-[10px] md:text-base group-hover:text-[#C9A84C] transition-colors border-r border-gray-100">{row.d15}</td>
+                    <td className="py-2 md:py-5 px-1 font-black text-gray-800 text-[9px] sm:text-xs md:text-lg group-hover:text-[#4a3426] transition-colors">{row.d30 || row.monthly}</td>
                   </tr>
                 ))}
               </tbody>
@@ -539,8 +531,8 @@ const FemaleHostel: React.FC<{ onNavigate: (view: ViewState) => void }> = ({
             viewport={{ once: true }}
             className="text-center mb-8 md:mb-16"
           >
-            <h2 className="text-3xl md:text-5xl text-[#002147] font-bold mb-4">সাপ্তাহিক খাবারের তালিকা</h2>
-            <div className="w-16 h-1 bg-[#D4AF37] mx-auto rounded-full"></div>
+            <h2 className="text-3xl md:text-5xl text-[#4a3426] font-bold mb-4">সাপ্তাহিক খাবারের তালিকা</h2>
+            <div className="w-16 h-1 bg-[#C9A84C] mx-auto rounded-full"></div>
           </motion.div>
 
           <motion.div 
@@ -552,17 +544,17 @@ const FemaleHostel: React.FC<{ onNavigate: (view: ViewState) => void }> = ({
             <div className="overflow-hidden pb-2 w-full">
               <table className="w-full text-center">
                 <thead>
-                  <tr className="bg-[#002147] text-white">
+                  <tr className="bg-[#4a3426] text-white">
                     <th className="py-2 md:py-5 px-1 border-r border-white/10 font-bold text-[10px] md:text-lg">দিন</th>
                     <th className="py-2 md:py-5 px-1 border-r border-white/10 font-bold text-[10px] md:text-base">সকালের নাস্তা<br/><span className="text-[7px] md:text-xs text-white/50 font-normal tracking-wide block">(০৭:০০-০৯:৩০ টা)</span></th>
                     <th className="py-2 md:py-5 px-1 border-r border-white/10 font-bold text-[10px] md:text-base">দুপুরের খাবার<br/><span className="text-[7px] md:text-xs text-white/50 font-normal tracking-wide block">(০১:০০-০৩:০০ টা)</span></th>
                     <th className="py-2 md:py-5 px-1 font-bold text-[10px] md:text-base">রাতের খাবার<br/><span className="text-[7px] md:text-xs text-white/50 font-normal tracking-wide block">(০৮:৩০-১০:৩০ টা)</span></th>
                   </tr>
                 </thead>
-                <tbody className="divide-y divide-gray-100 text-[#002147]">
+                <tbody className="divide-y divide-gray-100 text-[#4a3426]">
                   {menu.map((item, idx) => (
                     <tr key={idx} className="hover:bg-gray-50 transition-colors">
-                      <td className="py-2 md:py-4 px-1 font-bold bg-[#002147]/5 border-r border-gray-100 text-[9px] md:text-base">{item.day}</td>
+                      <td className="py-2 md:py-4 px-1 font-bold bg-[#4a3426]/5 border-r border-gray-100 text-[9px] md:text-base">{item.day}</td>
                       <td className="py-2 md:py-4 px-1 text-[8px] md:text-base border-r border-gray-100 font-medium whitespace-pre-wrap">{item.breakfast}</td>
                       <td className="py-2 md:py-4 px-1 text-[8px] md:text-base border-r border-gray-100 font-medium whitespace-pre-wrap">{item.lunch}</td>
                       <td className="py-2 md:py-4 px-1 text-[8px] md:text-base font-medium whitespace-pre-wrap">{item.dinner}</td>
@@ -579,7 +571,7 @@ const FemaleHostel: React.FC<{ onNavigate: (view: ViewState) => void }> = ({
       </section>
 
       {/* Gallery Section with Lightbox */}
-      <section id="gallery" className="py-6 md:py-32 bg-[#f8f9fa] px-4 sm:px-6">
+      <section id="gallery" className="py-6 md:py-32 bg-[#f8f6f0] px-4 sm:px-6">
         <div className="max-w-7xl mx-auto">
           <motion.div 
             initial={{ opacity: 0, y: 20 }}
@@ -587,9 +579,9 @@ const FemaleHostel: React.FC<{ onNavigate: (view: ViewState) => void }> = ({
             viewport={{ once: true }}
             className="text-center mb-8 md:mb-16"
           >
-            <span className="text-[#D4AF37] text-[10px] md:text-xs font-bold uppercase tracking-[0.4em] block mb-3">GALLERY</span>
-            <h2 className="text-3xl md:text-5xl text-[#002147] font-bold">গ্যালারি</h2>
-            <div className="w-16 h-1 bg-[#D4AF37] mx-auto mt-6 rounded-full"></div>
+            <span className="text-[#C9A84C] text-[10px] md:text-xs font-bold uppercase tracking-[0.4em] block mb-3">GALLERY</span>
+            <h2 className="text-3xl md:text-5xl text-[#4a3426] font-bold">গ্যালারি</h2>
+            <div className="w-16 h-1 bg-[#C9A84C] mx-auto mt-6 rounded-full"></div>
           </motion.div>
 
           <motion.div 
@@ -625,8 +617,8 @@ const FemaleHostel: React.FC<{ onNavigate: (view: ViewState) => void }> = ({
                     className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110"
                   />
                 )}
-                <div className="absolute inset-0 bg-[#002147]/30 opacity-0 group-hover:opacity-100 transition-opacity duration-300 pointer-events-none flex items-center justify-center">
-                  <div className="w-12 h-12 rounded-full flex items-center justify-center text-[#D4AF37] bg-white shadow-xl transform scale-50 group-hover:scale-100 transition-transform duration-300">
+                <div className="absolute inset-0 bg-[#4a3426]/30 opacity-0 group-hover:opacity-100 transition-opacity duration-300 pointer-events-none flex items-center justify-center">
+                  <div className="w-12 h-12 rounded-full flex items-center justify-center text-[#C9A84C] bg-white shadow-xl transform scale-50 group-hover:scale-100 transition-transform duration-300">
                     {item.type === 'video' ? (
                       <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={2.5} stroke="currentColor" className="w-6 h-6">
                         <path strokeLinecap="round" strokeLinejoin="round" d="M5.25 5.653c0-.856.917-1.398 1.667-.986l11.54 6.348a1.125 1.125 0 010 1.971l-11.54 6.347a1.125 1.125 0 01-1.667-.985V5.653z" />
@@ -644,6 +636,64 @@ const FemaleHostel: React.FC<{ onNavigate: (view: ViewState) => void }> = ({
         </div>
       </section>
 
+      {/* Video Section */}
+      {videos.some(v => v.active) && (
+        <section id="videos" className="py-6 md:py-24 bg-[#FAF9F5] px-4 sm:px-6">
+          <div className="max-w-7xl mx-auto">
+            <motion.div 
+              initial={{ opacity: 0, y: 20 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true }}
+              className="text-center mb-8 md:mb-16"
+            >
+              <span className="text-[#C9A84C] text-[10px] md:text-xs font-bold uppercase tracking-[0.4em] block mb-3">FACILITY VIDEOS</span>
+              <h2 className="text-3xl md:text-5xl text-[#4a3426] font-bold">ফিচারড ভিডিও</h2>
+              <div className="w-16 h-1 bg-[#C9A84C] mx-auto mt-6 rounded-full"></div>
+            </motion.div>
+
+            <div className={`grid gap-4 sm:gap-6 justify-center ${videos.filter(v => v.active).length === 1 ? 'grid-cols-1 max-w-[280px] mx-auto' : 'grid-cols-2 md:grid-cols-3 lg:grid-cols-4'}`}>
+              {videos.filter(v => v.active).map((video) => {
+                const embedUrl = getEmbedUrl(video.url, video.type);
+                return (
+                  <motion.div
+                    key={video.id}
+                    initial={{ opacity: 0, scale: 0.95 }}
+                    whileInView={{ opacity: 1, scale: 1 }}
+                    viewport={{ once: true }}
+                    transition={{ duration: 0.5 }}
+                    className="bg-white rounded-xl md:rounded-2xl overflow-hidden border border-gray-100 shadow-md p-2 flex flex-col items-center w-full"
+                  >
+                    <div className="relative aspect-[9/16] w-full rounded-lg md:rounded-xl overflow-hidden bg-black shadow-inner">
+                      {video.type === 'direct' ? (
+                        <video 
+                          src={video.url} 
+                          className="w-full h-full object-cover absolute inset-0" 
+                          controls 
+                          playsInline
+                        />
+                      ) : (
+                        <iframe
+                          title={video.title}
+                          src={embedUrl}
+                          className="w-full h-full border-0 absolute inset-0"
+                          allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+                          allowFullScreen
+                        />
+                      )}
+                    </div>
+                    {video.title && (
+                      <h3 className="text-xs md:text-sm font-bold text-[#4a3426] mt-2 px-1 text-center leading-snug">
+                        {video.title}
+                      </h3>
+                    )}
+                  </motion.div>
+                );
+              })}
+            </div>
+          </div>
+        </section>
+      )}
+
 
       {/* Facilities Section */}
       <section id="facilities" className="py-6 md:py-32 bg-white px-4 sm:px-6">
@@ -654,9 +704,9 @@ const FemaleHostel: React.FC<{ onNavigate: (view: ViewState) => void }> = ({
             viewport={{ once: true }}
             className="text-center mb-8 md:mb-20"
           >
-            <span className="text-[#D4AF37] text-[10px] md:text-xs font-bold uppercase tracking-[0.4em] block mb-3">ALL FEATURES</span>
-            <h2 className="text-3xl md:text-5xl font-bold text-[#002147]">সব সুযোগ-সুবিধা এক নজরে</h2>
-            <div className="w-16 h-1 bg-[#D4AF37] mx-auto mt-6 rounded-full"></div>
+            <span className="text-[#C9A84C] text-[10px] md:text-xs font-bold uppercase tracking-[0.4em] block mb-3">ALL FEATURES</span>
+            <h2 className="text-3xl md:text-5xl font-bold text-[#4a3426]">সব সুযোগ-সুবিধা এক নজরে</h2>
+            <div className="w-16 h-1 bg-[#C9A84C] mx-auto mt-6 rounded-full"></div>
           </motion.div>
 
           <motion.div 
@@ -670,23 +720,23 @@ const FemaleHostel: React.FC<{ onNavigate: (view: ViewState) => void }> = ({
               <motion.div
                 variants={fadeInUp}
                 key={idx}
-                className="bg-[#f8f9fa] border border-gray-100 rounded-2xl sm:rounded-3xl p-4 sm:p-8 hover:bg-[#002147] hover:border-[#002147] transition-all duration-500 group shadow-lg shadow-gray-200/50 hover:shadow-2xl hover:-translate-y-2 relative overflow-hidden"
+                className="bg-[#f8f6f0] border border-[#C9A84C]/20 rounded-2xl sm:rounded-3xl p-4 sm:p-8 hover:bg-[#4a3426] hover:border-[#4a3426] transition-all duration-500 group shadow-lg shadow-gray-200/50 hover:shadow-2xl hover:-translate-y-2 relative overflow-hidden"
               >
-                <div className="absolute -right-10 -top-10 w-32 h-32 bg-[#D4AF37]/10 rounded-full blur-2xl group-hover:bg-white/5 transition-colors duration-500"></div>
+                <div className="absolute -right-10 -top-10 w-32 h-32 bg-[#C9A84C]/10 rounded-full blur-2xl group-hover:bg-white/5 transition-colors duration-500"></div>
                 <div className="flex flex-col sm:flex-row items-center sm:items-start gap-2 sm:gap-4 mb-4 sm:mb-6 relative z-10 text-center sm:text-left">
-                  <div className="w-8 h-8 sm:w-12 sm:h-12 bg-white rounded-xl sm:rounded-2xl flex items-center justify-center border border-gray-100 group-hover:bg-[#D4AF37] group-hover:border-transparent transition-colors duration-500 shadow-sm shrink-0">
-                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-4 h-4 sm:w-6 sm:h-6 text-[#002147] group-hover:text-white transition-colors duration-500">
+                  <div className="w-8 h-8 sm:w-12 sm:h-12 bg-white rounded-xl sm:rounded-2xl flex items-center justify-center border border-gray-100 group-hover:bg-[#C9A84C] group-hover:border-transparent transition-colors duration-500 shadow-sm shrink-0">
+                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-4 h-4 sm:w-6 sm:h-6 text-[#4a3426] group-hover:text-white transition-colors duration-500">
                       <path strokeLinecap="round" strokeLinejoin="round" d="M9 12.75L11.25 15 15 9.75M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
                     </svg>
                   </div>
-                  <h3 className="text-xs sm:text-xl font-black text-[#002147] tracking-tight group-hover:text-white transition-colors duration-500">
+                  <h3 className="text-xs sm:text-xl font-black text-[#4a3426] tracking-tight group-hover:text-white transition-colors duration-500">
                     {category.title}
                   </h3>
                 </div>
                 <ul className="space-y-2 sm:space-y-4 relative z-10">
                   {category.items.map((item, i) => (
-                    <li key={i} className="flex items-start gap-1.5 sm:gap-3 text-[10px] sm:text-[14px] text-[#002147]/70 group-hover:text-white/80 transition-colors duration-500 leading-snug">
-                      <div className="w-1.5 h-1.5 bg-[#D4AF37] rounded-full mt-1 sm:mt-1.5 shrink-0 shadow-sm"></div>
+                    <li key={i} className="flex items-start gap-1.5 sm:gap-3 text-[10px] sm:text-[14px] text-[#4a3426]/70 group-hover:text-white/80 transition-colors duration-500 leading-snug">
+                       <div className="w-1.5 h-1.5 bg-[#C9A84C] rounded-full mt-1 sm:mt-1.5 shrink-0 shadow-sm"></div>
                       <span>{item}</span>
                     </li>
                   ))}
@@ -706,7 +756,7 @@ const FemaleHostel: React.FC<{ onNavigate: (view: ViewState) => void }> = ({
             viewport={{ once: true }}
             className="text-center md:text-left mb-6 md:mb-8"
           >
-            <h2 className="text-3xl md:text-4xl font-black text-[#002147] tracking-tight">
+            <h2 className="text-3xl md:text-4xl font-black text-[#4a3426] tracking-tight">
               Find Us on <span className="text-[#8CC63F]">Google Map</span>
             </h2>
           </motion.div>
@@ -725,8 +775,8 @@ const FemaleHostel: React.FC<{ onNavigate: (view: ViewState) => void }> = ({
                   <path fillRule="evenodd" d="M11.54 22.351l.07.04.028.016a.76.76 0 00.723 0l.028-.015.071-.041a16.975 16.975 0 001.152-.722c1.102-.736 2.531-1.748 3.82-3.114 1.256-1.337 2.162-2.715 2.162-4.565 0-4.639-3.76-8.5-8.5-8.5s-8.5 3.861-8.5 8.5c0 1.85 1.006 3.228 2.262 4.565 1.289 1.366 2.718 2.378 4.02 3.114a16.707 16.707 0 001.152.722zM12 14.5a2.5 2.5 0 100-5 2.5 2.5 0 000 5z" clipRule="evenodd" />
                 </svg>
               </div>
-              <h3 className="text-lg md:text-xl font-bold text-[#002147] mb-1 md:mb-2">Hostel Address</h3>
-              <p className="text-[#002147]/70 text-sm md:text-base font-medium leading-relaxed max-w-md">
+              <h3 className="text-lg md:text-xl font-bold text-[#4a3426] mb-1 md:mb-2">Hostel Address</h3>
+              <p className="text-[#4a3426]/70 text-sm md:text-base font-medium leading-relaxed max-w-md">
                 বাড়ি# ১৮৯, রোড# ১৩, সেক্টর# ১০, রানাভোলা এভিনিউ, কামারপাড়া, উত্তরা, ঢাকা।
               </p>
             </motion.div>
@@ -782,19 +832,19 @@ const FemaleHostel: React.FC<{ onNavigate: (view: ViewState) => void }> = ({
       {/* Footer Helper */}
       <section className="py-12 bg-white">
           <div className="max-w-4xl mx-auto px-6 text-center">
-            <h4 className="text-2xl text-[#002147] font-bold mb-4">যেকোনো প্রয়োজনে আমাদের সাথে যোগাযোগ করুন</h4>
+            <h4 className="text-2xl text-[#4a3426] font-bold mb-4">যেকোনো প্রয়োজনে আমাদের সাথে যোগাযোগ করুন</h4>
             <div className="flex flex-col md:flex-row items-center justify-center gap-6 md:gap-12 mt-8">
                <div className="flex items-center gap-3">
-                  <div className="w-12 h-12 bg-[#D4AF37]/10 text-[#D4AF37] rounded-full flex items-center justify-center">
+                  <div className="w-12 h-12 bg-[#C9A84C]/10 text-[#C9A84C] rounded-full flex items-center justify-center">
                      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" className="w-6 h-6"><path d="M1.5 4.5a3 3 0 013-3h1.372c.86 0 1.61.586 1.819 1.42l.54 2.159a1.83 1.83 0 01-.521 1.748L6.222 8.307a11.042 11.042 0 005.471 5.471l1.488-1.488a1.83 1.83 0 011.748-.521l2.159.54c.834.209 1.42.959 1.42 1.819V19.5a3 3 0 01-3 3h-2.25a16.5 16.5 0 01-16.5-16.5V4.5z" /></svg>
                   </div>
-                  <span className="font-black text-xl text-[#002147]">{branchPhoneNumber}</span>
+                  <span className="font-black text-xl text-[#4a3426]">{branchPhoneNumber}</span>
                </div>
                <div className="flex items-center gap-3">
-                  <div className="w-12 h-12 bg-[#D4AF37]/10 text-[#D4AF37] rounded-full flex items-center justify-center">
+                  <div className="w-12 h-12 bg-[#C9A84C]/10 text-[#C9A84C] rounded-full flex items-center justify-center">
                      <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-6 h-6"><path strokeLinecap="round" strokeLinejoin="round" d="M21.75 6.75v10.5a2.25 2.25 0 01-2.25 2.25h-15a2.25 2.25 0 01-2.25-2.25V6.75m19.5 0A2.25 2.25 0 0019.5 4.5h-15a2.25 2.25 0 00-2.25 2.25m19.5 0v.243a2.25 2.25 0 01-1.07 1.916l-7.5 4.615a2.25 2.25 0 01-2.36 0L3.32 8.91a2.25 2.25 0 01-1.07-1.916V6.75" /></svg>
                   </div>
-                  <span className="font-bold text-lg text-[#002147]">info.queenspoint@gmail.com</span>
+                  <span className="font-bold text-lg text-[#4a3426]">info.queenspoint@gmail.com</span>
                </div>
             </div>
           </div>

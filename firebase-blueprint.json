@@ -55,6 +55,20 @@
         "createdAt": { "type": "number" }
       },
       "required": ["url", "type", "storagePath", "createdAt"]
+    },
+    "VideoItem": {
+      "title": "Video Item",
+      "description": "A video item with source type and URL.",
+      "type": "object",
+      "properties": {
+        "title": { "type": "string" },
+        "type": { "type": "string", "enum": ["youtube", "facebook", "drive", "direct"] },
+        "url": { "type": "string" },
+        "active": { "type": "boolean" },
+        "order": { "type": "number" },
+        "createdAt": { "type": "number" }
+      },
+      "required": ["title", "type", "url", "active", "order", "createdAt"]
     }
   },
   "firestore": {
@@ -85,6 +99,14 @@
     "/queenspoint_gallery/{itemId}": {
       "schema": { "$ref": "#/entities/GalleryItem" },
       "description": "Queens point gallery media."
+    },
+    "/bachelorpoint_videos/{videoId}": {
+      "schema": { "$ref": "#/entities/VideoItem" },
+      "description": "Bachelor point custom video settings."
+    },
+    "/queenspoint_videos/{videoId}": {
+      "schema": { "$ref": "#/entities/VideoItem" },
+      "description": "Queens point custom video settings."
     }
   }
 }

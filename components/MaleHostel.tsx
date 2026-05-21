@@ -9,6 +9,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { ViewState } from '../types';
 import { collection, onSnapshot } from 'firebase/firestore';
 import { db } from '../src/lib/firebase';
+import { getEmbedUrl } from './Admin';
 
 const malePricingData = [
   { type: 'Economy AC (9-seat)', d1: '599৳', d3: '1699৳', d7: '3499৳', d15: '4999৳', monthly: '7999৳' },
@@ -82,6 +83,7 @@ const MaleHostel: React.FC<MaleHostelProps> = ({ onNavigate }) => {
   const [gallery, setGallery] = useState<any[]>(() =>
     maleGalleryImages.map((url) => ({ type: 'image', url }))
   );
+  const [videos, setVideos] = useState<any[]>([]);
 
   useEffect(() => {
     const unsubPrices = onSnapshot(collection(db, 'bachelorpoint_prices'), (snapshot) => {
@@ -96,7 +98,11 @@ const MaleHostel: React.FC<MaleHostelProps> = ({ onNavigate }) => {
         setGallery(items);
       }
     });
-    return () => { unsubPrices(); unsubMenu(); unsubGallery(); };
+    const unsubVideos = onSnapshot(collection(db, 'bachelorpoint_videos'), (snapshot) => {
+      const items = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() as any })).sort((a,b)=>a.order-b.order);
+      setVideos(items);
+    });
+    return () => { unsubPrices(); unsubMenu(); unsubGallery(); unsubVideos(); };
   }, []);
 
   const branchPhoneRaw = "01628855159";
@@ -111,7 +117,7 @@ const MaleHostel: React.FC<MaleHostelProps> = ({ onNavigate }) => {
   };
 
   return (
-    <div className="relative font-sans text-[#002147] bg-[#f8f9fa] overflow-hidden">
+    <div className="relative font-sans text-[#4a3426] bg-[#f8f6f0] overflow-hidden">
       {/* Back Button */}
       <div className="fixed top-24 left-4 md:top-32 md:left-8 z-[100]">
         <button 
@@ -172,28 +178,29 @@ const MaleHostel: React.FC<MaleHostelProps> = ({ onNavigate }) => {
       </AnimatePresence>
 
       {/* Header Space */}
-      <div className="h-20 md:h-24 bg-[#002147]"></div>
+      <div className="h-20 md:h-24 bg-[#4a3426]"></div>
 
       {/* Hero */}
-      <section className="relative h-[70vh] md:h-[80vh] bg-[#002147] flex items-center justify-center text-center overflow-hidden">
+      <section className="relative h-[70vh] md:h-[90vh] bg-black flex items-center justify-center text-center overflow-hidden">
+        {/* Dark overlay to make text highly readable without blocking the beautiful image details */}
+        <div className="absolute inset-0 bg-[#000000]/45 z-[1] pointer-events-none"></div>
         <motion.img 
           initial={{ scale: 1.1 }}
           animate={{ scale: 1 }}
           transition={{ duration: 10, ease: "easeOut" }}
           src="https://lh3.googleusercontent.com/d/1cjIYSZDiCig4kN1FbLxGIoEUTcdcCU1C" 
-          className="absolute inset-0 w-full h-full object-cover opacity-60"
+          className="absolute inset-0 w-full h-full object-cover opacity-100"
           alt="Bachelor Point Interior"
         />
-        <div className="absolute inset-0 bg-gradient-to-t from-[#002147] via-[#002147]/40 to-[#002147]/20"></div>
-        <div className="relative z-10 px-4 md:px-6 max-w-5xl -translate-y-10">
+        <div className="relative z-10 px-6 py-8 md:px-12 md:py-12 max-w-4xl mx-4 -translate-y-5">
           <motion.div
             initial={{ opacity: 0, y: 30 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.8, delay: 0.2 }}
             className="inline-flex items-center gap-3 mb-6 bg-white/5 backdrop-blur-md border border-white/10 px-4 py-2 rounded-full"
           >
-            <div className="w-2 h-2 rounded-full bg-[#D4AF37] animate-ping"></div>
-            <span className="text-[#D4AF37] uppercase tracking-[0.3em] text-[9px] md:text-xs font-bold leading-none mt-0.5">A Premium Initiative by AyaanAyaat Homes</span>
+            <div className="w-2 h-2 rounded-full bg-[#C9A84C] animate-ping"></div>
+            <span className="text-[#C9A84C] uppercase tracking-[0.3em] text-[9px] md:text-xs font-bold leading-none mt-0.5">A Premium Initiative by AyaanAyaat Homes</span>
           </motion.div>
           
           <motion.h1 
@@ -210,7 +217,7 @@ const MaleHostel: React.FC<MaleHostelProps> = ({ onNavigate }) => {
             initial={{ opacity: 0, y: 30 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.8, delay: 0.6 }}
-            className="text-white/80 text-sm md:text-xl max-w-2xl mx-auto leading-relaxed font-light mb-10"
+            className="text-white/90 text-sm md:text-xl max-w-2xl mx-auto leading-relaxed font-light mb-10"
           >
             বিলাসবহুল ও আধুনিক ব্যাচেলর লাইফস্টাইলের জন্য সেরা ঠিকানা। আপনার ক্যারিয়ারের শুরু হোক একটি সুন্দর ও নিরাপদ পরিবেশে।
           </motion.p>
@@ -223,7 +230,7 @@ const MaleHostel: React.FC<MaleHostelProps> = ({ onNavigate }) => {
           >
             <button 
               onClick={scrollToPackages}
-              className="w-auto relative group overflow-hidden bg-[#D4AF37] text-[#002147] px-4 py-2 sm:px-10 sm:py-4 rounded-full text-[8px] sm:text-xs md:text-sm font-black uppercase tracking-[0.1em] sm:tracking-widest shadow-[0_15px_40px_-5px_rgba(212,175,55,0.4)] transition-all whitespace-nowrap flex-1 sm:flex-none"
+              className="w-auto relative group overflow-hidden bg-[#C9A84C] text-white px-4 py-2 sm:px-10 sm:py-4 rounded-full text-[8px] sm:text-xs md:text-sm font-black uppercase tracking-[0.1em] sm:tracking-widest shadow-[0_15px_40px_-5px_rgba(201,168,76,0.4)] transition-all whitespace-nowrap flex-1 sm:flex-none"
             >
               <div className="absolute inset-0 bg-white transform translate-y-full group-hover:translate-y-0 transition-transform duration-300 ease-in-out"></div>
               <span className="relative z-10 flex items-center justify-center gap-1 md:gap-2">
@@ -261,18 +268,18 @@ const MaleHostel: React.FC<MaleHostelProps> = ({ onNavigate }) => {
           transition={{ duration: 0.8, delay: 1 }}
           className="max-w-4xl mx-auto bg-white rounded-full shadow-2xl py-2 sm:py-4 flex flex-row items-center justify-between px-3 sm:px-6 md:px-8 border border-gray-100 gap-2 sm:gap-4 relative overflow-hidden"
         >
-          <div className="absolute right-0 top-0 w-32 h-32 bg-gradient-to-bl from-[#D4AF37]/10 to-transparent blur-2xl pointer-events-none"></div>
+          <div className="absolute right-0 top-0 w-32 h-32 bg-gradient-to-bl from-[#C9A84C]/10 to-transparent blur-2xl pointer-events-none"></div>
 
           <div className="flex items-center gap-2 sm:gap-4 md:gap-6 w-full relative z-10 flex-1">
-            <div className="w-8 h-8 sm:w-12 sm:h-12 bg-gradient-to-br from-[#002147] to-[#003b80] rounded-full flex items-center justify-center text-[#D4AF37] shrink-0 shadow-lg relative overflow-hidden group">
+            <div className="w-8 h-8 sm:w-12 sm:h-12 bg-gradient-to-br from-[#4a3426] to-[#3d2b1f] rounded-full flex items-center justify-center text-[#C9A84C] shrink-0 shadow-lg relative overflow-hidden group">
               <span className="absolute inset-0 bg-white/20 -translate-x-full group-hover:translate-x-full transition-transform duration-1000 ease-in-out"></span>
               <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" className="w-4 h-4 sm:w-6 sm:h-6">
                 <path fillRule="evenodd" d="M11.54 22.351l.07.04.028.016a.76.76 0 00.723 0l.028-.015.071-.041a16.975 16.975 0 001.152-.722c1.102-.736 2.531-1.748 3.82-3.114 1.256-1.337 2.162-2.715 2.162-4.565 0-4.639-3.76-8.5-8.5-8.5s-8.5 3.861-8.5 8.5c0 1.85 1.006 3.228 2.262 4.565 1.289 1.366 2.718 2.378 4.02 3.114a16.707 16.707 0 001.152.722zM12 14.5a2.5 2.5 0 100-5 2.5 2.5 0 000 5z" clipRule="evenodd" />
               </svg>
             </div>
             <div className="text-left flex-1 min-w-0">
-              <span className="text-[#D4AF37] text-[6px] sm:text-[9px] md:text-[10px] font-bold uppercase tracking-[0.2em] block mb-0.5 sm:mb-1">Our Location</span>
-              <h3 className="text-[#002147] text-[8px] sm:text-sm md:text-base font-bold leading-tight sm:leading-snug truncate sm:whitespace-normal">
+              <span className="text-[#C9A84C] text-[6px] sm:text-[9px] md:text-[10px] font-bold uppercase tracking-[0.2em] block mb-0.5 sm:mb-1">Our Location</span>
+              <h3 className="text-[#4a3426] text-[8px] sm:text-sm md:text-base font-bold leading-tight sm:leading-snug truncate sm:whitespace-normal">
                 ৩৬৭, গাওয়াইর, দক্ষিণখান, ঢাকা-১২৩০
               </h3>
             </div>
@@ -282,7 +289,7 @@ const MaleHostel: React.FC<MaleHostelProps> = ({ onNavigate }) => {
             href={branchMapLink} 
             target="_blank" 
             rel="noopener noreferrer"
-            className="w-auto shrink-0 flex items-center justify-center gap-1 sm:gap-2 bg-[#f8f9fa] hover:bg-[#D4AF37] hover:text-[#002147] text-[#002147] border border-[#002147]/10 px-3 py-1.5 sm:px-6 sm:py-3 rounded-full text-[7px] sm:text-xs font-bold uppercase tracking-widest transition-colors duration-300 group relative z-10 whitespace-nowrap"
+            className="w-auto shrink-0 flex items-center justify-center gap-1 sm:gap-2 bg-[#f8f6f0] hover:bg-[#C9A84C] hover:text-[#4a3426] text-[#4a3426] border border-[#4a3426]/10 px-3 py-1.5 sm:px-6 sm:py-3 rounded-full text-[7px] sm:text-xs font-bold uppercase tracking-widest transition-colors duration-300 group relative z-10 whitespace-nowrap"
           >
             <span className="hidden sm:inline">Google </span><span>Maps</span>
             <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={2.5} stroke="currentColor" className="w-2.5 h-2.5 sm:w-4 sm:h-4 group-hover:translate-x-1 transition-transform">
@@ -293,7 +300,7 @@ const MaleHostel: React.FC<MaleHostelProps> = ({ onNavigate }) => {
       </section>
 
       {/* PRICING (OUR RATES) */}
-      <section id="pricing-section" className="py-6 md:py-32 bg-[#f8f9fa] px-4 md:px-6 scroll-mt-20">
+      <section id="pricing-section" className="py-6 md:py-32 bg-[#f8f6f0] px-4 md:px-6 scroll-mt-20">
         <div className="max-w-7xl mx-auto">
           <motion.div 
             initial={{ opacity: 0, y: 30 }}
@@ -302,10 +309,10 @@ const MaleHostel: React.FC<MaleHostelProps> = ({ onNavigate }) => {
             transition={{ duration: 0.8 }}
             className="text-center mb-6 md:mb-20"
           >
-            <span className="text-[#D4AF37] text-[10px] md:text-xs font-bold uppercase tracking-[0.4em] block mb-3">Our Packages</span>
-            <h2 className="text-3xl md:text-5xl text-[#002147] font-bold mb-4">আবাসন প্যাকেজ ও ভাড়ার তালিকা</h2>
+            <span className="text-[#C9A84C] text-[10px] md:text-xs font-bold uppercase tracking-[0.4em] block mb-3">Our Packages</span>
+            <h2 className="text-3xl md:text-5xl text-[#4a3426] font-bold mb-4">আবাসন প্যাকেজ ও ভাড়ার তালিকা</h2>
             <p className="text-gray-500 text-xs md:text-sm max-w-lg mx-auto leading-relaxed">(৩ বেলা খাবার এবং অন্যান্য সকল সুবিধাসহ)</p>
-            <div className="w-16 h-1 bg-gradient-to-r from-transparent via-[#D4AF37] to-transparent mx-auto mt-6"></div>
+            <div className="w-16 h-1 bg-gradient-to-r from-transparent via-[#C9A84C] to-transparent mx-auto mt-6"></div>
             
             <div className="mt-8 inline-flex items-center gap-3 bg-white border border-[#4CAF50]/20 px-6 py-3 rounded-full shadow-sm">
                <div className="w-2 h-2 rounded-full bg-[#4CAF50] animate-pulse"></div>
@@ -324,24 +331,24 @@ const MaleHostel: React.FC<MaleHostelProps> = ({ onNavigate }) => {
           >
             <table className="w-full text-center">
               <thead>
-                <tr className="bg-[#002147] text-white">
+                <tr className="bg-[#4a3426] text-white">
                   <th className="py-2 px-1 text-left pl-2 md:pl-10 text-[8px] sm:text-[10px] md:text-lg font-bold border-r border-white/10 w-1/4">প্যাকেজ এর ধরন</th>
-                  <th className="py-2 px-1 text-[8px] sm:text-[10px] md:text-base font-black tracking-widest text-[#D4AF37] border-r border-white/10">১ দিন</th>
-                  <th className="py-2 px-1 text-[8px] sm:text-[10px] md:text-base font-black tracking-widest text-[#D4AF37] border-r border-white/10">৩ দিন</th>
-                  <th className="py-2 px-1 text-[8px] sm:text-[10px] md:text-base font-black tracking-widest text-[#D4AF37] border-r border-white/10">৭ দিন</th>
-                  <th className="py-2 px-1 text-[8px] sm:text-[10px] md:text-base font-black tracking-widest text-[#D4AF37] border-r border-white/10">১৫ দিন</th>
-                  <th className="py-2 px-1 text-[8px] sm:text-[10px] md:text-base font-black tracking-widest text-[#D4AF37]">৩০ দিন</th>
+                  <th className="py-2 px-1 text-[8px] sm:text-[10px] md:text-base font-black tracking-widest text-[#C9A84C] border-r border-white/10">১ দিন</th>
+                  <th className="py-2 px-1 text-[8px] sm:text-[10px] md:text-base font-black tracking-widest text-[#C9A84C] border-r border-white/10">৩ দিন</th>
+                  <th className="py-2 px-1 text-[8px] sm:text-[10px] md:text-base font-black tracking-widest text-[#C9A84C] border-r border-white/10">৭ দিন</th>
+                  <th className="py-2 px-1 text-[8px] sm:text-[10px] md:text-base font-black tracking-widest text-[#C9A84C] border-r border-white/10">১৫ দিন</th>
+                  <th className="py-2 px-1 text-[8px] sm:text-[10px] md:text-base font-black tracking-widest text-[#C9A84C]">৩০ দিন</th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-gray-100">
                 {prices.map((row, idx) => (
-                  <tr key={idx} className="hover:bg-[#f8f9fa] transition-colors group">
-                    <td className="py-2 md:py-4 px-1 text-left pl-2 md:pl-10 font-bold text-[#002147] border-r border-gray-100 text-[8px] sm:text-[10px] md:text-lg">{row.type}</td>
-                    <td className="py-2 md:py-4 px-1 font-black text-gray-600 text-[8px] sm:text-[10px] md:text-base group-hover:text-[#D4AF37] transition-colors border-r border-gray-100">{row.d1}</td>
-                    <td className="py-2 md:py-4 px-1 font-black text-gray-600 text-[8px] sm:text-[10px] md:text-base group-hover:text-[#D4AF37] transition-colors border-r border-gray-100">{row.d3}</td>
-                    <td className="py-2 md:py-4 px-1 font-black text-gray-600 text-[8px] sm:text-[10px] md:text-base group-hover:text-[#D4AF37] transition-colors border-r border-gray-100">{row.d7}</td>
-                    <td className="py-2 md:py-4 px-1 font-black text-gray-600 text-[8px] sm:text-[10px] md:text-base group-hover:text-[#D4AF37] transition-colors border-r border-gray-100">{row.d15}</td>
-                    <td className="py-2 md:py-4 px-1 font-black text-gray-800 text-[8px] sm:text-[10px] md:text-lg group-hover:text-[#002147] transition-colors">{row.monthly}</td>
+                  <tr key={idx} className="hover:bg-[#f8f6f0] transition-colors group">
+                    <td className="py-2 md:py-4 px-1 text-left pl-2 md:pl-10 font-bold text-[#4a3426] border-r border-gray-100 text-[8px] sm:text-[10px] md:text-lg">{row.type}</td>
+                    <td className="py-2 md:py-4 px-1 font-black text-gray-600 text-[8px] sm:text-[10px] md:text-base group-hover:text-[#C9A84C] transition-colors border-r border-gray-100">{row.d1}</td>
+                    <td className="py-2 md:py-4 px-1 font-black text-gray-600 text-[8px] sm:text-[10px] md:text-base group-hover:text-[#C9A84C] transition-colors border-r border-gray-100">{row.d3}</td>
+                    <td className="py-2 md:py-4 px-1 font-black text-gray-600 text-[8px] sm:text-[10px] md:text-base group-hover:text-[#C9A84C] transition-colors border-r border-gray-100">{row.d7}</td>
+                    <td className="py-2 md:py-4 px-1 font-black text-gray-600 text-[8px] sm:text-[10px] md:text-base group-hover:text-[#C9A84C] transition-colors border-r border-gray-100">{row.d15}</td>
+                    <td className="py-2 md:py-4 px-1 font-black text-gray-800 text-[8px] sm:text-[10px] md:text-lg group-hover:text-[#4a3426] transition-colors">{row.monthly}</td>
                   </tr>
                 ))}
               </tbody>
@@ -351,8 +358,8 @@ const MaleHostel: React.FC<MaleHostelProps> = ({ onNavigate }) => {
       </section>
 
       {/* Weekly Menu Section */}
-      <section className="py-6 md:py-32 bg-[#f8f9fa] px-4 md:px-6 relative overflow-hidden">
-        <div className="absolute top-0 right-0 w-[600px] h-[600px] bg-[#D4AF37]/5 rounded-full blur-[80px] -translate-y-1/2 translate-x-1/2 pointer-events-none"></div>
+      <section className="py-6 md:py-32 bg-[#f8f6f0] px-4 md:px-6 relative overflow-hidden">
+        <div className="absolute top-0 right-0 w-[600px] h-[600px] bg-[#C9A84C]/5 rounded-full blur-[80px] -translate-y-1/2 translate-x-1/2 pointer-events-none"></div>
         
         <motion.div 
           initial={{ opacity: 0, y: 50 }}
@@ -361,15 +368,15 @@ const MaleHostel: React.FC<MaleHostelProps> = ({ onNavigate }) => {
           transition={{ duration: 0.8 }}
           className="max-w-6xl mx-auto bg-white shadow-[0_20px_50px_rgba(0,33,71,0.08)] rounded-xl md:rounded-3xl border border-gray-100 overflow-hidden relative"
         >
-          <div className="absolute top-0 left-0 right-0 h-2 bg-gradient-to-r from-[#D4AF37] via-[#f4e2a6] to-[#D4AF37]"></div>
+          <div className="absolute top-0 left-0 right-0 h-2 bg-gradient-to-r from-[#C9A84C] via-[#f4e2a6] to-[#C9A84C]"></div>
           <div className="p-6 md:p-12 text-center relative z-10 border-b border-gray-100 bg-[#fefbf2]">
              <div className="flex flex-col md:flex-row items-center justify-center gap-5 mb-4">
-                <div className="w-16 h-16 md:w-24 md:h-24 border-4 border-white shadow-xl rounded-full p-1 bg-[#f8f9fa] overflow-hidden">
+                <div className="w-16 h-16 md:w-24 md:h-24 border-4 border-white shadow-xl rounded-full p-1 bg-[#f8f6f0] overflow-hidden">
                    <img src="https://lh3.googleusercontent.com/d/1cjIYSZDiCig4kN1FbLxGIoEUTcdcCU1C" className="w-full h-full object-cover rounded-full" alt="Bachelor Point Logo" />
                 </div>
                 <div className="text-center md:text-left">
-                   <h2 className="text-3xl md:text-5xl font-black text-[#002147] tracking-tight">ব্যাচেলর পয়েন্ট</h2>
-                   <p className="text-sm md:text-xl font-bold text-[#D4AF37] mt-2 uppercase tracking-[0.2em]">সাপ্তাহিক খাবারের তালিকা</p>
+                   <h2 className="text-3xl md:text-5xl font-black text-[#4a3426] tracking-tight">ব্যাচেলর পয়েন্ট</h2>
+                   <p className="text-sm md:text-xl font-bold text-[#C9A84C] mt-2 uppercase tracking-[0.2em]">সাপ্তাহিক খাবারের তালিকা</p>
                 </div>
              </div>
           </div>
@@ -378,14 +385,14 @@ const MaleHostel: React.FC<MaleHostelProps> = ({ onNavigate }) => {
             <table className="w-full border-collapse text-center">
               <thead>
                 <tr className="bg-[#E3F2FD] border-y-2 border-gray-300">
-                  <th className="py-2 md:py-6 px-1 md:px-4 text-[10px] md:text-xl font-black text-[#002147] border-r-2 border-gray-300">দিন</th>
-                  <th className="py-2 md:py-6 px-1 md:px-4 text-[9px] md:text-xl font-black text-[#002147] border-r-2 border-gray-300">
+                  <th className="py-2 md:py-6 px-1 md:px-4 text-[10px] md:text-xl font-black text-[#4a3426] border-r-2 border-gray-300">দিন</th>
+                  <th className="py-2 md:py-6 px-1 md:px-4 text-[9px] md:text-xl font-black text-[#4a3426] border-r-2 border-gray-300">
                     সকালের নাস্তা
                   </th>
-                  <th className="py-2 md:py-6 px-1 md:px-4 text-[9px] md:text-xl font-black text-[#002147] border-r-2 border-gray-300">
+                  <th className="py-2 md:py-6 px-1 md:px-4 text-[9px] md:text-xl font-black text-[#4a3426] border-r-2 border-gray-300">
                     দুপুরের খাবার
                   </th>
-                  <th className="py-2 md:py-6 px-1 md:px-4 text-[9px] md:text-xl font-black text-[#002147]">
+                  <th className="py-2 md:py-6 px-1 md:px-4 text-[9px] md:text-xl font-black text-[#4a3426]">
                     রাতের খাবার
                   </th>
                 </tr>
@@ -393,7 +400,7 @@ const MaleHostel: React.FC<MaleHostelProps> = ({ onNavigate }) => {
               <tbody>
                 {menu.map((item, idx) => (
                   <tr key={idx} className="border-b-2 border-gray-200 hover:bg-gray-50 transition-colors">
-                    <td className="py-2 md:py-5 px-1 md:px-6 font-black text-[#002147] text-[9px] md:text-lg border-r-2 border-gray-300 bg-[#FDFDFD]">{item.day}</td>
+                    <td className="py-2 md:py-5 px-1 md:px-6 font-black text-[#4a3426] text-[9px] md:text-lg border-r-2 border-gray-300 bg-[#FDFDFD]">{item.day}</td>
                     <td className="py-2 md:py-5 px-1 md:px-6 font-bold text-gray-700 text-[8px] md:text-base border-r-2 border-gray-300 whitespace-pre-wrap">{item.breakfast}</td>
                     <td className="py-2 md:py-5 px-1 md:px-6 font-bold text-gray-700 text-[8px] md:text-base border-r-2 border-gray-300 whitespace-pre-wrap">{item.lunch}</td>
                     <td className="py-2 md:py-5 px-1 md:px-6 font-bold text-gray-700 text-[8px] md:text-base whitespace-pre-wrap">{item.dinner}</td>
@@ -421,10 +428,10 @@ const MaleHostel: React.FC<MaleHostelProps> = ({ onNavigate }) => {
             transition={{ duration: 0.8 }}
             className="text-center mb-8 md:mb-20"
           >
-            <span className="text-[#D4AF37] text-[10px] md:text-xs font-bold uppercase tracking-[0.4em] block mb-3">GALLERY</span>
-            <h2 className="text-3xl md:text-5xl text-[#002147] font-bold mb-4">গ্যালারি</h2>
+            <span className="text-[#C9A84C] text-[10px] md:text-xs font-bold uppercase tracking-[0.4em] block mb-3">GALLERY</span>
+            <h2 className="text-3xl md:text-5xl text-[#4a3426] font-bold mb-4">গ্যালারি</h2>
             <p className="text-gray-500 text-xs md:text-sm max-w-lg mx-auto leading-relaxed">আমাদের আধুনিক ও আরামদায়ক পরিবেশের কিছু মুহূর্ত</p>
-            <div className="w-16 h-1 bg-gradient-to-r from-transparent via-[#D4AF37] to-transparent mx-auto mt-6"></div>
+            <div className="w-16 h-1 bg-gradient-to-r from-transparent via-[#C9A84C] to-transparent mx-auto mt-6"></div>
           </motion.div>
 
           <motion.div 
@@ -466,7 +473,7 @@ const MaleHostel: React.FC<MaleHostelProps> = ({ onNavigate }) => {
                     className="w-full h-full object-cover transition-transform duration-[2s] group-hover:scale-110"
                   />
                 )}
-                <div className="absolute inset-0 bg-gradient-to-t from-[#002147]/60 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500 flex items-center justify-center">
+                <div className="absolute inset-0 bg-gradient-to-t from-[#4a3426]/60 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500 flex items-center justify-center">
                    <div className="w-10 h-10 md:w-12 md:h-12 border border-white/40 rounded-full flex items-center justify-center text-white bg-white/20 backdrop-blur-md transform scale-50 group-hover:scale-100 transition-transform duration-500">
                       {item.type === 'video' ? (
                         <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor" className="w-5 h-5">
@@ -485,9 +492,66 @@ const MaleHostel: React.FC<MaleHostelProps> = ({ onNavigate }) => {
         </div>
       </section>
 
+      {/* Video Section */}
+      {videos.some(v => v.active) && (
+        <section id="videos" className="py-6 md:py-24 bg-gray-50 px-4 sm:px-6 relative z-10">
+          <div className="max-w-7xl mx-auto">
+            <motion.div 
+               initial={{ opacity: 0, y: 30 }}
+               whileInView={{ opacity: 1, y: 0 }}
+               viewport={{ once: true }}
+               className="text-center mb-8 md:mb-16"
+            >
+              <span className="text-[#C9A84C] text-[10px] md:text-xs font-bold uppercase tracking-[0.4em] block mb-3">FACILITY VIDEOS</span>
+              <h2 className="text-3xl md:text-5xl text-[#4a3426] font-bold">ফিচারড ভিডিও</h2>
+              <div className="w-16 h-1 bg-[#C9A84C] mx-auto mt-6 rounded-full"></div>
+            </motion.div>
+
+            <div className={`grid gap-4 sm:gap-6 justify-center ${videos.filter(v => v.active).length === 1 ? 'grid-cols-1 max-w-[280px] mx-auto' : 'grid-cols-2 md:grid-cols-3 lg:grid-cols-4'}`}>
+              {videos.filter(v => v.active).map((video) => {
+                const embedUrl = getEmbedUrl(video.url, video.type);
+                return (
+                  <motion.div
+                    key={video.id}
+                    initial={{ opacity: 0, scale: 0.95 }}
+                    whileInView={{ opacity: 1, scale: 1 }}
+                    viewport={{ once: true }}
+                    transition={{ duration: 0.5 }}
+                    className="bg-white rounded-xl md:rounded-2xl overflow-hidden border border-gray-150 shadow-md p-2 flex flex-col items-center w-full"
+                  >
+                    <div className="relative aspect-[9/16] w-full rounded-lg md:rounded-xl overflow-hidden bg-black shadow-inner">
+                      {video.type === 'direct' ? (
+                        <video 
+                          src={video.url} 
+                          className="w-full h-full object-cover absolute inset-0" 
+                          controls 
+                          playsInline
+                        />
+                      ) : (
+                        <iframe
+                          title={video.title}
+                          src={embedUrl}
+                          className="w-full h-full border-0 absolute inset-0"
+                          allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+                          allowFullScreen
+                        />
+                      )}
+                    </div>
+                    {video.title && (
+                      <h3 className="text-xs md:text-sm font-bold text-[#4a3426] mt-2 px-1 text-center leading-snug">
+                        {video.title}
+                      </h3>
+                    )}
+                  </motion.div>
+                );
+              })}
+            </div>
+          </div>
+        </section>
+      )}
 
       {/* ALL FEATURES SECTION */}
-      <section id="facilities" className="py-6 md:py-32 bg-[#F8FAFC] text-[#002147] px-4 sm:px-6">
+      <section id="facilities" className="py-6 md:py-32 bg-[#f8f6f0] text-[#4a3426] px-4 sm:px-6">
         <div className="max-w-7xl mx-auto">
           <motion.div 
             initial={{ opacity: 0, y: 30 }}
@@ -496,9 +560,9 @@ const MaleHostel: React.FC<MaleHostelProps> = ({ onNavigate }) => {
             transition={{ duration: 0.8 }}
             className="text-center mb-8 md:mb-24"
           >
-             <span className="text-[#D4AF37] text-[10px] md:text-xs font-bold uppercase tracking-[0.4em] block mb-3">ALL FEATURES</span>
+             <span className="text-[#C9A84C] text-[10px] md:text-xs font-bold uppercase tracking-[0.4em] block mb-3">ALL FEATURES</span>
              <h2 className="text-3xl md:text-5xl lg:text-6xl font-bold mb-5">সব সুযোগ-সুবিধা এক নজরে</h2>
-             <div className="w-20 h-1 bg-gradient-to-r from-transparent via-[#D4AF37] to-transparent mx-auto mt-6"></div>
+             <div className="w-20 h-1 bg-gradient-to-r from-transparent via-[#C9A84C] to-transparent mx-auto mt-6"></div>
           </motion.div>
 
           <motion.div 
@@ -520,19 +584,19 @@ const MaleHostel: React.FC<MaleHostelProps> = ({ onNavigate }) => {
                 key={idx} 
                 className="bg-white rounded-2xl sm:rounded-3xl p-4 sm:p-8 hover:shadow-[0_20px_40px_rgba(0,33,71,0.08)] transition-all duration-500 group relative overflow-hidden border border-gray-100"
               >
-                 <div className="absolute top-0 right-0 w-32 h-32 bg-gradient-to-bl from-[#D4AF37]/10 to-transparent blur-3xl opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
+                 <div className="absolute top-0 right-0 w-32 h-32 bg-gradient-to-bl from-[#C9A84C]/10 to-transparent blur-3xl opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
                  <div className="flex flex-col sm:flex-row items-center sm:items-center gap-2 sm:gap-4 mb-4 sm:mb-8 text-center sm:text-left">
-                    <div className="w-8 h-8 sm:w-12 sm:h-12 bg-[#002147]/5 rounded-xl sm:rounded-2xl flex items-center justify-center group-hover:bg-[#002147] group-hover:text-white transition-all duration-500 group-hover:scale-110 group-hover:rotate-3 shadow-sm shrink-0">
+                    <div className="w-8 h-8 sm:w-12 sm:h-12 bg-[#4a3426]/5 rounded-xl sm:rounded-2xl flex items-center justify-center group-hover:bg-[#4a3426] group-hover:text-white transition-all duration-500 group-hover:scale-110 group-hover:rotate-3 shadow-sm shrink-0">
                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-4 h-4 sm:w-6 sm:h-6">
                           <path strokeLinecap="round" strokeLinejoin="round" d="M9 12.75L11.25 15 15 9.75M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
                        </svg>
                     </div>
-                    <h3 className="text-xs sm:text-xl md:text-2xl font-bold text-[#002147] tracking-tight group-hover:text-[#D4AF37] transition-colors duration-300">{category.title}</h3>
+                    <h3 className="text-xs sm:text-xl md:text-2xl font-bold text-[#4a3426] tracking-tight group-hover:text-[#C9A84C] transition-colors duration-300">{category.title}</h3>
                  </div>
                  <ul className="space-y-2 sm:space-y-4">
                     {category.items.map((item, i) => (
-                      <li key={i} className="flex items-start gap-1.5 sm:gap-4 text-[10px] sm:text-sm text-gray-500 group-hover:text-[#002147]/80 transition-colors duration-300">
-                        <div className="w-1.5 h-1.5 sm:w-2 sm:h-2 bg-[#D4AF37] rounded-full mt-1 sm:mt-1.5 shrink-0 group-hover:scale-150 transition-transform duration-300"></div>
+                      <li key={i} className="flex items-start gap-1.5 sm:gap-4 text-[10px] sm:text-sm text-gray-500 group-hover:text-[#4a3426]/80 transition-colors duration-300">
+                        <div className="w-1.5 h-1.5 sm:w-2 sm:h-2 bg-[#C9A84C] rounded-full mt-1 sm:mt-1.5 shrink-0 group-hover:scale-150 transition-transform duration-300"></div>
                         <span className="leading-relaxed">{item}</span>
                       </li>
                     ))}
@@ -548,14 +612,14 @@ const MaleHostel: React.FC<MaleHostelProps> = ({ onNavigate }) => {
             transition={{ duration: 0.8, delay: 0.3 }}
             className="mt-20 md:mt-28 bg-white border border-gray-100 p-8 md:p-12 rounded-[2.5rem] flex flex-col md:flex-row items-center justify-between gap-8 shadow-[0_15px_40px_rgba(0,33,71,0.05)] relative overflow-hidden"
           >
-             <div className="absolute inset-0 opacity-[0.03] pointer-events-none" style={{ backgroundImage: 'radial-gradient(#002147 1px, transparent 1px)', backgroundSize: '20px 20px' }}></div>
+             <div className="absolute inset-0 opacity-[0.03] pointer-events-none" style={{ backgroundImage: 'radial-gradient(#4a3426 1px, transparent 1px)', backgroundSize: '20px 20px' }}></div>
              <div className="text-center md:text-left relative z-10 w-full md:w-auto">
-                <h4 className="text-3xl md:text-4xl text-[#002147] font-bold mb-3">& Many More...</h4>
+                <h4 className="text-3xl md:text-4xl text-[#4a3426] font-bold mb-3">& Many More...</h4>
                 <p className="text-gray-500 text-sm md:text-base max-w-md">আরো বিস্তারিত জানতে এবং যেকোনো প্রয়োজনে আমাদের সাথে যোগাযোগ করুন।</p>
              </div>
-             <div className="flex flex-col sm:flex-row items-center gap-6 relative z-10 w-full md:w-auto shrink-0 bg-[#f8f9fa] p-4 rounded-3xl border border-gray-100">
-                <a href={`tel:${branchPhoneRaw}`} className="flex items-center gap-3 text-[#002147] hover:text-[#D4AF37] font-black text-xl md:text-2xl transition-colors group">
-                   <div className="w-12 h-12 bg-white text-[#002147] border border-gray-200 rounded-full flex items-center justify-center shadow-sm group-hover:scale-110 transition-transform duration-300">
+             <div className="flex flex-col sm:flex-row items-center gap-6 relative z-10 w-full md:w-auto shrink-0 bg-[#f8f6f0] p-4 rounded-3xl border border-gray-100">
+                <a href={`tel:${branchPhoneRaw}`} className="flex items-center gap-3 text-[#4a3426] hover:text-[#C9A84C] font-black text-xl md:text-2xl transition-colors group">
+                   <div className="w-12 h-12 bg-white text-[#4a3426] border border-gray-200 rounded-full flex items-center justify-center shadow-sm group-hover:scale-110 transition-transform duration-300">
                       <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" className="w-5 h-5 group-hover:animate-bounce">
                          <path d="M1.5 4.5a3 3 0 013-3h1.372c.86 0 1.61.586 1.819 1.42l.54 2.159a1.83 1.83 0 01-.521 1.748L6.222 8.307a11.042 11.042 0 005.471 5.471l1.488-1.488a1.83 1.83 0 011.748-.521l2.159.54c.834.209 1.42.959 1.42 1.819V19.5a3 3 0 01-3 3h-2.25a16.5 16.5 0 01-16.5-16.5V4.5z" />
                       </svg>
@@ -563,8 +627,8 @@ const MaleHostel: React.FC<MaleHostelProps> = ({ onNavigate }) => {
                    <span className="font-black drop-shadow-sm">{branchPhoneFormatted}</span>
                 </a>
                 <div className="hidden sm:block w-[1px] h-10 bg-gray-200"></div>
-                <a href="mailto:info.bachelorpoint@gmail.com" className="text-gray-500 text-xs md:text-sm flex items-center gap-2 font-medium hover:text-[#002147] transition-colors group px-2">
-                   <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-5 h-5 text-[#D4AF37] group-hover:scale-110 transition-transform">
+                <a href="mailto:info.bachelorpoint@gmail.com" className="text-gray-500 text-xs md:text-sm flex items-center gap-2 font-medium hover:text-[#4a3426] transition-colors group px-2">
+                   <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-5 h-5 text-[#C9A84C] group-hover:scale-110 transition-transform">
                       <path strokeLinecap="round" strokeLinejoin="round" d="M21.75 6.75v10.5a2.25 2.25 0 01-2.25 2.25h-15a2.25 2.25 0 01-2.25-2.25V6.75m19.5 0A2.25 2.25 0 0019.5 4.5h-15a2.25 2.25 0 00-2.25 2.25m19.5 0v.243a2.25 2.25 0 01-1.07 1.916l-7.5 4.615a2.25 2.25 0 01-2.36 0L3.32 8.91a2.25 2.25 0 01-1.07-1.916V6.75" />
                    </svg>
                    <span className="underline decoration-transparent group-hover:decoration-gray-300 transition-colors">info.bachelorpoint@gmail.com</span>
@@ -583,7 +647,7 @@ const MaleHostel: React.FC<MaleHostelProps> = ({ onNavigate }) => {
             viewport={{ once: true }}
             className="text-center md:text-left mb-6 md:mb-8"
           >
-            <h2 className="text-3xl md:text-4xl font-black text-[#002147] tracking-tight">
+            <h2 className="text-3xl md:text-4xl font-black text-[#4a3426] tracking-tight">
               Find Us on <span className="text-[#8CC63F]">Google Map</span>
             </h2>
           </motion.div>
@@ -602,8 +666,8 @@ const MaleHostel: React.FC<MaleHostelProps> = ({ onNavigate }) => {
                   <path fillRule="evenodd" d="M11.54 22.351l.07.04.028.016a.76.76 0 00.723 0l.028-.015.071-.041a16.975 16.975 0 001.152-.722c1.102-.736 2.531-1.748 3.82-3.114 1.256-1.337 2.162-2.715 2.162-4.565 0-4.639-3.76-8.5-8.5-8.5s-8.5 3.861-8.5 8.5c0 1.85 1.006 3.228 2.262 4.565 1.289 1.366 2.718 2.378 4.02 3.114a16.707 16.707 0 001.152.722zM12 14.5a2.5 2.5 0 100-5 2.5 2.5 0 000 5z" clipRule="evenodd" />
                 </svg>
               </div>
-              <h3 className="text-lg md:text-xl font-bold text-[#002147] mb-1 md:mb-2">Hostel Address</h3>
-              <p className="text-[#002147]/70 text-sm md:text-base font-medium leading-relaxed max-w-md">
+              <h3 className="text-lg md:text-xl font-bold text-[#4a3426] mb-1 md:mb-2">Hostel Address</h3>
+              <p className="text-[#4a3426]/70 text-sm md:text-base font-medium leading-relaxed max-w-md">
                 ৩৬৭, গাওয়াইর, দক্ষিণখান, ঢাকা-১২৩০
               </p>
             </motion.div>

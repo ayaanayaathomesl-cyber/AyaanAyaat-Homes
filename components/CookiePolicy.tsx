@@ -9,7 +9,7 @@ export const CookiePolicy: React.FC = () => {
           e.preventDefault();
           window.history.pushState({ type: 'home' }, '', '/');
           window.dispatchEvent(new PopStateEvent('popstate', { state: { type: 'home' }}));
-        }} className="bg-white text-[#002147] hover:bg-gray-100 p-2 md:p-3 rounded-full shadow-md border border-[#002147]/10 transition-colors inline-flex items-center justify-center group" aria-label="Close">
+        }} className="bg-white text-[#4a3426] hover:bg-gray-100 p-2 md:p-3 rounded-full shadow-md border border-[#4a3426]/10 transition-colors inline-flex items-center justify-center group" aria-label="Close">
           <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor" className="w-5 h-5 md:w-6 md:h-6 group-hover:scale-110 transition-transform">
             <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
           </svg>
@@ -21,7 +21,7 @@ export const CookiePolicy: React.FC = () => {
         transition={{ duration: 0.8 }}
       >
         <span className="text-[#D4AF37] text-xs font-bold uppercase tracking-[0.2em] mb-4 block">Legal</span>
-        <h1 className="text-4xl md:text-5xl text-[#002147] mb-8">Cookie Policy</h1>
+        <h1 className="text-4xl md:text-5xl text-[#4a3426] mb-8">Cookie Policy</h1>
         
         <div className="prose prose-lg prose-slate text-gray-600 space-y-6">
           <p>
@@ -29,14 +29,14 @@ export const CookiePolicy: React.FC = () => {
             technologies when you visit our website.
           </p>
 
-          <h2 className="text-2xl text-[#002147] mt-8 mb-4">1. What are Cookies?</h2>
+          <h2 className="text-2xl text-[#4a3426] mt-8 mb-4">1. What are Cookies?</h2>
           <p>
             Cookies are small text files that are placed on your computer or mobile device when you
             visit a website. They are widely used by website owners to make their websites work,
             or to work more efficiently, as well as to provide reporting information.
           </p>
 
-          <h2 className="text-2xl text-[#002147] mt-8 mb-4">2. How We Use Cookies</h2>
+          <h2 className="text-2xl text-[#4a3426] mt-8 mb-4">2. How We Use Cookies</h2>
           <p>
             We use cookies for several reasons, including:
           </p>
@@ -46,7 +46,7 @@ export const CookiePolicy: React.FC = () => {
             <li><strong>Functionality Cookies:</strong> Used to recognize you when you return to our website and personalize content for you.</li>
           </ul>
 
-          <h2 className="text-2xl text-[#002147] mt-8 mb-4">3. Your Choices</h2>
+          <h2 className="text-2xl text-[#4a3426] mt-8 mb-4">3. Your Choices</h2>
           <p>
             You have the right to decide whether to accept or reject cookies. You can exercise your
             cookie preferences by setting or amending your web browser controls to accept or refuse cookies.

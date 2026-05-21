@@ -155,6 +155,7 @@ export default function Admin({ onNavigate }: AdminProps) {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [loginError, setLoginError] = useState('');
+  const [isLoading, setIsLoading] = useState(false);
 
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(auth, (u) => setUser(u));
@@ -163,22 +164,28 @@ export default function Admin({ onNavigate }: AdminProps) {
 
   const handleGoogleLogin = async () => {
     setLoginError('');
+    setIsLoading(true);
     try {
       await signInWithPopup(auth, new GoogleAuthProvider());
     } catch (error: any) {
       console.error(error);
       setLoginError(error.message || 'Login failed');
+    } finally {
+      setIsLoading(false);
     }
   };
 
   const handleEmailLogin = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoginError('');
+    setIsLoading(true);
     try {
       await signInWithEmailAndPassword(auth, email, password);
     } catch (error: any) {
       console.error(error);
       setLoginError('Invalid email or password');
+    } finally {
+      setIsLoading(false);
     }
   };
 
@@ -187,12 +194,15 @@ export default function Admin({ onNavigate }: AdminProps) {
       setLoginError('Please enter your email address to reset your password.');
       return;
     }
+    setIsLoading(true);
     try {
       await sendPasswordResetEmail(auth, email);
       setLoginError('Password reset email sent. Please check your inbox.');
     } catch (error: any) {
       console.error(error);
       setLoginError(error.message || 'Failed to send reset email');
+    } finally {
+      setIsLoading(false);
     }
   };
 
@@ -205,15 +215,15 @@ export default function Admin({ onNavigate }: AdminProps) {
           {onNavigate && (
             <button 
               onClick={() => onNavigate({ type: 'home' })}
-              className="absolute top-4 left-4 text-gray-400 hover:text-[#002147] transition-colors p-2 flex items-center gap-1 font-semibold text-sm"
+              className="absolute top-4 left-4 text-gray-400 hover:text-[#4a3426] transition-colors p-2 flex items-center gap-1 font-semibold text-sm"
             >
               <ArrowLeft className="w-4 h-4" /> Back to Site
             </button>
           )}
-          <div className="w-16 h-16 bg-[#002147] rounded-full flex items-center justify-center mx-auto mb-6 text-white shadow-lg mt-4">
+          <div className="w-16 h-16 bg-[#4a3426] rounded-full flex items-center justify-center mx-auto mb-6 text-white shadow-lg mt-4">
             <Settings className="w-8 h-8" />
           </div>
-          <h1 className="text-2xl font-black text-[#002147] mb-2">Admin Portal</h1>
+          <h1 className="text-2xl font-black text-[#4a3426] mb-2">Admin Portal</h1>
           <p className="text-gray-500 mb-6 font-medium">Please sign in to manage content</p>
           
           {loginError && (
@@ -247,16 +257,28 @@ export default function Admin({ onNavigate }: AdminProps) {
               <button
                 type="button"
                 onClick={handleResetPassword}
-                className="text-[#002147] hover:text-[#D4AF37] font-medium transition-colors"
+                disabled={isLoading}
+                className="text-[#4a3426] hover:text-[#D4AF37] font-medium transition-colors disabled:opacity-50"
               >
                 Forgot Password?
               </button>
             </div>
             <button
               type="submit"
-              className="w-full bg-[#002147] hover:bg-[#003366] text-white font-bold py-3 px-6 rounded-xl transition-colors shadow-lg"
+              disabled={isLoading}
+              className="w-full bg-[#4a3426] hover:bg-[#5c4033] text-white font-bold py-3 px-6 rounded-xl transition-colors shadow-lg flex justify-center items-center gap-2 disabled:opacity-70 disabled:cursor-not-allowed"
             >
-              Sign In
+              {isLoading ? (
+                <>
+                  <svg className="animate-spin h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                    <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                    <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                  </svg>
+                  Signing In...
+                </>
+              ) : (
+                'Sign In'
+              )}
             </button>
           </form>
 
@@ -271,26 +293,34 @@ export default function Admin({ onNavigate }: AdminProps) {
 
           <button
             onClick={handleGoogleLogin}
-            className="w-full flex items-center justify-center gap-2 bg-white hover:bg-gray-50 text-gray-700 font-bold py-3 px-6 rounded-xl border border-gray-200 transition-colors shadow-sm"
+            disabled={isLoading}
+            className="w-full flex items-center justify-center gap-2 bg-white hover:bg-gray-50 text-gray-700 font-bold py-3 px-6 rounded-xl border border-gray-200 transition-colors shadow-sm disabled:opacity-70 disabled:cursor-not-allowed"
           >
-            <svg className="w-5 h-5" viewBox="0 0 24 24">
-              <path
-                fill="currentColor"
-                d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"
-              />
-              <path
-                fill="#34A853"
-                d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"
-              />
-              <path
-                fill="#FBBC05"
-                d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z"
-              />
-              <path
-                fill="#EA4335"
-                d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"
-              />
-            </svg>
+            {isLoading ? (
+              <svg className="animate-spin h-5 w-5 text-gray-500" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+              </svg>
+            ) : (
+              <svg className="w-5 h-5" viewBox="0 0 24 24">
+                <path
+                  fill="currentColor"
+                  d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"
+                />
+                <path
+                  fill="#34A853"
+                  d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"
+                />
+                <path
+                  fill="#FBBC05"
+                  d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z"
+                />
+                <path
+                  fill="#EA4335"
+                  d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"
+                />
+              </svg>
+            )}
             Google
           </button>
         </div>
@@ -304,7 +334,7 @@ export default function Admin({ onNavigate }: AdminProps) {
       <ConfirmModal />
       
       {/* Top Header / Sidebar */}
-      <div className="w-full md:w-64 bg-[#002147] text-white flex-shrink-0 flex flex-col relative h-auto md:h-full z-[70] shadow-xl md:shadow-2xl">
+      <div className="w-full md:w-64 bg-[#4a3426] text-white flex-shrink-0 flex flex-col relative h-auto md:h-full z-[70] shadow-xl md:shadow-2xl">
         <div className="p-4 md:p-6 border-b border-white/10 flex items-center justify-between md:block">
           <div className="flex items-center gap-2 md:gap-3">
             <Settings className="w-5 h-5 md:w-6 md:h-6 text-[#D4AF37]" />
@@ -390,10 +420,12 @@ export default function Admin({ onNavigate }: AdminProps) {
 
 function HomeSettings() {
   const [philosophyImages, setPhilosophyImages] = useState<string[]>([]);
-  const [uploading, setUploading] = useState(false);
+  const [homeBgImages, setHomeBgImages] = useState<string[]>([]);
+  const [uploadingPhil, setUploadingPhil] = useState(false);
+  const [uploadingBg, setUploadingBg] = useState(false);
 
   useEffect(() => {
-    const unsub = onSnapshot(doc(db, 'settings', 'philosophy'), (doc) => {
+    const unsubPhil = onSnapshot(doc(db, 'settings', 'philosophy'), (doc) => {
       if (doc.exists()) {
         const data = doc.data();
         if (data.images && Array.isArray(data.images) && data.images.length > 0) {
@@ -405,10 +437,25 @@ function HomeSettings() {
         }
       }
     }, (error) => handleFirestoreError(error, OperationType.GET, 'settings/philosophy'));
-    return unsub;
+
+    const unsubBg = onSnapshot(doc(db, 'settings', 'homeBackgrounds'), (doc) => {
+      if (doc.exists()) {
+        const data = doc.data();
+        if (data.images && Array.isArray(data.images)) {
+          setHomeBgImages(data.images);
+        } else {
+          setHomeBgImages([]);
+        }
+      }
+    }, (error) => handleFirestoreError(error, OperationType.GET, 'settings/homeBackgrounds'));
+    
+    return () => {
+      unsubPhil();
+      unsubBg();
+    };
   }, []);
 
-  const handleUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleUpload = async (e: React.ChangeEvent<HTMLInputElement>, type: 'philosophy' | 'background') => {
     const file = e.target.files?.[0];
     if (!file) return;
 
@@ -418,7 +465,9 @@ function HomeSettings() {
       return;
     }
 
-    setUploading(true);
+    if (type === 'philosophy') setUploadingPhil(true);
+    else setUploadingBg(true);
+
     try {
       let cloudName = import.meta.env.VITE_CLOUDINARY_CLOUD_NAME || localStorage.getItem('cloudinary_cloud_name');
       let uploadPreset = import.meta.env.VITE_CLOUDINARY_UPLOAD_PRESET || localStorage.getItem('cloudinary_upload_preset');
@@ -437,7 +486,12 @@ function HomeSettings() {
 
       if (!cloudName || !uploadPreset) {
         const config = await requestCloudinaryConfig();
-        if (!config) { setUploading(false); e.target.value = ''; return; }
+        if (!config) { 
+          if (type === 'philosophy') setUploadingPhil(false);
+          else setUploadingBg(false);
+          e.target.value = ''; 
+          return; 
+        }
         cloudName = config.cloudName;
         uploadPreset = config.uploadPreset;
       }
@@ -453,10 +507,17 @@ function HomeSettings() {
       const data = await res.json();
 
       if (res.ok) {
-        await setDoc(doc(db, 'settings', 'philosophy'), { 
-          images: [...philosophyImages, data.secure_url],
-          updatedAt: Date.now()
-        }, { merge: true });
+        if (type === 'philosophy') {
+          await setDoc(doc(db, 'settings', 'philosophy'), { 
+            images: [...philosophyImages, data.secure_url],
+            updatedAt: Date.now()
+          }, { merge: true });
+        } else {
+          await setDoc(doc(db, 'settings', 'homeBackgrounds'), { 
+            images: [...homeBgImages, data.secure_url],
+            updatedAt: Date.now()
+          }, { merge: true });
+        }
       } else {
         alert('Upload failed: ' + data.error?.message);
         if (data.error?.message?.includes('Upload preset')) {
@@ -467,51 +528,61 @@ function HomeSettings() {
       console.error("Upload error:", error);
       alert('Upload failed: ' + (error?.message || String(error)));
     } finally {
-      setUploading(false);
+      if (type === 'philosophy') setUploadingPhil(false);
+      else setUploadingBg(false);
       e.target.value = '';
     }
   };
 
-  const deleteImage = async (urlStr: string) => {
+  const deleteImage = async (urlStr: string, type: 'philosophy' | 'background') => {
     if (await requestConfirm('Are you sure you want to delete this image?')) {
        try {
          const { deleteField } = await import('firebase/firestore');
-         const newImages = philosophyImages.filter(img => img !== urlStr);
-         await updateDoc(doc(db, 'settings', 'philosophy'), { 
-           images: newImages,
-           imageUrl: deleteField() 
-         });
+         if (type === 'philosophy') {
+           const newImages = philosophyImages.filter(img => img !== urlStr);
+           await updateDoc(doc(db, 'settings', 'philosophy'), { 
+             images: newImages,
+             imageUrl: deleteField() 
+           });
+         } else {
+           const newImages = homeBgImages.filter(img => img !== urlStr);
+           await updateDoc(doc(db, 'settings', 'homeBackgrounds'), { 
+             images: newImages,
+           });
+         }
        } catch (e) {
-         handleFirestoreError(e, OperationType.UPDATE, 'settings/philosophy');
+         handleFirestoreError(e, OperationType.UPDATE, type === 'philosophy' ? 'settings/philosophy' : 'settings/homeBackgrounds');
        }
     }
   };
 
   return (
-    <div className="space-y-6">
-      <h2 className="text-2xl font-black text-[#002147]">Our Philosophy Images</h2>
-      
-      <div className="space-y-4">
-        {philosophyImages.length > 0 && (
-          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
-             {philosophyImages.map((img, i) => (
-                <div key={i} className="relative w-full aspect-video rounded-xl overflow-hidden border-2 border-gray-100 group">
-                   <img src={img} className="w-full h-full object-cover" alt="Philosophy" />
-                   <div className="absolute inset-0 bg-black/50 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
-                      <button onClick={() => deleteImage(img)} className="bg-red-600 hover:bg-red-700 text-white p-2 rounded-full cursor-pointer">
-                         <Trash2 className="w-5 h-5" />
-                      </button>
-                   </div>
-                </div>
-             ))}
-          </div>
-        )}
+    <div className="space-y-12">
+      <div className="space-y-6">
+        <h2 className="text-2xl font-black text-[#4a3426]">Our Philosophy Images</h2>
         
-        <label className="inline-flex items-center gap-2 cursor-pointer bg-[#002147] hover:bg-[#001530] text-white font-bold py-3 px-6 rounded-xl transition-colors mt-4">
-          <Upload className="w-5 h-5" />
-          <span>{uploading ? 'Uploading...' : 'Upload New Image'}</span>
-          <input type="file" accept="image/*" className="hidden" onChange={handleUpload} disabled={uploading} />
-        </label>
+        <div className="space-y-4">
+          {philosophyImages.length > 0 && (
+            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
+               {philosophyImages.map((img, i) => (
+                  <div key={i} className="relative w-full aspect-video rounded-xl overflow-hidden border-2 border-gray-100 group">
+                     <img src={img} className="w-full h-full object-cover" alt="Philosophy" />
+                     <div className="absolute inset-0 bg-black/50 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
+                        <button onClick={() => deleteImage(img, 'philosophy')} className="bg-red-600 hover:bg-red-700 text-white p-2 rounded-full cursor-pointer">
+                           <Trash2 className="w-5 h-5" />
+                        </button>
+                     </div>
+                  </div>
+               ))}
+            </div>
+          )}
+          
+          <label className="inline-flex items-center gap-2 cursor-pointer bg-[#4a3426] hover:bg-[#2b1c11] text-white font-bold py-3 px-6 rounded-xl transition-colors mt-4">
+            <Upload className="w-5 h-5" />
+            <span>{uploadingPhil ? 'Uploading...' : 'Upload New Image'}</span>
+            <input type="file" accept="image/*" className="hidden" onChange={(e) => handleUpload(e, 'philosophy')} disabled={uploadingPhil} />
+          </label>
+        </div>
       </div>
     </div>
   );
@@ -522,32 +593,39 @@ function BranchSettings({ branch, prefix }: { branch: string, prefix: string }) 
 
   return (
     <div className="space-y-8">
-      <h2 className="text-2xl font-black text-[#002147] capitalize">{branch} Point Settings</h2>
+      <h2 className="text-2xl font-black text-[#4a3426] capitalize">{branch} Point Settings</h2>
       
       <div className="flex flex-wrap gap-2 mb-6">
         <button 
           onClick={() => setActiveSection('pricing')} 
-          className={`px-4 py-2 rounded-lg font-bold text-sm transition-colors ${activeSection === 'pricing' ? 'bg-[#002147] text-white' : 'bg-gray-100 text-gray-600 hover:bg-gray-200'}`}
+          className={`px-4 py-2 rounded-lg font-bold text-sm transition-colors ${activeSection === 'pricing' ? 'bg-[#4a3426] text-white' : 'bg-gray-100 text-gray-600 hover:bg-gray-200'}`}
         >
           Pricing Table
         </button>
         <button 
           onClick={() => setActiveSection('menu')} 
-          className={`px-4 py-2 rounded-lg font-bold text-sm transition-colors ${activeSection === 'menu' ? 'bg-[#002147] text-white' : 'bg-gray-100 text-gray-600 hover:bg-gray-200'}`}
+          className={`px-4 py-2 rounded-lg font-bold text-sm transition-colors ${activeSection === 'menu' ? 'bg-[#4a3426] text-white' : 'bg-gray-100 text-gray-600 hover:bg-gray-200'}`}
         >
           Food Menu
         </button>
         <button 
           onClick={() => setActiveSection('gallery')} 
-          className={`px-4 py-2 rounded-lg font-bold text-sm transition-colors ${activeSection === 'gallery' ? 'bg-[#002147] text-white' : 'bg-gray-100 text-gray-600 hover:bg-gray-200'}`}
+          className={`px-4 py-2 rounded-lg font-bold text-sm transition-colors ${activeSection === 'gallery' ? 'bg-[#4a3426] text-white' : 'bg-gray-100 text-gray-600 hover:bg-gray-200'}`}
         >
           Gallery Media
+        </button>
+        <button 
+          onClick={() => setActiveSection('video')} 
+          className={`px-4 py-2 rounded-lg font-bold text-sm transition-colors ${activeSection === 'video' ? 'bg-[#4a3426] text-white' : 'bg-gray-100 text-gray-600 hover:bg-gray-200'}`}
+        >
+          Videos
         </button>
       </div>
 
       {activeSection === 'pricing' && <PricesSettings prefix={prefix} />}
       {activeSection === 'menu' && <MenuSettings prefix={prefix} />}
       {activeSection === 'gallery' && <GallerySettings prefix={prefix} />}
+      {activeSection === 'video' && <VideoSettings prefix={prefix} />}
     </div>
   );
 }
@@ -643,7 +721,7 @@ function PricesSettings({ prefix }: { prefix: string }) {
   return (
     <div className="space-y-4">
       <div className="flex items-center justify-between">
-        <h3 className="text-xl font-bold text-[#002147]">Pricing Table</h3>
+        <h3 className="text-xl font-bold text-[#4a3426]">Pricing Table</h3>
         <div className="flex gap-2">
           <button onClick={addPrice} className="bg-[#D4AF37] text-white px-4 py-2 rounded-lg font-bold flex items-center gap-2 text-sm"><Plus className="w-4 h-4"/> Add Row</button>
         </div>
@@ -651,7 +729,7 @@ function PricesSettings({ prefix }: { prefix: string }) {
 
       <div className="overflow-x-auto pb-4 rounded-xl border border-gray-100 shadow-sm bg-white">
         <table className="w-full text-sm text-left">
-          <thead className="bg-[#002147]/5 text-[#002147] font-semibold">
+          <thead className="bg-[#4a3426]/5 text-[#4a3426] font-semibold">
             <tr>
               <th className="p-4">Type</th>
               <th className="p-4">1 Day</th>
@@ -759,7 +837,7 @@ function MenuSettings({ prefix }: { prefix: string }) {
   return (
     <div className="space-y-4">
       <div className="flex items-center justify-between">
-        <h3 className="text-xl font-bold text-[#002147]">Food Menu</h3>
+        <h3 className="text-xl font-bold text-[#4a3426]">Food Menu</h3>
         <div className="flex gap-2">
           <button onClick={addMenu} className="bg-[#D4AF37] text-white px-4 py-2 rounded-lg font-bold flex items-center gap-2 text-sm"><Plus className="w-4 h-4"/> Add Row</button>
         </div>
@@ -767,7 +845,7 @@ function MenuSettings({ prefix }: { prefix: string }) {
 
       <div className="overflow-x-auto pb-4 rounded-xl border border-gray-100 shadow-sm bg-white">
         <table className="w-full text-sm text-left">
-          <thead className="bg-[#002147]/5 text-[#002147] font-semibold">
+          <thead className="bg-[#4a3426]/5 text-[#4a3426] font-semibold">
             <tr>
               <th className="p-4 w-[15%]">Day</th>
               <th className="p-4 w-[25%]">Breakfast</th>
@@ -888,7 +966,7 @@ function GallerySettings({ prefix }: { prefix: string }) {
   return (
     <div className="space-y-4">
       <div className="flex items-center justify-between mb-4">
-        <h3 className="text-xl font-bold text-[#002147]">Gallery Media</h3>
+        <h3 className="text-xl font-bold text-[#4a3426]">Gallery Media</h3>
         <label className="cursor-pointer bg-[#D4AF37] text-white px-4 py-2 rounded-lg font-bold flex items-center gap-2">
            <Upload className="w-4 h-4"/>
            <span>{uploading ? 'Uploading...' : 'Upload Media'}</span>
@@ -926,6 +1004,283 @@ function GallerySettings({ prefix }: { prefix: string }) {
              <p className="font-medium text-lg">No media uploaded yet.</p>
              <p className="text-sm">Upload images or videos to see them here.</p>
            </div>
+        )}
+      </div>
+    </div>
+  );
+}
+
+// Helper to parse and convert various video URLs to embeddable URLs
+export function getEmbedUrl(url: string, type: 'youtube' | 'facebook' | 'drive' | 'direct') {
+  if (!url) return '';
+  const trimmed = url.trim();
+
+  if (type === 'youtube') {
+    const regExp = /^.*(youtu.be\/|v\/|u\/\w\/|embed\/|watch\?v=|\&v=)([^#\&\?]*).*/;
+    const match = trimmed.match(regExp);
+    const videoId = (match && match[2].length === 11) ? match[2] : null;
+    if (videoId) {
+      return `https://www.youtube.com/embed/${videoId}?autoplay=0&rel=0`;
+    }
+    return trimmed;
+  }
+
+  if (type === 'facebook') {
+    return `https://www.facebook.com/plugins/video.php?href=${encodeURIComponent(trimmed)}&show_text=0&width=500`;
+  }
+
+  if (type === 'drive') {
+    // Extract ID from drive link e.g. drive.google.com/file/d/123/view
+    const match = trimmed.match(/\/file\/d\/([a-zA-Z0-9_-]+)/);
+    const driveId = match ? match[1] : null;
+    if (driveId) {
+      return `https://drive.google.com/file/d/${driveId}/preview`;
+    }
+    return trimmed;
+  }
+
+  return trimmed;
+}
+
+function VideoSettings({ prefix }: { prefix: string }) {
+  const [videos, setVideos] = useState<any[]>([]);
+  const [uploadingId, setUploadingId] = useState<string | null>(null);
+
+  useEffect(() => {
+    const unsub = onSnapshot(collection(db, `${prefix}_videos`), (snapshot) => {
+      const items = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() })).sort((a: any, b: any) => a.order - b.order);
+      setVideos(items);
+    }, (error) => handleFirestoreError(error, OperationType.GET, `${prefix}_videos`));
+    return unsub;
+  }, [prefix]);
+
+  const addVideo = async () => {
+    try {
+      const id = Date.now().toString();
+      await setDoc(doc(db, `${prefix}_videos`, id), {
+        title: 'New Promo Video',
+        type: 'youtube',
+        url: '',
+        active: false,
+        order: videos.length,
+        createdAt: Date.now()
+      });
+    } catch (e) {
+      handleFirestoreError(e, OperationType.CREATE, `${prefix}_videos`);
+    }
+  };
+
+  const deleteVideo = async (id: string) => {
+    if (await requestConfirm('Delete this video from the system?')) {
+      try {
+        await deleteDoc(doc(db, `${prefix}_videos`, id));
+      } catch (e) {
+        handleFirestoreError(e, OperationType.DELETE, `${prefix}_videos`);
+      }
+    }
+  };
+
+  const updateVideo = async (id: string, updatedFields: any) => {
+    try {
+      await setDoc(doc(db, `${prefix}_videos`, id), updatedFields, { merge: true });
+    } catch (e) {
+      handleFirestoreError(e, OperationType.UPDATE, `${prefix}_videos`);
+    }
+  };
+
+  const handleUpload = async (id: string, e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    if (file.size > 100 * 1024 * 1024) {
+      alert("File is too large. Please keep it under 100MB");
+      e.target.value = '';
+      return;
+    }
+
+    setUploadingId(id);
+    try {
+      let cloudName = import.meta.env.VITE_CLOUDINARY_CLOUD_NAME || localStorage.getItem('cloudinary_cloud_name');
+      let uploadPreset = import.meta.env.VITE_CLOUDINARY_UPLOAD_PRESET || localStorage.getItem('cloudinary_upload_preset');
+
+      if (!cloudName || !uploadPreset) {
+        const snap = await getDoc(doc(db, 'settings', 'cloudinary'));
+        if (snap.exists() && snap.data().cloudName && snap.data().uploadPreset) {
+          cloudName = snap.data().cloudName;
+          uploadPreset = snap.data().uploadPreset;
+          localStorage.setItem('cloudinary_cloud_name', cloudName as string);
+          localStorage.setItem('cloudinary_upload_preset', uploadPreset as string);
+        }
+      }
+
+      if (!cloudName || !uploadPreset) {
+        const config = await requestCloudinaryConfig();
+        if (!config) { setUploadingId(null); e.target.value = ''; return; }
+        cloudName = config.cloudName;
+        uploadPreset = config.uploadPreset;
+      }
+
+      const formData = new FormData();
+      formData.append('file', file);
+      formData.append('upload_preset', uploadPreset);
+
+      const res = await fetch(`https://api.cloudinary.com/v1_1/${cloudName}/video/upload`, {
+        method: 'POST',
+        body: formData
+      });
+      const data = await res.json();
+
+      if (res.ok) {
+        await setDoc(doc(db, `${prefix}_videos`, id), {
+          url: data.secure_url,
+          type: 'direct',
+          updatedAt: Date.now()
+        }, { merge: true });
+      } else {
+        alert('Upload failed: ' + data.error?.message);
+      }
+    } catch (error: any) {
+      console.error(error);
+      alert('Upload failed: ' + (error?.message || String(error)));
+    } finally {
+      setUploadingId(null);
+      e.target.value = '';
+    }
+  };
+
+  return (
+    <div className="space-y-6">
+      <div className="flex items-center justify-between">
+        <div>
+          <h3 className="text-xl font-bold text-[#4a3426]">Featured Video Section</h3>
+          <p className="text-xs text-gray-500 mt-1">Add promo or facility walkthrough videos for the hostel page.</p>
+        </div>
+        <button
+          onClick={addVideo}
+          className="bg-[#D4AF37] hover:bg-[#b08e2a] text-white px-4 py-2 rounded-lg font-bold flex items-center gap-2 text-sm transition-colors shadow-sm"
+        >
+          <Plus className="w-4 h-4" />
+          <span>Add Video</span>
+        </button>
+      </div>
+
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+        {videos.map(item => {
+          const embedUrl = getEmbedUrl(item.url, item.type);
+          return (
+            <div key={item.id} className="bg-white border border-gray-100 rounded-2xl p-5 shadow-sm hover:shadow-md transition-all flex flex-col justify-between">
+              <div className="space-y-4">
+                {/* Title */}
+                <div>
+                  <label className="block text-xs font-bold text-gray-600 uppercase mb-1">Video Title (ভিডিও শিরোনাম)</label>
+                  <input
+                    type="text"
+                    className="w-full border border-gray-200 rounded-lg p-2.5 text-sm focus:ring-2 focus:ring-[#D4AF37] outline-none font-medium"
+                    value={item.title || ''}
+                    onChange={e => updateVideo(item.id, { title: e.target.value })}
+                  />
+                </div>
+
+                {/* Video source type */}
+                <div>
+                  <label className="block text-xs font-bold text-gray-600 uppercase mb-1">Source Platform (উৎস প্ল্যাটফর্ম)</label>
+                  <select
+                    className="w-full border border-gray-200 rounded-lg p-2.5 text-sm focus:ring-2 focus:ring-[#D4AF37] outline-none font-medium bg-white"
+                    value={item.type}
+                    onChange={e => updateVideo(item.id, { type: e.target.value, url: '' })}
+                  >
+                    <option value="youtube">YouTube</option>
+                    <option value="facebook">Facebook Video</option>
+                    <option value="drive">Google Drive Video link</option>
+                    <option value="direct">Direct Video Upload / Direct URL (এমপি৪ ফাইল আপলোড)</option>
+                  </select>
+                </div>
+
+                {/* Video URL Input or direct Upload option */}
+                <div>
+                  <div className="flex items-center justify-between mb-1">
+                    <label className="block text-xs font-bold text-gray-600 uppercase">Video URL / Share Link (ভিডিও লিঙ্ক)</label>
+                    {item.type === 'direct' && (
+                      <label className="cursor-pointer text-[11px] font-bold text-[#D4AF37] hover:underline bg-[#D4AF37]/10 px-2 py-1 rounded">
+                        {uploadingId === item.id ? 'Uploading...' : 'Upload Video File'}
+                        <input
+                          type="file"
+                          accept="video/*"
+                          className="hidden"
+                          onChange={e => handleUpload(item.id, e)}
+                          disabled={uploadingId === item.id}
+                        />
+                      </label>
+                    )}
+                  </div>
+                  <input
+                    type="text"
+                    placeholder={
+                      item.type === 'youtube' ? 'e.g. https://www.youtube.com/watch?v=...' :
+                      item.type === 'facebook' ? 'e.g. https://www.facebook.com/.../videos/...' :
+                      item.type === 'drive' ? 'e.g. https://drive.google.com/file/d/.../view' :
+                      'e.g. https://example.com/video.mp4'
+                    }
+                    className="w-full border border-gray-200 rounded-lg p-2.5 text-sm focus:ring-2 focus:ring-[#D4AF37] outline-none font-mono"
+                    value={item.url || ''}
+                    onChange={e => updateVideo(item.id, { url: e.target.value })}
+                  />
+                </div>
+
+                {/* Preview block */}
+                {item.url ? (
+                  <div className="border border-gray-100 rounded-xl overflow-hidden aspect-video bg-gray-50 flex items-center justify-center relative">
+                    {item.type === 'direct' ? (
+                      <video src={item.url} className="w-full h-full object-cover" controls muted />
+                    ) : (
+                      <iframe
+                        title="Video Preview"
+                        src={embedUrl}
+                        className="w-full h-full"
+                        allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+                        allowFullScreen
+                      />
+                    )}
+                  </div>
+                ) : (
+                  <div className="border border-dashed border-gray-200 rounded-xl aspect-video bg-gray-50 flex flex-col justify-center items-center text-gray-400 p-4">
+                    <FileVideo className="w-8 h-8 mb-2" />
+                    <p className="text-xs font-medium">Add a valid URL to preview the video player</p>
+                  </div>
+                )}
+              </div>
+
+              {/* Action buttons list */}
+              <div className="flex items-center justify-between border-t border-gray-100 mt-5 pt-4">
+                <label className="flex items-center gap-2 cursor-pointer">
+                  <input
+                    type="checkbox"
+                    className="rounded text-[#D4AF37] focus:ring-[#D4AF37] cursor-pointer"
+                    checked={item.active}
+                    onChange={e => updateVideo(item.id, { active: e.target.checked })}
+                  />
+                  <span className="text-sm font-semibold text-gray-700">Show on Page (পেজে প্রদর্শন করুন)</span>
+                </label>
+
+                <button
+                  type="button"
+                  onClick={() => deleteVideo(item.id)}
+                  className="text-red-500 hover:text-white hover:bg-red-500 p-2 rounded-lg transition-colors text-xs font-bold flex items-center gap-1.5"
+                >
+                  <Trash2 className="w-4 h-4" />
+                  <span>Delete</span>
+                </button>
+              </div>
+            </div>
+          );
+        })}
+
+        {videos.length === 0 && (
+          <div className="col-span-full py-16 text-center text-gray-500 bg-gray-50 rounded-xl border border-dashed border-gray-300">
+            <FileVideo className="w-12 h-12 text-gray-400 mx-auto mb-3" />
+            <p className="font-medium text-lg">No videos configured.</p>
+            <p className="text-sm text-gray-400">Add a promo video to showcase accommodations!</p>
+          </div>
         )}
       </div>
     </div>

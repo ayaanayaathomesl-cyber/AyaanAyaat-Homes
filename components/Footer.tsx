@@ -73,10 +73,11 @@ const Footer: React.FC<FooterProps> = ({ onNavigate }) => {
              Explore
           </h4>
           <ul className="space-y-2 md:space-y-3 text-white/70 text-[10px] sm:text-[11px] md:text-sm font-medium flex-grow">
-            <li><button onClick={() => onNavigate({ type: 'home' })} className="hover:text-[#D4AF37] hover:translate-x-1 md:hover:translate-x-2 transition-all flex items-center gap-1.5 md:gap-3 group"><span className="w-1.5 h-1.5 md:w-1.5 md:h-1.5 bg-[#D4AF37] rounded-sm opacity-0 group-hover:opacity-100 transition-opacity"></span> Home</button></li>
+            <li><a href="/" onClick={(e) => { e.preventDefault(); onNavigate({ type: 'home' }) }} className="hover:text-[#D4AF37] hover:translate-x-1 md:hover:translate-x-2 transition-all flex items-center gap-1.5 md:gap-3 group"><span className="w-1.5 h-1.5 md:w-1.5 md:h-1.5 bg-[#D4AF37] rounded-sm opacity-0 group-hover:opacity-100 transition-opacity"></span> Home</a></li>
             <li>
-              <button 
-                onClick={() => {
+              <a href="/queenspoint"
+                onClick={(e) => {
+                  e.preventDefault();
                   const navigate = () => {
                     const el = document.getElementById("queens-point-card");
                     if (el) {
@@ -106,11 +107,12 @@ const Footer: React.FC<FooterProps> = ({ onNavigate }) => {
               >
                 <span className="w-1.5 h-1.5 md:w-1.5 md:h-1.5 bg-[#D4AF37] rounded-sm opacity-0 group-hover:opacity-100 transition-opacity shrink-0"></span> 
                 Queens Point
-              </button>
+              </a>
             </li>
             <li>
-              <button 
-                onClick={() => {
+              <a href="/bachelorpoint"
+                onClick={(e) => {
+                  e.preventDefault();
                   const navigate = () => {
                     const el = document.getElementById("bachelor-point-card");
                     if (el) {
@@ -140,16 +142,16 @@ const Footer: React.FC<FooterProps> = ({ onNavigate }) => {
               >
                 <span className="w-1.5 h-1.5 md:w-1.5 md:h-1.5 bg-[#D4AF37] rounded-sm opacity-0 group-hover:opacity-100 transition-opacity shrink-0"></span> 
                 Bachelor Point
-              </button>
+              </a>
             </li>
-            <li><button onClick={() => { onNavigate({ type: 'home' }); setTimeout(() => document.getElementById("upcoming")?.scrollIntoView({ behavior: "smooth" }), 100); }} className="hover:text-[#D4AF37] hover:translate-x-1 md:hover:translate-x-2 transition-all flex items-center gap-1.5 md:gap-3 group text-left leading-tight"><span className="w-1.5 h-1.5 md:w-1.5 md:h-1.5 bg-[#D4AF37] rounded-sm opacity-0 group-hover:opacity-100 transition-opacity shrink-0"></span> Upcoming</button></li>
+            <li><a href="/#upcoming" onClick={(e) => { e.preventDefault(); onNavigate({ type: 'home' }); setTimeout(() => document.getElementById("upcoming")?.scrollIntoView({ behavior: "smooth" }), 100); }} className="hover:text-[#D4AF37] hover:translate-x-1 md:hover:translate-x-2 transition-all flex items-center gap-1.5 md:gap-3 group text-left leading-tight"><span className="w-1.5 h-1.5 md:w-1.5 md:h-1.5 bg-[#D4AF37] rounded-sm opacity-0 group-hover:opacity-100 transition-opacity shrink-0"></span> Upcoming</a></li>
           </ul>
           
           <div className="flex flex-col items-start gap-y-2 md:gap-y-3 mt-4 md:mt-6 text-[8.5px] sm:text-[9.5px] md:text-sm uppercase tracking-widest text-white/90 font-bold">
-            <button onClick={() => onNavigate({ type: 'faq' })} className="hover:text-[#D4AF37] transition-colors text-left leading-tight text-[#D4AF37]">FAQ</button>
-            <button onClick={() => onNavigate({ type: 'privacy' })} className="hover:text-[#D4AF37] transition-colors text-left leading-tight">Privacy</button>
-            <button onClick={() => onNavigate({ type: 'terms' })} className="hover:text-[#D4AF37] transition-colors text-left leading-tight">Terms</button>
-            <button onClick={() => onNavigate({ type: 'cookies' })} className="hover:text-[#D4AF37] transition-colors text-left leading-tight">Cookies</button>
+            <a href="/faq" onClick={(e) => { e.preventDefault(); onNavigate({ type: 'faq' }) }} className="hover:text-[#D4AF37] transition-colors text-left leading-tight text-[#D4AF37]">FAQ</a>
+            <a href="/privacy" onClick={(e) => { e.preventDefault(); onNavigate({ type: 'privacy' }) }} className="hover:text-[#D4AF37] transition-colors text-left leading-tight">Privacy</a>
+            <a href="/terms" onClick={(e) => { e.preventDefault(); onNavigate({ type: 'terms' }) }} className="hover:text-[#D4AF37] transition-colors text-left leading-tight">Terms</a>
+            <a href="/cookies" onClick={(e) => { e.preventDefault(); onNavigate({ type: 'cookies' }) }} className="hover:text-[#D4AF37] transition-colors text-left leading-tight">Cookies</a>
           </div>
         </div>
 

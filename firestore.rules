@@ -47,10 +47,26 @@ service cloud.firestore {
              data.createdAt is number;
     }
 
+    function isValidVideoItem(data) {
+      return data.keys().hasAll(['title', 'type', 'url', 'active', 'createdAt', 'order']) &&
+             data.title is string && data.title.size() <= 200 &&
+             data.type is string && (data.type == 'youtube' || data.type == 'facebook' || data.type == 'drive' || data.type == 'direct') &&
+             data.url is string && data.url.size() <= 2000 &&
+             data.active is bool &&
+             data.createdAt is number &&
+             data.order is number;
+    }
+
     match /settings/philosophy {
       allow read: if true;
       allow create: if isAdmin() && isValidPhilosophyState(incoming());
       allow update: if isAdmin() && isValidPhilosophyState(incoming()) && incoming().diff(existing()).affectedKeys().hasOnly(['imageUrl', 'images', 'updatedAt']);
+    }
+
+    match /settings/homeBackgrounds {
+      allow read: if true;
+      allow create: if isAdmin() && isValidPhilosophyState(incoming());
+      allow update: if isAdmin() && isValidPhilosophyState(incoming()) && incoming().diff(existing()).affectedKeys().hasOnly(['images', 'updatedAt']);
     }
 
     match /settings/cloudinary {
@@ -96,6 +112,20 @@ service cloud.firestore {
       allow read: if true;
       allow create: if isAdmin() && isValidId(itemId) && isValidGalleryItem(incoming()) && incoming().keys().size() == 4;
       allow delete: if isAdmin() && isValidId(itemId);
+    }
+
+    match /bachelorpoint_videos/{videoId} {
+      allow read: if true;
+      allow create: if isAdmin() && isValidId(videoId) && isValidVideoItem(incoming()) && incoming().keys().size() == 6;
+      allow update: if isAdmin() && isValidId(videoId) && isValidVideoItem(incoming());
+      allow delete: if isAdmin() && isValidId(videoId);
+    }
+
+    match /queenspoint_videos/{videoId} {
+      allow read: if true;
+      allow create: if isAdmin() && isValidId(videoId) && isValidVideoItem(incoming()) && incoming().keys().size() == 6;
+      allow update: if isAdmin() && isValidId(videoId) && isValidVideoItem(incoming());
+      allow delete: if isAdmin() && isValidId(videoId);
     }
   }
 }

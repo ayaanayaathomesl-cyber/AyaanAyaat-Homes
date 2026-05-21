@@ -8,7 +8,7 @@ import React, { useState, useEffect } from 'react';
 import { ViewState } from '../types';
 import { motion, AnimatePresence } from 'motion/react';
 import { Lock } from 'lucide-react';
-import { doc, getDoc } from 'firebase/firestore';
+import { doc, getDoc, onSnapshot } from 'firebase/firestore';
 import { db } from '../src/lib/firebase';
 
 interface HomeProps {
@@ -27,30 +27,313 @@ const Home: React.FC<HomeProps> = ({ onNavigate }) => {
   ];
   
   const [philosophyImages, setPhilosophyImages] = useState<string[]>(defaultPhilosophyImages);
+  const [homeBgImages, setHomeBgImages] = useState<string[]>([]);
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
+  const [currentBgIndex, setCurrentBgIndex] = useState(0);
   const [isHovered, setIsHovered] = useState(false);
   const [isAnimating, setIsAnimating] = useState(false);
   const [isManual, setIsManual] = useState(false);
 
+  const [typedL1, setTypedL1] = useState('');
+  const [typedL2, setTypedL2] = useState('');
+  const [activeHighlight, setActiveHighlight] = useState('');
+
+  const canvasRef = React.useRef<HTMLCanvasElement>(null);
+  const orb1Ref = React.useRef<HTMLDivElement>(null);
+  const orb2Ref = React.useRef<HTMLDivElement>(null);
+  const [stats, setStats] = useState({ branches: 0, residents: 0, experience: 0 });
+  const hasAnimatedRef = React.useRef(false);
+
   useEffect(() => {
-    // Fetch custom philosophy image from Firebase
-    const fetchImage = async () => {
-      try {
-        const d = await getDoc(doc(db, 'settings', 'philosophy'));
-        if (d.exists()) {
-          const data = d.data();
-          if (data.images && Array.isArray(data.images) && data.images.length > 0) {
-            setPhilosophyImages(data.images);
-          } else if (data.imageUrl) {
-            setPhilosophyImages([data.imageUrl]);
-          }
+    const slides = [
+      { l1: 'ছাত্র ছাত্রী এবং সকল পেশার মানুষের জন্য', l2: 'আধুনিক হোস্টেল সল্যুশন', hl: 'ছাত্র ছাত্রী' },
+      { l1: 'নিরাপদ ও আরামদায়ক আবাসন', l2: 'উত্তরা এবং দক্ষিণখানে আমাদের শাখা', hl: 'নিরাপদ' },
+      { l1: '৩ বেলা মানসম্মত খাবার ও হাই-স্পিড ওয়াই-ফাই', l2: 'স্বাচ্ছন্দ্যময় জীবনযাত্রার নিশ্চয়তা', hl: 'খাবার' },
+      { l1: '২৪/৭ নিরাপত্তা ও সিসিটিভি মনিটরিং', l2: 'আপনার পরিবারের বিশ্বাসযোগ্য আশ্রয়', hl: '২৪/৭' }
+    ];
+    let active = true;
+    let slideIdx = 0;
+
+    const timer = async () => {
+      // Delay initial typewriter start a bit to let page intro complete
+      await new Promise(resolve => setTimeout(resolve, 1800));
+      while (active) {
+        const slide = slides[slideIdx % slides.length];
+        setCurrentBgIndex(slideIdx);
+        setTypedL2('');
+        setActiveHighlight(slide.hl);
+        
+        // Type Line 1
+        for (let i = 0; i <= slide.l1.length; i++) {
+          if (!active) return;
+          setTypedL1(slide.l1.slice(0, i));
+          await new Promise(resolve => setTimeout(resolve, 55));
         }
-      } catch (err) {
-        console.error("Failed to load philosophy image", err);
+
+        // Type Line 2
+        for (let i = 0; i <= slide.l2.length; i++) {
+          if (!active) return;
+          setTypedL2(slide.l2.slice(0, i));
+          await new Promise(resolve => setTimeout(resolve, 55));
+        }
+
+        // Pause state on full description
+        await new Promise(resolve => setTimeout(resolve, 2500));
+
+        // Erase Line 2
+        for (let i = slide.l2.length; i >= 0; i--) {
+          if (!active) return;
+          setTypedL2(slide.l2.slice(0, i));
+          await new Promise(resolve => setTimeout(resolve, 20));
+        }
+
+        // Erase Line 1
+        for (let i = slide.l1.length; i >= 0; i--) {
+          if (!active) return;
+          setTypedL1(slide.l1.slice(0, i));
+          await new Promise(resolve => setTimeout(resolve, 20));
+        }
+
+        await new Promise(resolve => setTimeout(resolve, 400));
+        slideIdx++;
       }
     };
-    fetchImage();
+
+    timer();
+
+    return () => {
+      active = false;
+    };
   }, []);
+
+  useEffect(() => {
+    const canvas = canvasRef.current;
+    if (!canvas) return;
+    const ctx = canvas.getContext('2d');
+    if (!ctx) return;
+
+    let animationFrameId: number;
+    const PARTICLE_COUNT = 70;
+    const particles: any[] = [];
+    const bokeh: any[] = [];
+    const stars: any[] = [];
+    const colors = [
+      'rgba(201,168,76,', 'rgba(232,201,122,', 'rgba(245,228,176,'
+    ];
+
+    function resize() {
+      if (!canvas) return;
+      canvas.width = window.innerWidth;
+      canvas.height = window.innerHeight;
+    }
+    resize();
+    window.addEventListener('resize', resize);
+
+    for (let i = 0; i < PARTICLE_COUNT; i++) {
+      particles.push({
+        x: Math.random() * window.innerWidth,
+        y: Math.random() * window.innerHeight,
+        r: Math.random() * 2.5 + 0.5,
+        dx: (Math.random() - 0.5) * 0.5,
+        dy: -(Math.random() * 0.6 + 0.2),
+        life: Math.random(),
+        maxLife: Math.random() * 0.7 + 0.3,
+        color: colors[Math.floor(Math.random() * colors.length)],
+        shimmer: Math.random() * Math.PI * 2,
+        shimmerSpeed: Math.random() * 0.04 + 0.01,
+      });
+    }
+
+    // Firefly-style: also add a few larger bokeh circles
+    for (let i = 0; i < 12; i++) {
+      bokeh.push({
+        x: Math.random() * window.innerWidth,
+        y: Math.random() * window.innerHeight,
+        r: Math.random() * 18 + 8,
+        dx: (Math.random() - 0.5) * 0.25,
+        dy: -(Math.random() * 0.3 + 0.1),
+        alpha: Math.random() * 0.08 + 0.02,
+        color: colors[Math.floor(Math.random() * colors.length)],
+        pulse: Math.random() * Math.PI * 2,
+        pulseSpeed: Math.random() * 0.02 + 0.01,
+      });
+    }
+
+    function spawnStar() {
+      if (Math.random() > 0.98) {
+        stars.push({
+          x: Math.random() * window.innerWidth,
+          y: 0,
+          len: Math.random() * 120 + 60,
+          speed: Math.random() * 8 + 5,
+          alpha: 1.0,
+          angle: Math.PI / 4 + Math.random() * 0.3,
+          color: colors[Math.floor(Math.random() * colors.length)],
+        });
+      }
+    }
+
+    function drawParticles() {
+      if (!ctx || !canvas) return;
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+      // Bokeh
+      bokeh.forEach(b => {
+        b.x += b.dx; b.y += b.dy;
+        b.pulse += b.pulseSpeed;
+        if (b.y < -50) { b.y = canvas.height + 50; b.x = Math.random() * canvas.width; }
+        const alpha = b.alpha + Math.sin(b.pulse) * 0.03;
+        const gradient = ctx.createRadialGradient(b.x, b.y, 0, b.x, b.y, b.r);
+        gradient.addColorStop(0, b.color + alpha + ')');
+        gradient.addColorStop(1, b.color + '0)');
+        ctx.beginPath();
+        ctx.arc(b.x, b.y, b.r, 0, Math.PI * 2);
+        ctx.fillStyle = gradient;
+        ctx.fill();
+      });
+
+      // Sparks / fireflies
+      particles.forEach(p => {
+        p.x += p.dx; p.y += p.dy;
+        p.life += 0.004;
+        p.shimmer += p.shimmerSpeed;
+
+        if (p.y < -10) {
+          p.y = canvas.height + 10;
+          p.x = Math.random() * canvas.width;
+          p.life = 0;
+        }
+
+        const lifeAlpha = Math.sin(p.life * Math.PI);
+        const alpha = lifeAlpha * (0.5 + Math.sin(p.shimmer) * 0.3);
+
+        // Glow
+        const grd = ctx.createRadialGradient(p.x, p.y, 0, p.x, p.y, p.r * 4);
+        grd.addColorStop(0, p.color + alpha + ')');
+        grd.addColorStop(1, p.color + '0)');
+        ctx.beginPath();
+        ctx.arc(p.x, p.y, p.r * 4, 0, Math.PI * 2);
+        ctx.fillStyle = grd;
+        ctx.fill();
+
+        // Core dot
+        ctx.beginPath();
+        ctx.arc(p.x, p.y, p.r, 0, Math.PI * 2);
+        ctx.fillStyle = p.color + Math.min(alpha * 2, 1) + ')';
+        ctx.fill();
+      });
+
+      // Shooting Stars
+      spawnStar();
+      for (let i = stars.length - 1; i >= 0; i--) {
+        const s = stars[i];
+        const dx = Math.cos(s.angle) * s.speed;
+        const dy = Math.sin(s.angle) * s.speed;
+        s.x += dx; s.y += dy;
+        s.alpha -= 0.025;
+        if (s.alpha <= 0) {
+          stars.splice(i, 1);
+          continue;
+        }
+        ctx.save();
+        const sg = ctx.createLinearGradient(s.x, s.y, s.x - Math.cos(s.angle) * s.len, s.y - Math.sin(s.angle) * s.len);
+        sg.addColorStop(0, s.color + s.alpha + ')');
+        sg.addColorStop(1, s.color + '0)');
+        ctx.strokeStyle = sg;
+        ctx.lineWidth = 1.5;
+        ctx.beginPath();
+        ctx.moveTo(s.x, s.y);
+        ctx.lineTo(s.x - Math.cos(s.angle) * s.len, s.y - Math.sin(s.angle) * s.len);
+        ctx.stroke();
+        ctx.restore();
+      }
+
+      animationFrameId = requestAnimationFrame(drawParticles);
+    }
+    drawParticles();
+
+    return () => {
+      window.removeEventListener('resize', resize);
+      cancelAnimationFrame(animationFrameId);
+    };
+  }, []);
+
+  useEffect(() => {
+    if (hasAnimatedRef.current) return;
+    const animateCounters = () => {
+      hasAnimatedRef.current = true;
+      const targets = { branches: 4, residents: 1000, experience: 5 };
+      const current = { branches: 0, residents: 0, experience: 0 };
+      const steps = {
+        branches: targets.branches / 60,
+        residents: targets.residents / 60,
+        experience: targets.experience / 60
+      };
+      
+      const timer = setInterval(() => {
+        current.branches = Math.min(current.branches + steps.branches, targets.branches);
+        current.residents = Math.min(current.residents + steps.residents, targets.residents);
+        current.experience = Math.min(current.experience + steps.experience, targets.experience);
+        
+        setStats({
+          branches: Math.floor(current.branches),
+          residents: Math.floor(current.residents),
+          experience: Math.floor(current.experience)
+        });
+        
+        if (current.branches >= targets.branches && current.residents >= targets.residents && current.experience >= targets.experience) {
+          clearInterval(timer);
+        }
+      }, 30);
+    };
+    setTimeout(animateCounters, 1600);
+  }, []);
+
+  useEffect(() => {
+    const handleMouseMove = (e: MouseEvent) => {
+      const cx = e.clientX / window.innerWidth - 0.5;
+      const cy = e.clientY / window.innerHeight - 0.5;
+      if (orb1Ref.current) {
+        orb1Ref.current.style.transform = `translate(${cx * 30}px, ${cy * 30}px) scale(1)`;
+      }
+      if (orb2Ref.current) {
+        orb2Ref.current.style.transform = `translate(${-cx * 25}px, ${-cy * 25}px) scale(1)`;
+      }
+    };
+    document.addEventListener('mousemove', handleMouseMove);
+    return () => document.removeEventListener('mousemove', handleMouseMove);
+  }, []);
+
+  useEffect(() => {
+    // Fetch philosophy images
+    const unsubPhil = onSnapshot(doc(db, 'settings', 'philosophy'), (d) => {
+      if (d.exists()) {
+        const data = d.data();
+        if (data.images && Array.isArray(data.images) && data.images.length > 0) {
+          setPhilosophyImages(data.images);
+        } else if (data.imageUrl) {
+          setPhilosophyImages([data.imageUrl]);
+        }
+      }
+    });
+
+    // Fetch background images
+    const unsubBg = onSnapshot(doc(db, 'settings', 'homeBackgrounds'), (d) => {
+      if (d.exists()) {
+        const data = d.data();
+        if (data.images && Array.isArray(data.images)) {
+          setHomeBgImages(data.images);
+        }
+      }
+    });
+
+    return () => {
+      unsubPhil();
+      unsubBg();
+    };
+  }, []);
+
+  // Background images are now synchronized with the high-end typewriter slides
 
   useEffect(() => {
     if (isHovered) return;
@@ -108,184 +391,570 @@ const Home: React.FC<HomeProps> = ({ onNavigate }) => {
     }
   };
 
+
+  const defaultBgImages = [
+    "https://images.unsplash.com/photo-1616594039964-ae9021a400a0?auto=format&fit=crop&q=80&w=1600",
+    "https://images.unsplash.com/photo-1517248135467-4c7edcad34c4?auto=format&fit=crop&q=80&w=1600",
+    "https://images.unsplash.com/photo-1566073771259-6a8506099945?auto=format&fit=crop&q=80&w=1600"
+  ];
+  const activeBgImages = homeBgImages && homeBgImages.length >= 1 ? homeBgImages : defaultBgImages;
+
+  const renderHighlightedText = (text: string, highlight: string) => {
+    if (!highlight || !text.includes(highlight)) return text;
+    const parts = text.split(highlight);
+    return (
+      <>
+        {parts[0]}
+        <span className="text-[#E2C46A]">{highlight}</span>
+        {parts[1]}
+      </>
+    );
+  };
+
   return (
-    <div className="bg-[#f8f6f0] text-[#002147] font-sans">
+    <div className="bg-[#f8f6f0] text-[#4a3426] font-sans">
       <style>{`
-        @keyframes hero-float {
-          0%, 100% { transform: translateY(0px) scale(1) rotate(0deg); }
-          50% { transform: translateY(-15px) scale(1.02) rotate(0.5deg); }
+        /* Google Fonts provided by user */
+        @import url('https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;0,900;1,400&family=Cormorant+Garamond:wght@300;400;600&family=Hind+Siliguri:wght@300;400;500;600;700&display=swap');
+        
+        :root {
+          --gold:       #C9A84C;
+          --gold-light: #E8C97A;
+          --gold-pale:  #F5E4B0;
+          --dark:       #080602;
+          --cream:      #F8F0DC;
+          --white:      #FFFFFF;
         }
-        @keyframes hero-glow {
-          0%, 100% { filter: drop-shadow(0 4px 20px rgba(212,175,55,0.15)); }
-          50% { filter: drop-shadow(0 10px 40px rgba(212,175,55,0.4)); }
+
+        .custom-hero-scope {
+          font-family: 'Hind Siliguri', sans-serif;
+          color: var(--white);
         }
-        .animate-hero-float {
-          animation: hero-float 8s ease-in-out infinite, hero-glow 8s ease-in-out infinite;
+
+        /* ── HERO ── */
+        .hero {
+          position: relative;
+          width: 100%; height: 100vh;
+          min-height: 680px;
+          display: flex; align-items: center; justify-content: center;
+          overflow: hidden;
+          background: var(--dark);
         }
-        @keyframes text-shine {
-          0% { background-position: 200% center; }
-          100% { background-position: -200% center; }
+
+        /* ── BACKGROUND LAYERS ── */
+        .bg-wrap {
+          position: absolute; inset: 0; z-index: 0; overflow: hidden;
         }
-        .animate-text-shine {
-          background-size: 200% auto;
-          animation: text-shine 6s linear infinite;
+
+        /* High-end full-width background slideshow */
+        .bg-slides {
+          position: absolute; inset: 0;
+        }
+        .bg-slide {
+          position: absolute; inset: 0;
+          opacity: 0;
+          transition: opacity 1.8s ease-in-out;
+          pointer-events: none;
+        }
+        .bg-slide.active {
+          opacity: 1;
+        }
+        .bg-slide img {
+          width: 100%; height: 100%; object-fit: cover;
+          filter: brightness(.60) saturate(.90) contrast(1.02);
+          transition: transform 9.5s cubic-bezier(0.16, 1, 0.3, 1);
+          transform: scale(1.02);
+        }
+        .bg-slide.active img {
+          transform: scale(1.1); /* Slow majestic Ken Burns zoom */
+        }
+
+        /* Dark unified overlay */
+        .bg-master-overlay {
+          position: absolute; inset: 0; z-index: 2;
+          background:
+            linear-gradient(180deg,
+              rgba(8,6,2,.45) 0%,
+              rgba(8,6,2,.20) 30%,
+              rgba(8,6,2,.25) 60%,
+              rgba(8,6,2,.65) 100%
+            ),
+            linear-gradient(90deg, rgba(8,6,2,.4) 0%, transparent 20%, transparent 80%, rgba(8,6,2,.4) 100%);
+        }
+
+        /* Gold vignette pulse */
+        .bg-vignette {
+          position: absolute; inset: 0; z-index: 3;
+          background: radial-gradient(ellipse 80% 70% at 50% 50%, transparent 40%, rgba(8,6,2,.30) 100%);
+        }
+
+        /* Noise grain overlay */
+        .bg-grain {
+          position: absolute; inset: 0; z-index: 4; opacity: .03;
+          background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)'/%3E%3C/svg%3E");
+          background-size: 200px 200px;
+          animation: grainMove 0.15s steps(2) infinite;
+        }
+        @keyframes grainMove {
+          0% { transform: translate(0,0); } 25% { transform: translate(-2px,1px); } 50% { transform: translate(1px,-1px); } 75% { transform: translate(2px,2px); } 100% { transform: translate(-1px,0); }
+        }
+
+        /* Diagonal light sweep */
+        .bg-sweep {
+          position: absolute; inset: 0; z-index: 5;
+          background: linear-gradient(110deg, transparent 0%, rgba(201,168,76,.04) 48%, rgba(201,168,76,.08) 50%, transparent 52%);
+          animation: sweepMove 8s ease-in-out infinite;
+        }
+        @keyframes sweepMove {
+          0% { transform: translateX(-100%); } 100% { transform: translateX(200%); }
+        }
+
+        /* Floating particles drawn on canvas */
+        #particles { position: absolute; inset: 0; z-index: 6; pointer-events: none; }
+
+        /* Ambient gradient orbs */
+        .orb {
+          position: absolute;
+          border-radius: 50%;
+          filter: blur(95px);
+          opacity: .4;
+          pointer-events: none;
+          z-index: 1;
+        }
+        .orb-1 {
+          width: 500px; height: 500px;
+          background: radial-gradient(circle, var(--gold) 0%, transparent 70%);
+          top: -100px; left: -100px;
+          animation: orbFloat1 12s ease-in-out infinite;
+        }
+        .orb-2 {
+          width: 400px; height: 400px;
+          background: radial-gradient(circle, #8B6914 0%, transparent 70%);
+          bottom: -80px; right: -80px;
+          animation: orbFloat2 15s ease-in-out infinite;
+        }
+        @keyframes orbFloat1 {
+          0%, 100% { transform: translate(0,0) scale(1); }
+          50% { transform: translate(40px, 30px) scale(1.1); }
+        }
+        @keyframes orbFloat2 {
+          0%, 100% { transform: translate(0,0) scale(1); }
+          50% { transform: translate(-40px, -30px) scale(1.15); }
+        }
+
+        /* ── HERO CONTENT ── */
+        .hero-content {
+          position: relative;
+          z-index: 10;
+          text-align: center;
+          padding: 0 24px;
+          max-width: 860px;
+          width: 100%;
+        }
+
+        .badge {
+          display: inline-flex; align-items: center; justify-content: center; gap: 10px;
+          padding: 7px 20px;
+          border: 1px solid rgba(201,168,76,0.35);
+          border-radius: 50px;
+          font-size: 10.5px;
+          letter-spacing: 3px;
+          text-transform: uppercase;
+          color: var(--gold-light);
+          margin-bottom: 24px;
+          opacity: 0;
+          animation: fadeUp .8s .4s cubic-bezier(.16,1,.3,1) forwards;
+          backdrop-filter: blur(10px);
+          background: rgba(201,168,76,0.06);
+        }
+        .badge-dot {
+          width: 6px; height: 6px;
+          border-radius: 50%;
+          background: var(--gold);
+          box-shadow: 0 0 8px var(--gold);
+          animation: blink 1.8s ease-in-out infinite;
+        }
+        @keyframes blink {
+          0%, 100% { opacity: 1; transform: scale(1); }
+          50% { opacity: .25; transform: scale(.7); }
+        }
+
+        .hero-title {
+          font-family: 'Playfair Display', serif;
+          font-size: clamp(54px, 8.5vw, 106px);
+          font-weight: 900;
+          line-height: .92;
+          letter-spacing: -2px;
+          color: var(--white);
+          margin-bottom: 2px;
+          text-shadow: 0 4px 50px rgba(0,0,0,.6);
+          opacity: 0;
+          animation: fadeUp .9s .6s cubic-bezier(.16,1,.3,1) forwards;
+        }
+        .hero-title span {
+          color: var(--gold-light);
+          display: block;
+          font-style: italic;
+          font-weight: 300;
+          font-size: clamp(44px, 7vw, 86px);
+          line-height: .98;
+          text-shadow: 0 0 85px rgba(201,168,76,.3);
+        }
+
+        .hero-divider {
+          display: flex; align-items: center; gap: 16px;
+          margin: 24px auto;
+          width: 220px;
+          opacity: 0;
+          animation: fadeUp .6s .85s ease forwards;
+        }
+        .dline { flex: 1; height: 1px; background: linear-gradient(to right, transparent, rgba(201,168,76,.5)); }
+        .dline.r { background: linear-gradient(to left, transparent, rgba(201,168,76,.5)); }
+        .ddiamond { width: 6px; height: 6px; background: var(--gold); transform: rotate(45deg); flex-shrink: 0; }
+
+        /* MULTI-LINE TYPEWRITER */
+        .tw-wrap {
+          min-height: 90px;
+          display: flex; flex-direction: column; align-items: center; justify-content: center;
+          margin-bottom: 16px;
+          opacity: 0;
+          animation: fadeUp .7s 1.0s ease forwards;
+        }
+        #twL1 {
+          font-family: 'Hind Siliguri', sans-serif;
+          font-size: clamp(17px, 2.3vw, 26px);
+          font-weight: 600;
+          color: rgba(255,255,255,.88);
+          line-height: 1.55;
+          min-height: 1.5em;
+        }
+        #twL2 {
+          font-family: 'Hind Siliguri', sans-serif;
+          font-size: clamp(19px, 2.7vw, 30px);
+          font-weight: 700;
+          color: var(--white);
+          line-height: 1.45;
+          min-height: 1.5em;
+        }
+        .twc {
+          display: inline-block; width: 2px; height: 1.05em;
+          background: var(--gold); margin-left: 2px;
+          vertical-align: text-bottom;
+          animation: cblink .7s step-end infinite;
+        }
+        @keyframes cblink {
+          0%,100% { opacity: 1; } 50% { opacity: 0; }
+        }
+
+        .hero-tagline {
+          font-size: 14px;
+          color: rgba(255,255,255,0.45);
+          letter-spacing: .5px;
+          margin-bottom: 36px;
+          opacity: 0;
+          animation: fadeUp .7s 1.15s ease forwards;
+        }
+
+        .hero-cta {
+          display: inline-flex; align-items: center; gap: 12px;
+          padding: 15px 38px;
+          border-radius: 50px;
+          background: linear-gradient(135deg, var(--gold) 0%, #9a7320 100%);
+          color: #0C0902;
+          font-family: 'Hind Siliguri', sans-serif;
+          font-size: 16px;
+          font-weight: 700;
+          border: none; cursor: pointer;
+          box-shadow: 0 10px 46px rgba(200,168,75,.38);
+          transition: transform .3s, box-shadow .3s;
+          opacity: 0;
+          animation: fadeUp .9s 1.3s cubic-bezier(.16,1,.3,1) forwards;
+          position: relative;
+          overflow: hidden;
+        }
+        .hero-cta::before {
+          content: '';
+          position: absolute;
+          top: -50%; left: -60%;
+          width: 40%; height: 200%;
+          background: rgba(255,255,255,0.25);
+          transform: skewX(-20deg);
+          animation: shimmer 3s 2s infinite;
+        }
+        @keyframes shimmer {
+          0%   { left: -60%; }
+          100% { left: 130%; }
+        }
+        .hero-cta:hover {
+          transform: translateY(-4px) scale(1.03);
+          box-shadow: 0 18px 60px rgba(200,168,75,.55);
+        }
+        .cta-icon-box {
+          width: 26px; height: 26px; border-radius: 50%;
+          background: rgba(0,0,0,.15);
+          display: flex; align-items: center; justify-content: center;
+          transition: transform .3s;
+        }
+        .hero-cta:hover .cta-icon-box { transform: translateY(3px); }
+        .cta-icon-box svg { width: 13px; height: 13px; stroke: #0C0902; stroke-width: 2.5; }
+
+        /* Stats row with vertical linear gold dividers */
+        .hero-stats {
+          display: flex; justify-content: center; align-items: stretch;
+          margin-top: 52px;
+          opacity: 0;
+          animation: fadeUp .9s 1.45s cubic-bezier(.16,1,.3,1) forwards;
+        }
+        .stat-item { padding: 0 32px; text-align: center; position: relative; }
+        .stat-item + .stat-item::before {
+          content: ''; position: absolute; left: 0; top: 10%; height: 80%; width: 1px;
+          background: linear-gradient(to bottom, transparent, rgba(201,168,76,.4), transparent);
+        }
+        .stat-num {
+          font-family: 'Playfair Display', serif;
+          font-size: 34px;
+          font-weight: 700;
+          color: var(--gold-light);
+          line-height: 1;
+        }
+        .stat-label {
+          font-size: 10.5px;
+          letter-spacing: 2px;
+          text-transform: uppercase;
+          color: rgba(255,255,255,0.4);
+          margin-top: 5px;
+        }
+
+        /* Vertical scrolling track */
+        .scroll-hint {
+          position: absolute;
+          bottom: 32px; left: 50%;
+          transform: translateX(-50%);
+          z-index: 10;
+          display: flex; flex-direction: column; align-items: center; gap: 8px;
+          opacity: 0;
+          animation: fadeIn 1s 2.2s ease forwards;
+        }
+        .scroll-word {
+          font-size: 9px;
+          letter-spacing: 4px;
+          text-transform: uppercase;
+          color: rgba(255,255,255,0.25);
+        }
+        .scroll-track {
+          width: 1px; height: 50px;
+          background: rgba(201,168,76,0.15);
+          position: relative; overflow: hidden;
+        }
+        .scroll-fill {
+          position: absolute; top: 0; left: 0; right: 0; height: 50%;
+          background: linear-gradient(to bottom, var(--gold), transparent);
+          animation: scrollTrackAnimation 2.2s ease-in-out infinite;
+        }
+        @keyframes scrollTrackAnimation {
+          0% { top: -100%; }
+          100% { top: 100%; }
+        }
+
+        /* Gold frames inside corners (Classic Royal Style) */
+        .corner {
+          position: absolute; z-index: 9; pointer-events: none;
+          opacity: 0; animation: fadeIn 1.2s 1.6s ease forwards;
+        }
+        .corner-tl { top: 32px; left: 32px; }
+        .corner-br { bottom: 32px; right: 32px; transform: rotate(180deg); }
+        .corner svg { width: 44px; height: 44px; stroke: rgba(201,168,76,.28); fill: none; stroke-width: 1.2; }
+
+        /* Left and Right Rotated Editorial Labels */
+        .side-text {
+          position: absolute; z-index: 9;
+          font-size: 9px; letter-spacing: 4px; text-transform: uppercase;
+          color: rgba(255,255,255,.18);
+          white-space: nowrap;
+          pointer-events: none;
+          opacity: 0; animation: fadeIn 1.2s 1.8s ease forwards;
+        }
+        .side-text-l { left: 24px; top: 50%; transform: translateY(-50%) rotate(-90deg); transform-origin: left center; }
+        .side-text-r { right: 24px; top: 50%; transform: translateY(-50%) rotate(90deg); transform-origin: right center; }
+
+        @keyframes fadeUp {
+          from { opacity: 0; transform: translateY(28px); }
+          to   { opacity: 1; transform: translateY(0); }
+        }
+        @keyframes fadeIn {
+          from { opacity: 0; }
+          to   { opacity: 1; }
+        }
+
+        /* ── WELCOME SECTION ── */
+        .welcome {
+          background: var(--cream);
+          color: var(--dark);
+          padding: 80px 48px;
+          text-align: center;
+        }
+        .section-label {
+          font-size: 11px;
+          letter-spacing: 4px;
+          text-transform: uppercase;
+          color: var(--gold);
+          font-weight: 600;
+          margin-bottom: 12px;
+        }
+        .welcome h2 {
+          font-family: 'Playfair Display', serif;
+          font-size: 42px;
+          font-weight: 700;
+          color: var(--dark);
+        }
+        .welcome-underline {
+          width: 60px; height: 3px;
+          background: var(--gold);
+          margin: 16px auto 0;
+          border-radius: 2px;
+        }
+
+        /* Responsive custom variables overlay */
+        @media (max-width: 900px) {
+          .side-text, .corner { display: none; }
+          .hero-stats { gap: 16px; margin-top: 36px; flex-wrap: wrap; }
+          .stat-item { padding: 0 16px; }
+          .stat-item + .stat-item::before { display: none; }
+          .stat-num { font-size: 26px; }
+          .hero-title { font-size: clamp(38px, 10vw, 68px); }
+          .hero-title span { font-size: clamp(30px, 8vw, 54px); }
+          .tw-wrap { min-height: 80px; }
+          .hero-cta { padding: 14px 28px; font-size: 14px; }
+          .welcome { padding: 40px 24px; }
+          .welcome h2 { font-size: 32px; }
         }
       `}</style>
-      {/* Hero Section */}
-      <motion.section 
-        initial="hidden"
-        animate="visible"
-        variants={{
-          hidden: { opacity: 1 },
-          visible: { 
-            opacity: 1,
-            transition: { staggerChildren: 0.2, delayChildren: 0.2 }
-          }
-        }}
-        className="relative w-full h-[70vh] md:h-[90vh] min-h-[500px] md:min-h-[600px] flex items-center justify-center overflow-hidden"
-      >
-        {/* Background Image */}
-        <motion.div 
-          initial={{ scale: 1.1, opacity: 0 }}
-          animate={{ scale: [1.1, 1, 1.05, 1.1], opacity: 1 }}
-          transition={{ 
-            opacity: { duration: 1.5, ease: "easeOut" },
-            scale: { duration: 30, repeat: Infinity, ease: "linear" }
-          }}
-          className="absolute inset-0 w-full h-full"
-        >
-          <img 
-            src="https://images.unsplash.com/photo-1529156069898-49953e39b3ac?auto=format&fit=crop&q=80&w=2000" 
-            alt="Students Community" 
-            className="w-full h-full object-cover grayscale-[30%] opacity-90"
-          />
-          <div className="absolute inset-0 bg-[#002147]/60 mix-blend-multiply"></div>
-          <div className="absolute inset-0 bg-gradient-to-b from-[#002147]/80 to-transparent opacity-90"></div>
-        </motion.div>
+      
+      <div className="custom-hero-scope">
+        {/* HERO */}
+        <section className="hero">
+          {/* Unified elegant full-screen crossfading Ken Burns background slideshow */}
+          <div className="bg-wrap">
+            <div className="bg-slides">
+              {activeBgImages.map((img, idx) => {
+                const isActive = currentBgIndex % activeBgImages.length === idx;
+                return (
+                  <div key={idx} className={`bg-slide ${isActive ? 'active' : ''}`}>
+                    <img src={img} alt="" />
+                  </div>
+                );
+              })}
+            </div>
+            <div className="bg-master-overlay"></div>
+            <div className="bg-vignette"></div>
+            <div className="bg-grain"></div>
+            <div className="bg-sweep"></div>
+          </div>
 
-        {/* Animated Light Orbs */}
-        <div className="absolute inset-0 overflow-hidden pointer-events-none">
-          <motion.div 
-            animate={{ 
-              y: [0, -40, 0],
-              x: [0, 20, 0],
-              opacity: [0.3, 0.6, 0.3],
-            }}
-            transition={{ duration: 8, repeat: Infinity, ease: "easeInOut" }}
-            className="absolute top-[20%] left-[20%] w-[300px] h-[300px] bg-[#D4AF37]/20 rounded-full blur-[80px] mix-blend-screen"
-          />
-          <motion.div 
-            animate={{ 
-              y: [0, 50, 0],
-              x: [0, -30, 0],
-              opacity: [0.2, 0.5, 0.2],
-            }}
-            transition={{ duration: 10, repeat: Infinity, ease: "easeInOut", delay: 2 }}
-            className="absolute bottom-[30%] right-[15%] w-[400px] h-[400px] bg-[#D4AF37]/15 rounded-full blur-[100px] mix-blend-screen"
-          />
-          <motion.div 
-            animate={{ 
-              scale: [1, 1.2, 1],
-              opacity: [0.1, 0.3, 0.1],
-            }}
-            transition={{ duration: 6, repeat: Infinity, ease: "easeInOut", delay: 1 }}
-            className="absolute top-[50%] left-[50%] w-[500px] h-[500px] -translate-x-1/2 -translate-y-1/2 bg-[#D4AF37]/10 rounded-full blur-[120px] mix-blend-screen"
-          />
-        </div>
+          {/* Ambient moving orbs */}
+          <div className="orb orb-1" ref={orb1Ref}></div>
+          <div className="orb orb-2" ref={orb2Ref}></div>
 
-        {/* Content */}
-        <div className="relative z-10 text-center px-4 md:px-8 mt-16 max-w-5xl mx-auto flex flex-col items-center animate-hero-float">
-          <motion.div 
-            variants={{
-              hidden: { opacity: 0, y: 30 },
-              visible: { opacity: 1, y: 0, transition: { duration: 1, ease: [0.16, 1, 0.3, 1] } }
-            }}
-            className="mb-6 inline-flex flex-col items-center"
-          >
-            <span className="text-[#D4AF37] text-[10px] md:text-xs font-bold uppercase tracking-[0.3em] backdrop-blur-sm bg-white/5 border border-white/20 px-5 py-2 rounded-full mb-4 relative overflow-hidden group shadow-[0_0_15px_rgba(212,175,55,0.2)] animate-[pulse_4s_ease-in-out_infinite]">
-              <span className="absolute inset-0 bg-gradient-to-r from-transparent via-[#D4AF37]/20 to-transparent -translate-x-full animate-[shimmer_2s_infinite]"></span>
+          {/* Golden star / spark canvas */}
+          <canvas id="particles" ref={canvasRef}></canvas>
+
+          {/* Ornamental corner markings (Classic Royal Style) */}
+          <div className="corner corner-tl">
+            <svg viewBox="0 0 48 48">
+              <path d="M2 46 L2 2 L46 2" />
+            </svg>
+          </div>
+          <div className="corner corner-br">
+            <svg viewBox="0 0 48 48">
+              <path d="M2 46 L2 2 L46 2" />
+            </svg>
+          </div>
+
+          {/* Structural rotated editorial side tags */}
+          <div className="side-text side-text-l">Premium Hostel Living · Dhaka Bangladesh</div>
+          <div className="side-text side-text-r">Queens Point · Bachelor Point · Premium Accommodations</div>
+
+          {/* Hero primary layout contents */}
+          <div className="hero-content">
+            <div className="badge">
+              <div className="badge-dot"></div>
               Premium Hostel Living
-            </span>
-          </motion.div>
-          
-          <motion.h1 
-            variants={{
-              hidden: { opacity: 0, y: 40 },
-              visible: { opacity: 1, y: 0, transition: { duration: 1, ease: [0.16, 1, 0.3, 1] } }
-            }}
-            className="text-white font-normal text-4xl sm:text-5xl md:text-7xl lg:text-[100px] leading-[1.1] md:leading-[0.9] tracking-tight drop-shadow-lg mb-4 md:mb-6"
-          >
-            AyaanAyaat <br/>
-            <span className="font-light bg-gradient-to-r from-[#D4AF37] via-[#fff3cc] to-[#D4AF37] text-transparent bg-clip-text animate-text-shine inline-block pb-4">Homes</span>
-            <span className="sr-only"> - Premium Hostel, Bachelor Point, Queens Point, and Police Point in Dhaka</span>
-          </motion.h1>
-          
-          <motion.div 
-            variants={{
-              hidden: { opacity: 0, y: 30 },
-              visible: { opacity: 1, y: 0, transition: { duration: 1, ease: [0.16, 1, 0.3, 1] } }
-            }}
-            className="mt-2 md:mt-4 space-y-1 md:space-y-2"
-          >
-            <h3 className="text-[#f8f6f0] text-lg md:text-3xl font-bold tracking-wide drop-shadow-md">
-              <span className="text-[#D4AF37]">ছাত্র ছাত্রী</span> এবং সকল পেশার মানুষের জন্য
-            </h3>
-            <h3 className="text-white text-xl md:text-4xl lg:text-5xl font-bold tracking-tight drop-shadow-md">
-              আধুনিক হোষ্টেল সল্যুশন
-            </h3>
-          </motion.div>
-          
-          <motion.p 
-            variants={{
-              hidden: { opacity: 0, y: 20 },
-              visible: { opacity: 1, y: 0, transition: { duration: 1, ease: [0.16, 1, 0.3, 1] } }
-            }}
-            className="text-white/70 text-xs md:text-base font-light tracking-widest mt-2 md:mt-4 max-w-lg mx-auto"
-          >
-            এক ছাদের নিচে থাকা, খাওয়া ও বিনোদনের সকল সুবিধা।
-          </motion.p>
+            </div>
 
-          <motion.div 
-            variants={{
-              hidden: { opacity: 0, scale: 0.9 },
-              visible: { opacity: 1, scale: 1, transition: { duration: 1, ease: [0.34, 1.56, 0.64, 1] } }
-            }}
-            className="mt-8 md:mt-12 flex justify-center"
-          >
-            <button 
-              onClick={scrollToBranches}
-              className="group relative flex items-center gap-3 bg-gradient-to-r from-[#D4AF37] via-[#f4e2a6] to-[#D4AF37] bg-[length:200%_auto] animate-text-shine text-[#002147] px-8 py-3.5 md:px-10 md:py-4 rounded-full text-[11px] md:text-xs font-bold uppercase tracking-[0.2em] transition-all duration-500 shadow-[0_15px_30px_-10px_rgba(212,175,55,0.4)] hover:shadow-[0_20px_40px_-15px_rgba(212,175,55,0.8)] transform hover:-translate-y-1 hover:scale-105"
-            >
-              <div className="absolute inset-0 rounded-full ring-2 ring-[#D4AF37] animate-[ping_4s_ease-out_infinite] opacity-40"></div>
-              <span className="relative z-10">আমাদের ব্রাঞ্চ-সমূহ</span>
-              <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={2.5} stroke="currentColor" className="w-3.5 h-3.5 md:w-4 md:h-4 transition-transform duration-500 group-hover:translate-y-1 relative z-10">
-                <path strokeLinecap="round" strokeLinejoin="round" d="M19.5 8.25l-7.5 7.5-7.5-7.5" />
-              </svg>
+            <h1 className="hero-title">
+              AyaanAyaat
+              <span>Homes</span>
+            </h1>
+
+            <div className="hero-divider">
+              <div className="dline"></div>
+              <div className="ddiamond"></div>
+              <div className="dline r"></div>
+            </div>
+
+            {/* HIGH-END MULTI-LINE TYPEWRITER */}
+            <div className="tw-wrap">
+              <div id="twL1">
+                {renderHighlightedText(typedL1, activeHighlight)}
+                {typedL1 && !typedL2 && <span className="twc"></span>}
+              </div>
+              <div id="twL2">
+                {typedL2}
+                {typedL2 && <span className="twc"></span>}
+                {!typedL1 && !typedL2 && <span className="twc"></span>}
+              </div>
+            </div>
+
+            <p className="hero-tagline">এক ছাদের নিচে থাকা, খাওয়া ও বিনোদনের সকল সুবিধা।</p>
+
+            <button className="hero-cta" onClick={scrollToBranches}>
+              আমাদের শাখা সমূহ
+              <div className="cta-icon-box">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                  <polyline points="6 9 12 15 18 9"/>
+                </svg>
+              </div>
             </button>
-          </motion.div>
-        </div>
-      </motion.section>
 
-      {/* Welcome Banner */}
-      <motion.div 
-        initial={{ y: 30, opacity: 0 }}
-        whileInView={{ y: 0, opacity: 1 }}
-        viewport={{ once: true, margin: "-50px" }}
-        transition={{ duration: 0.7 }}
-        className="w-full bg-[#f8f9fa] pt-16 pb-8 md:pt-24 flex flex-col items-center justify-center px-4 relative z-20"
-      >
-        <span className="text-[#D4AF37] text-[10px] md:text-xs font-bold uppercase tracking-[0.4em] mb-4">Welcome To</span>
-        <h2 className="text-3xl md:text-5xl text-[#002147] mb-6 text-center drop-shadow-sm font-bold">
-          AyaanAyaat Homes
-        </h2>
-        <div className="w-24 h-1 bg-gradient-to-r from-transparent via-[#D4AF37] to-transparent rounded-full shadow-sm"></div>
-      </motion.div>
+            {/* High end royal numeric metric counters */}
+            <div className="hero-stats">
+              <div className="stat-item">
+                <div className="stat-num">{stats.branches}+</div>
+                <div className="stat-label">শাখা সমূহ</div>
+              </div>
+              <div className="stat-item">
+                <div className="stat-num">{stats.residents}+</div>
+                <div className="stat-label">সন্তুষ্ট বাসিন্দা</div>
+              </div>
+              <div className="stat-item">
+                <div className="stat-num">{stats.experience}+</div>
+                <div className="stat-label">বছরের অভিজ্ঞতা</div>
+              </div>
+            </div>
+          </div>
+
+          {/* Smooth Vertical Scroll Hint Track */}
+          <div className="scroll-hint">
+            <span className="scroll-word">Scroll</span>
+            <div className="scroll-track">
+              <div className="scroll-fill"></div>
+            </div>
+          </div>
+        </section>
+
+        {/* WELCOME */}
+        <section className="welcome">
+          <p className="section-label">Welcome To</p>
+          <h2>AyaanAyaat Homes</h2>
+          <div className="welcome-underline"></div>
+        </section>
+      </div>
 
       {/* Philosophy Section */}
-      <section className="bg-[#f8f9fa] pb-10 md:pb-24 px-4 md:px-6 relative overflow-hidden">
+      <section className="bg-gradient-to-b from-[#fcfbf9] to-[#f5f2eb] pb-10 md:pb-24 px-4 md:px-6 relative overflow-hidden">
         {/* Animated background blobs */}
-        <div className="absolute top-0 right-[10%] w-[300px] h-[300px] bg-[#D4AF37]/5 rounded-full blur-[60px] pointer-events-none animate-pulse"></div>
-        <div className="absolute bottom-0 left-[10%] w-[250px] h-[250px] bg-[#002147]/5 rounded-full blur-[50px] pointer-events-none animate-pulse" style={{ animationDelay: '2s' }}></div>
+        <div className="absolute top-0 right-[10%] w-[300px] h-[300px] bg-[#C9A84C]/5 rounded-full blur-[60px] pointer-events-none animate-pulse"></div>
+        <div className="absolute bottom-0 left-[10%] w-[250px] h-[250px] bg-[#8B5A2B]/5 rounded-full blur-[50px] pointer-events-none animate-pulse" style={{ animationDelay: '2s' }}></div>
         
         <div className="max-w-[85rem] mx-auto py-6 md:py-10">
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 md:gap-12 lg:gap-20 items-center">
@@ -298,7 +967,7 @@ const Home: React.FC<HomeProps> = ({ onNavigate }) => {
               transition={{ duration: 0.8 }}
               className="relative h-[220px] sm:h-[350px] md:h-[500px] order-2 lg:order-2 w-full max-w-[90vw] sm:max-w-none mx-auto"
             >
-              <div className={`absolute inset-0 bg-[#002147] rounded-2xl md:rounded-3xl shadow-xl overflow-hidden transition-transform duration-500 ${isAnimating || isHovered ? 'rotate-0' : '-rotate-3'}`}>
+              <div className={`absolute inset-0 bg-[#4a3426] rounded-2xl md:rounded-3xl shadow-xl overflow-hidden transition-transform duration-500 ${isAnimating || isHovered ? 'rotate-0' : '-rotate-3'}`}>
                 <img 
                   src={philosophyImages[(currentImageIndex + 1) % philosophyImages.length]} 
                   alt="Next Living" 
@@ -306,7 +975,7 @@ const Home: React.FC<HomeProps> = ({ onNavigate }) => {
                 />
               </div>
               <div 
-                className={`absolute inset-0 bg-[#002147] rounded-2xl md:rounded-3xl shadow-2xl overflow-hidden transition-transform duration-500 z-10 group cursor-pointer ${isAnimating || isHovered ? 'rotate-0' : 'rotate-3'}`}
+                className={`absolute inset-0 bg-[#4a3426] rounded-2xl md:rounded-3xl shadow-2xl overflow-hidden transition-transform duration-500 z-10 group cursor-pointer ${isAnimating || isHovered ? 'rotate-0' : 'rotate-3'}`}
                 onClick={handleNextImage}
                 onMouseEnter={() => setIsHovered(true)}
                 onMouseLeave={() => setIsHovered(false)}
@@ -329,7 +998,7 @@ const Home: React.FC<HomeProps> = ({ onNavigate }) => {
                     />
                   </motion.div>
                 </AnimatePresence>
-                <div className="absolute inset-0 bg-gradient-to-t from-[#002147]/90 via-[#002147]/20 to-transparent pointer-events-none z-30"></div>
+                <div className="absolute inset-0 bg-gradient-to-t from-[#4a3426]/90 via-[#4a3426]/20 to-transparent pointer-events-none z-30"></div>
                 <div className="absolute bottom-4 left-4 right-4 md:bottom-6 md:left-6 md:right-6 pointer-events-none z-30">
                   <div className="bg-white/10 backdrop-blur-md border border-white/20 rounded-xl md:rounded-2xl p-3 md:p-4 transform translate-y-[-10px] group-hover:translate-y-0 transition-transform duration-500">
                     <p className="text-white text-xs md:text-sm font-medium">✨ স্মার্ট জীবনযাত্রার নতুন সংজ্ঞা</p>
@@ -344,38 +1013,43 @@ const Home: React.FC<HomeProps> = ({ onNavigate }) => {
               whileInView={{ x: 0, opacity: 1 }}
               viewport={{ once: true }}
               transition={{ duration: 0.8, delay: 0.2 }}
-              className="flex flex-col justify-center space-y-4 md:space-y-8 relative z-20 order-1 lg:order-1"
+              className="flex flex-col justify-center space-y-3 md:space-y-8 relative z-20 order-1 lg:order-1"
             >
-              <div className="inline-flex items-center gap-2 md:gap-3">
-                <div className="w-8 md:w-12 h-[2px] bg-[#D4AF37]"></div>
-                <span className="text-[#D4AF37] text-[10px] md:text-xs font-bold uppercase tracking-[0.3em]">Our Philosophy</span>
+              <div className="inline-flex items-center gap-3">
+                <div className="w-10 md:w-16 h-[2px] bg-gradient-to-r from-[#C9A84C] to-transparent"></div>
+                <span className="text-[#C9A84C] font-semibold text-[11px] md:text-sm uppercase tracking-[0.4em] font-serif">Philosophy</span>
               </div>
               
-              <h3 className="text-[22px] sm:text-3xl md:text-5xl lg:text-6xl text-[#002147] leading-tight font-light relative">
-                <span className="absolute -top-4 -left-4 md:-top-6 md:-left-6 text-4xl md:text-6xl text-[#D4AF37]/20">"</span>
+              <h3 className="text-[22px] sm:text-3xl md:text-5xl lg:text-[3.25rem] text-[#2a1b12] leading-[1.25] font-black tracking-tight relative z-10 w-full">
+                <span className="absolute -top-4 -left-3 md:-top-10 md:-left-8 text-5xl md:text-8xl text-[#C9A84C] opacity-20 font-serif leading-none select-none">"</span>
                 আমরা বিলাসিতা নয়, <br className="hidden md:block"/> 
-                <span className="font-bold text-[#D4AF37]">সাধ্যের মধ্যে আধুনিক</span> <br className="hidden md:block"/> 
-                জীবনযাত্রার নিশ্চয়তা দিই।
-                <span className="absolute -bottom-4 -right-4 md:-bottom-6 md:-right-6 text-4xl md:text-6xl text-[#D4AF37]/20 leading-none">"</span>
+                <span className="relative inline-block mt-1 md:mt-2">
+                  <span className="relative z-10 text-[#C9A84C]">সাধ্যের মধ্যে আধুনিক</span>
+                  <span className="absolute bottom-1 md:bottom-2 left-0 w-full h-1.5 md:h-4 bg-[#C9A84C]/20 -z-10 skew-x-[-15deg]"></span>
+                </span> <br className="hidden md:block"/> 
+                <span className="mt-1 inline-block">জীবনযাত্রার নিশ্চয়তা দিই।</span>
+                <span className="absolute -bottom-3 -right-1 md:-bottom-6 md:-right-4 text-5xl md:text-8xl text-[#C9A84C] opacity-20 font-serif leading-none select-none drop-shadow-sm">"</span>
               </h3>
               
-              <p className="text-xs md:text-lg text-[#002147]/70 font-medium leading-relaxed">
+              <p className="text-[13px] md:text-[17px] text-[#615249] bg-gradient-to-r from-white to-white/60 backdrop-blur-md p-4 md:p-7 rounded-xl md:rounded-2xl border-l-4 border-[#C9A84C] font-medium leading-[1.6] md:leading-[1.8] shadow-[0_4px_20px_rgba(0,0,0,0.03)] selection:bg-[#C9A84C]/20">
                 ঢাকার ব্যস্ত জীবনে আপনার থাকার জায়গাটি হওয়া চাই একটি শান্তির নীড়। AyaanAyaat Homes-এর প্রতিটি প্রজেক্ট ডিজাইন করা হয়েছে আপনার কাজের উদ্দীপনা এবং ব্যক্তিগত প্রশান্তির কথা মাথায় রেখে।
               </p>
               
-              <div className="grid grid-cols-2 gap-2 md:gap-6 pt-2 md:pt-4">
+              <div className="grid grid-cols-2 sm:grid-cols-2 gap-2 md:gap-5 pt-1 md:pt-2">
                 {[
-                  { title: "নিরাপদ পরিবেশ", desc: "২৪/৭ সিসিটিভি ও গার্ড" },
-                  { title: "স্বাস্থ্যসম্মত খাবার", desc: "৩ বেলা মানসম্মত মিল" },
-                  { title: "আধুনিক সুবিধা", desc: "এসি, ওয়াইফাই ও অন্যান্য" },
-                  { title: "স্মার্ট লোকেশন", desc: "যাতায়াতের সেরা সুবিধা" }
+                  { title: "নিরাপদ পরিবেশ", desc: "২৪/৭ সিসিটিভি ও গার্ড", icon: <svg className="w-4 h-4 md:w-6 md:h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="1.5" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"></path></svg> },
+                  { title: "স্বাস্থ্যসম্মত খাবার", desc: "৩ বেলা মানসম্মত মিল", icon: <svg className="w-4 h-4 md:w-6 md:h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="1.5" d="M21 15.546c-.523 0-1.046.151-1.5.454a2.704 2.704 0 01-3 0 2.704 2.704 0 00-3 0 2.704 2.704 0 01-3 0 2.704 2.704 0 00-3 0 2.704 2.704 0 01-3 0 2.701 2.701 0 00-1.5-.454M9 6v2m3-2v2m3-2v2M9 3h.01M12 3h.01M15 3h.01M21 21v-5a2 2 0 00-2-2H5a2 2 0 00-2 2v5a2 2 0 002 2h14a2 2 0 002-2z"></path></svg> },
+                  { title: "আধুনিক সুবিধা", desc: "এসি, ওয়াইফাই ও অন্যান্য", icon: <svg className="w-4 h-4 md:w-6 md:h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="1.5" d="M9.75 17L9 20l-1 1h8l-1-1-.75-3M3 13h18M5 17h14a2 2 0 002-2V5a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"></path></svg> },
+                  { title: "স্মার্ট লোকেশন", desc: "যাতায়াতের সেরা সুবিধা", icon: <svg className="w-4 h-4 md:w-6 md:h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="1.5" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.243-4.243a8 8 0 1111.314 0z"></path><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="1.5" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"></path></svg> }
                 ].map((item, idx) => (
-                  <div key={idx} className="bg-white p-3 md:p-4 rounded-xl border border-gray-100 shadow-sm hover:shadow-md transition-shadow group">
-                    <div className="w-6 h-6 md:w-8 md:h-8 rounded-full bg-[#002147]/5 flex items-center justify-center mb-2 md:mb-3 group-hover:bg-[#D4AF37]/10 transition-colors">
-                      <svg className="w-3 h-3 md:w-4 md:h-4 text-[#002147] group-hover:text-[#D4AF37] transition-colors" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M5 13l4 4L19 7"></path></svg>
+                  <div key={idx} className="flex flex-col sm:flex-row items-center sm:items-start text-center sm:text-left gap-2 sm:gap-4 p-3 md:p-5 bg-white hover:bg-gradient-to-br hover:from-white hover:to-[#faf8f5] rounded-xl md:rounded-2xl border border-gray-100 shadow-sm hover:shadow-[0_8px_30px_rgba(201,168,76,0.12)] transition-all duration-300 group">
+                    <div className="w-8 h-8 md:w-12 md:h-12 shrink-0 rounded-full bg-[#faf8f5] border border-gray-100 flex items-center justify-center text-[#a88241] group-hover:bg-[#C9A84C] group-hover:border-[#C9A84C] group-hover:text-white transition-all duration-500 ease-out sm:group-hover:-translate-y-1">
+                      {item.icon}
                     </div>
-                    <h4 className="text-[#002147] font-bold text-[11px] md:text-sm mb-0.5 md:mb-1">{item.title}</h4>
-                    <p className="text-[#002147]/60 text-[9px] md:text-xs">{item.desc}</p>
+                    <div className="pt-0.5">
+                      <h4 className="text-[#2a1b12] font-black text-[11px] md:text-base leading-tight mb-1 md:mb-1.5 tracking-tight">{item.title}</h4>
+                      <p className="text-[#615249]/80 text-[9px] md:text-sm font-medium leading-snug">{item.desc}</p>
+                    </div>
                   </div>
                 ))}
               </div>
@@ -385,322 +1059,637 @@ const Home: React.FC<HomeProps> = ({ onNavigate }) => {
       </section>
 
       {/* Branches Sections */}
-      <section id="our-branches" className="bg-white border-y border-[#002147]/10 scroll-mt-20">
+      <section id="our-branches" className="bg-white border-y border-[#4a3426]/10 scroll-mt-20">
         {/* Navigation Grid Style approach for titles */}
-        <motion.div 
-          initial={{ opacity: 0 }}
-          whileInView={{ opacity: 1 }}
-          viewport={{ once: true }}
-          transition={{ duration: 0.8 }}
-          className="border-b border-[#002147]/10 px-3 py-3 md:px-6 md:py-16 bg-[#f8f9fa] relative overflow-hidden"
-        >
-          {/* Subtle background pattern */}
-          <div className="absolute inset-0 opacity-[0.03] pointer-events-none" style={{ backgroundImage: 'radial-gradient(#002147 1px, transparent 1px)', backgroundSize: '30px 30px' }}></div>
-          <div className="absolute right-0 top-0 w-64 h-64 bg-gradient-to-bl from-[#D4AF37]/10 to-transparent blur-3xl pointer-events-none rounded-full transform translate-x-1/2 -translate-y-1/2"></div>
+        
+
+        
+
+        {/* --- CUSTOM CSS FOR NEW BRANCHES DESIGN --- */}
+        <style>{`
+          :root {
+            --gold: #C9A84C;
+            --gold-light: #E8C97A;
+            --dark-color: #1A1A14; /* changed from --dark to avoid conflicts potentially */
+            --dark-mid: #2A2A1E;
+            --cream: #F9F6EF;
+            --cream-mid: #EDE8DC;
+            --white: #FFFFFF;
+            --female-accent: #C97A9B;
+            --male-accent: #4A7AAC;
+            --text-muted: #888878;
+          }
+
+          /* ── Section Header ── */
+          .br-section-header {
+            text-align: center;
+            padding: 72px 24px 56px;
+            position: relative;
+            background: var(--cream);
+          }
+
+          .br-section-header::after {
+            content: '';
+            display: block;
+            width: 60px;
+            height: 2px;
+            background: var(--gold);
+            margin: 20px auto 0;
+          }
+
+          .br-section-label {
+            font-family: 'DM Sans', sans-serif;
+            font-size: 11px;
+            font-weight: 500;
+            letter-spacing: 4px;
+            text-transform: uppercase;
+            color: var(--gold);
+            margin-bottom: 14px;
+          }
+
+          .br-section-title {
+            font-family: 'Playfair Display', serif;
+            font-size: clamp(36px, 5vw, 56px);
+            font-weight: 700;
+            color: var(--dark-color);
+            line-height: 1.15;
+          }
+
+          .br-section-title span {
+            color: var(--gold);
+          }
+
+          .br-section-desc {
+            max-width: 520px;
+            margin: 18px auto 0;
+            font-size: 15px;
+            color: var(--text-muted);
+            line-height: 1.7;
+          }
+
+          /* ── Cards Grid ── */
+          .br-branches-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(480px, 1fr));
+            gap: 32px;
+            max-width: 1160px;
+            margin: 0 auto;
+            padding: 0 28px 80px;
+            background: var(--cream);
+          }
+
+          /* ── Branch Card ── */
+          .br-new-card {
+            background: var(--white);
+            border-radius: 20px;
+            overflow: hidden;
+            box-shadow: 0 4px 32px rgba(0,0,0,0.07);
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            min-height: 340px;
+            transition: transform 0.4s ease, box-shadow 0.4s ease;
+            position: relative;
+            cursor: pointer;
+          }
+
+          .br-new-card::after {
+            content: '';
+            position: absolute;
+            inset: 0;
+            border-radius: 20px;
+            border: 3px solid transparent;
+            pointer-events: none;
+            z-index: 10;
+            transition: border-color 0.4s ease, box-shadow 0.4s ease;
+          }
+
+          .br-new-card:hover {
+            transform: translateY(-12px);
+            box-shadow: 0 24px 50px rgba(0,0,0,0.15);
+          }
+
+          .br-new-card.female:hover::after {
+            animation: glowPulseFemale 1.5s infinite alternate;
+            border-color: var(--female-accent);
+          }
           
-          <div className="max-w-7xl mx-auto flex flex-col md:flex-row justify-between items-center gap-2 md:gap-8 relative z-10">
-            <div className="group cursor-default text-center md:text-left">
-              <span className="text-[#D4AF37] text-[8px] sm:text-xs font-bold uppercase tracking-[0.4em] block mb-1 md:mb-3 group-hover:tracking-[0.5em] transition-all duration-500 origin-center md:origin-left">Our Premium Locations</span>
-              <h2 className="text-2xl sm:text-4xl md:text-5xl lg:text-6xl text-[#002147] group-hover:text-[#003b80] transition-colors duration-300">আমাদের <span className="text-[#D4AF37]">ব্রাঞ্চ-সমূহ</span></h2>
+          .br-new-card.male:hover::after {
+            animation: glowPulseMale 1.5s infinite alternate;
+            border-color: var(--male-accent);
+          }
+
+          @keyframes glowPulseFemale {
+            0% { box-shadow: 0 0 5px rgba(201,122,155, 0.4), inset 0 0 5px rgba(201,122,155, 0.4); border-color: rgba(201,122,155, 0.8); }
+            100% { box-shadow: 0 0 20px rgba(201,122,155, 1), inset 0 0 15px rgba(201,122,155, 0.8); border-color: rgba(201,122,155, 1); }
+          }
+
+          @keyframes glowPulseMale {
+            0% { box-shadow: 0 0 5px rgba(74,122,172, 0.4), inset 0 0 5px rgba(74,122,172, 0.4); border-color: rgba(74,122,172, 0.8); }
+            100% { box-shadow: 0 0 20px rgba(74,122,172, 1), inset 0 0 15px rgba(74,122,172, 0.8); border-color: rgba(74,122,172, 1); }
+          }
+
+          /* ── Card Image Side ── */
+          .br-card-image {
+            position: relative;
+            overflow: hidden;
+            height: 100%;
+          }
+
+          .br-card-image img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            display: block;
+            transition: transform 0.5s ease;
+          }
+
+          .br-new-card:hover .br-card-image img {
+            transform: scale(1.05);
+          }
+
+          .br-image-overlay {
+            position: absolute;
+            inset: 0;
+            background: linear-gradient(135deg, rgba(0,0,0,0.25) 0%, transparent 60%);
+          }
+
+          .br-type-badge {
+            position: absolute;
+            top: 16px;
+            left: 16px;
+            padding: 6px 14px;
+            border-radius: 50px;
+            font-size: 10px;
+            font-weight: 600;
+            letter-spacing: 2px;
+            text-transform: uppercase;
+            color: white;
+            backdrop-filter: blur(8px);
+          }
+
+          .br-new-card.female .br-type-badge {
+            background: rgba(201,122,155,0.85);
+          }
+
+          .br-new-card.male .br-type-badge {
+            background: rgba(74,122,172,0.85);
+          }
+
+          /* ── Card Content Side ── */
+          .br-card-content {
+            padding: 32px 28px;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            position: relative;
+            background: var(--white);
+          }
+
+          .br-card-content::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 3px;
+            height: 100%;
+          }
+
+          .br-new-card.female .br-card-content::before {
+            background: linear-gradient(to bottom, var(--female-accent), transparent);
+          }
+
+          .br-new-card.male .br-card-content::before {
+            background: linear-gradient(to bottom, var(--male-accent), transparent);
+          }
+
+          .br-brand-name {
+            font-size: 11px;
+            font-weight: 500;
+            letter-spacing: 2px;
+            text-transform: uppercase;
+            color: var(--text-muted);
+            margin-bottom: 6px;
+          }
+
+          .br-branch-name {
+            font-family: 'Playfair Display', serif;
+            font-size: 26px;
+            font-weight: 700;
+            color: var(--dark-color);
+            line-height: 1.2;
+            margin-bottom: 6px;
+          }
+
+          .br-branch-tagline {
+            font-size: 12px;
+            color: var(--gold);
+            font-style: italic;
+            margin-bottom: 18px;
+          }
+
+          /* Address */
+          .br-address-box-new {
+            display: flex;
+            gap: 10px;
+            align-items: flex-start;
+            background: var(--cream);
+            border-radius: 10px;
+            padding: 12px 14px;
+            margin-bottom: 18px;
+          }
+
+          .br-address-icon-new {
+            width: 18px;
+            height: 18px;
+            flex-shrink: 0;
+            margin-top: 1px;
+          }
+
+          .br-address-text-new {
+            font-size: 12.5px;
+            line-height: 1.6;
+            color: #555548;
+            margin: 0;
+          }
+
+          /* Amenity Tags */
+          .br-amenities {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 7px;
+            margin-bottom: 22px;
+          }
+
+          .br-amenity-tag {
+            display: inline-flex;
+            align-items: center;
+            gap: 5px;
+            padding: 5px 11px;
+            border-radius: 50px;
+            font-size: 11px;
+            font-weight: 500;
+            border: 1px solid;
+          }
+
+          .br-amenity-tag.green  { color: #2D7A4F; border-color: #A8D9BF; background: #EEF8F3; }
+          .br-amenity-tag.amber  { color: #7A5A1A; border-color: #E0C97A; background: #FDF8EC; }
+          .br-amenity-tag.blue   { color: #1A4A7A; border-color: #7AB0E0; background: #EEF4FB; }
+          .br-amenity-tag.pink   { color: #7A2A5A; border-color: #E07AB0; background: #FBEEF4; }
+
+          /* Card Footer */
+          .br-card-footer {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 10px;
+          }
+
+          .br-cta-btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            padding: 10px 20px;
+            border-radius: 50px;
+            font-size: 12px;
+            font-weight: 600;
+            text-decoration: none;
+            letter-spacing: 0.5px;
+            transition: all 0.25s ease;
+            cursor: pointer;
+            border: none;
+          }
+
+          .br-new-card.female .br-cta-btn {
+            background: var(--dark-color);
+            color: var(--gold-light);
+          }
+
+          .br-new-card.male .br-cta-btn {
+            background: var(--dark-color);
+            color: var(--gold-light);
+          }
+
+          .br-cta-btn:hover {
+            background: var(--gold);
+            color: var(--dark-color);
+          }
+
+          .br-cta-arrow {
+            font-size: 14px;
+            transition: transform 0.25s;
+          }
+
+          .br-cta-btn:hover .br-cta-arrow {
+            transform: translateX(4px);
+          }
+
+          .br-social-links {
+            display: flex;
+            gap: 8px;
+          }
+
+          .br-social-link {
+            width: 34px;
+            height: 34px;
+            border-radius: 50%;
+            background: var(--cream-mid);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            text-decoration: none;
+            transition: all 0.2s;
+            border: 1px solid transparent;
+          }
+
+          .br-social-link:hover {
+            border-color: var(--gold);
+            background: var(--white);
+          }
+
+          .br-social-link svg { width: 16px; height: 16px; }
+
+          /* ── Decorative corner accent ── */
+          .br-corner-accent {
+            position: absolute;
+            bottom: 0;
+            right: 0;
+            width: 60px;
+            height: 60px;
+            opacity: 0.06;
+            pointer-events: none;
+          }
+
+          .br-new-card.female .br-corner-accent { color: var(--female-accent); }
+          .br-new-card.male   .br-corner-accent { color: var(--male-accent); }
+
+          /* ── Responsive ── */
+          @media (max-width: 768px) {
+            .br-section-header {
+              padding: 32px 16px 24px;
+            }
+            .br-section-header::after { margin-top: 12px; }
+            .br-section-label { font-size: 10px; margin-bottom: 8px; }
+            .br-section-title { font-size: clamp(28px, 8vw, 32px); }
+            .br-section-desc { font-size: 12px; margin-top: 12px; line-height: 1.5; }
+
+            .br-branches-grid {
+              grid-template-columns: 1fr;
+              padding: 0 16px 40px;
+              gap: 16px;
+            }
+
+            .br-new-card {
+              grid-template-columns: 120px 1fr;
+              min-height: unset;
+            }
+
+            .br-card-image {
+              height: 100%;
+            }
+
+            .br-card-content {
+              padding: 16px 14px;
+            }
+            
+            .br-brand-name { margin-bottom: 4px; font-size: 9px; }
+            .br-branch-name { font-size: 18px; margin-bottom: 4px; }
+            .br-branch-tagline { margin-bottom: 8px; font-size: 10px; }
+            .br-address-box-new { padding: 6px 8px; margin-bottom: 10px; gap: 6px; border-radius: 6px; }
+            .br-address-icon-new { width: 14px; height: 14px; }
+            .br-address-text-new { font-size: 10px; line-height: 1.3; }
+            .br-amenities { gap: 4px; margin-bottom: 12px; }
+            .br-amenity-tag { font-size: 8.5px; padding: 3px 6px; }
+            .br-type-badge { font-size: 8px; padding: 4px 8px; top: 8px; left: 8px; }
+            .br-cta-btn { padding: 8px 12px; font-size: 10px; }
+            .br-social-link { width: 30px; height: 30px; }
+            .br-social-link svg { width: 14px; height: 14px; }
+          }
+
+          /* Entry animation */
+          .br-new-card {
+            opacity: 0;
+            animation: fadeUp 0.6s ease forwards;
+          }
+
+          .br-new-card:nth-child(1) { animation-delay: 0.1s; }
+          .br-new-card:nth-child(2) { animation-delay: 0.25s; }
+
+          @keyframes fadeUp {
+            from { opacity: 0; transform: translateY(30px); }
+            to   { opacity: 1; transform: translateY(0); }
+          }
+        `}</style>
+
+        {/* --- NEW BRANCHES DESIGN --- */}
+        <section className="bg-[var(--cream)]" id="branches-section">
+          {/* Section Header */}
+          <div className="br-section-header">
+            <p className="br-section-label">OUR PREMIUM LOCATIONS</p>
+            <h2 className="br-section-title">আমাদের <span>ব্রাঞ্চ-সমূহ</span></h2>
+            <p className="br-section-desc">
+              ছাত্র-ছাত্রী ও চাকরিজীবীদের নিরাপদ আবাসনে AyaanAyaat Homes-এর দুটি প্রিমিয়াম প্রজেক্ট— ছেলেদের জন্য 'ব্যাচেলর পয়েন্ট' এবং মেয়েদের জন্য 'কুইন্স পয়েন্ট'।
+            </p>
+          </div>
+
+          {/* Cards */}
+          <div className="br-branches-grid">
+
+            {/* Queens Point (Female) */}
+            <div className="br-new-card female" onClick={() => onNavigate({ type: 'female-hostel' })}>
+              <div className="br-card-image">
+                <img src="https://lh3.googleusercontent.com/d/1XVpXrYorEp471NKLuuQ124m-mDd5_ah6" alt="Queens Point Building" />
+                <div className="br-image-overlay"></div>
+                <span className="br-type-badge">FEMALE BRANCH</span>
+              </div>
+
+              <div className="br-card-content">
+                <div className="br-card-top">
+                  <p className="br-brand-name">AyaanAyaat Homes</p>
+                  <h3 className="br-branch-name">Queens Point</h3>
+                  <span className="sr-only">কুইন্স পয়েন্ট - মেয়েদের হোস্টেল Queens Point Girls Hostel in Dhaka</span>
+                  <p className="br-branch-tagline">নিরাপদ আশ্রয়ে রাজকীয়তা</p>
+
+                  <div className="br-address-box-new">
+                    <svg className="br-address-icon-new" fill="none" viewBox="0 0 24 24" stroke="#C9A84C" strokeWidth="2">
+                      <path strokeLinecap="round" strokeLinejoin="round" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"/>
+                      <path strokeLinecap="round" strokeLinejoin="round" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"/>
+                    </svg>
+                    <p className="br-address-text-new">বাড়ি# ১৮৯, রোড# ১৩, সেক্টর# ১০, উত্তরা, রানাভোলা এভিনিউ, ঢাকা</p>
+                  </div>
+
+                  <div className="br-amenities">
+                    <span className="br-amenity-tag green">✓ ২৪/৭ নিরাপত্তা</span>
+                    <span className="br-amenity-tag amber">✓ মানসম্মত খাবার</span>
+                    <span className="br-amenity-tag blue">✓ AC / Non-AC</span>
+                    <span className="br-amenity-tag pink">✓ ওয়াই-ফাই</span>
+                  </div>
+                </div>
+
+                <div className="br-card-footer">
+                  <button onClick={() => onNavigate({ type: 'female-hostel' })} className="br-cta-btn">
+                    বিস্তারিত দেখুন <span className="br-cta-arrow">→</span>
+                  </button>
+                  <div className="br-social-links">
+                    <a href="https://www.facebook.com/share/1AZyBMJreP/" target="_blank" rel="noopener noreferrer" className="br-social-link" title="Facebook" onClick={(e) => e.stopPropagation()}>
+                      <svg viewBox="0 0 24 24" fill="#1877F2"><path d="M24 12.073C24 5.405 18.627 0 12 0S0 5.405 0 12.073C0 18.1 4.388 23.094 10.125 24v-8.437H7.078v-3.49h3.047V9.413c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.49h-2.796V24C19.612 23.094 24 18.1 24 12.073z"/></svg>
+                    </a>
+                    <a href="https://maps.app.goo.gl/wAa3pBmE6b6SVWks9" target="_blank" rel="noopener noreferrer" className="br-social-link" title="Google Maps" onClick={(e) => e.stopPropagation()}>
+                      <svg viewBox="0 0 24 24" fill="none" stroke="#EA4335" strokeWidth="2"><path strokeLinecap="round" strokeLinejoin="round" d="M12 2C8.686 2 6 4.686 6 8c0 5.25 6 13 6 13s6-7.75 6-13c0-3.314-2.686-6-6-6z"/><circle cx="12" cy="8" r="2" fill="#EA4335" stroke="none"/></svg>
+                    </a>
+                  </div>
+                </div>
+
+                {/* decorative */}
+                <svg className="br-corner-accent" viewBox="0 0 60 60" fill="currentColor"><path d="M0 60 L60 0 L60 60 Z"/></svg>
+              </div>
             </div>
-            <div className="text-center md:text-left md:border-l-2 md:border-[#D4AF37] md:pl-8 md:py-2">
-              <p className="text-[#002147]/80 text-[11px] md:text-sm max-w-lg leading-relaxed font-semibold">
-                <strong>AyaanAyaat Homes</strong>-এর দুটি স্বনামধন্য প্রজেক্ট—ছেলেদের জন্য <span className="text-[#D4AF37]">ব্যাচেলর পয়েন্ট</span> এবং মেয়েদের জন্য <span className="text-[#D4AF37]">কুইন পয়েন্ট</span>। ঢাকা শহরে ছাত্র-ছাত্রী ও চাকরিজীবীদের নিরাপদ এবং আরামদায়ক আবাসন নিশ্চিতে আমরা প্রতিশ্রুতিবদ্ধ।
+
+            {/* Bachelor Point (Male) */}
+            <div className="br-new-card male" onClick={() => onNavigate({ type: 'male-hostel' })}>
+              <div className="br-card-image">
+                <img src="https://lh3.googleusercontent.com/d/1cjIYSZDiCig4kN1FbLxGIoEUTcdcCU1C" alt="Bachelor Point Building" />
+                <div className="br-image-overlay"></div>
+                <span className="br-type-badge">MALE BRANCH</span>
+              </div>
+
+              <div className="br-card-content">
+                <div className="br-card-top">
+                  <p className="br-brand-name">AyaanAyaat Homes</p>
+                  <h3 className="br-branch-name">Bachelor Point</h3>
+                  <span className="sr-only">বেচেলর পয়েন্ট - ব্যাচেলর পয়েন্ট ছেলেদের হোস্টেল Bachelor Point Boys Hostel in Dhaka</span>
+                  <p className="br-branch-tagline">আধুনিক স্মার্ট জীবনের নিশ্চয়তা</p>
+
+                  <div className="br-address-box-new">
+                    <svg className="br-address-icon-new" fill="none" viewBox="0 0 24 24" stroke="#C9A84C" strokeWidth="2">
+                      <path strokeLinecap="round" strokeLinejoin="round" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"/>
+                      <path strokeLinecap="round" strokeLinejoin="round" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"/>
+                    </svg>
+                    <p className="br-address-text-new">৩৬৭, গাওয়াইর, দক্ষিণখান, ঢাকা-১২৩০</p>
+                  </div>
+
+                  <div className="br-amenities">
+                    <span className="br-amenity-tag green">✓ ২৪/৭ সিসিটিভি</span>
+                    <span className="br-amenity-tag amber">✓ মানসম্মত খাবার</span>
+                    <span className="br-amenity-tag blue">✓ AC / Non-AC</span>
+                    <span className="br-amenity-tag pink">✓ ওয়াই-ফাই</span>
+                  </div>
+                </div>
+
+                <div className="br-card-footer">
+                  <button onClick={() => onNavigate({ type: 'male-hostel' })} className="br-cta-btn">
+                    বিস্তারিত দেখুন <span className="br-cta-arrow">→</span>
+                  </button>
+                  <div className="br-social-links">
+                    <a href="https://www.facebook.com/share/1CwaVA5WXK/" target="_blank" rel="noopener noreferrer" className="br-social-link" title="Facebook" onClick={(e) => e.stopPropagation()}>
+                      <svg viewBox="0 0 24 24" fill="#1877F2"><path d="M24 12.073C24 5.405 18.627 0 12 0S0 5.405 0 12.073C0 18.1 4.388 23.094 10.125 24v-8.437H7.078v-3.49h3.047V9.413c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.49h-2.796V24C19.612 23.094 24 18.1 24 12.073z"/></svg>
+                    </a>
+                    <a href="https://maps.app.goo.gl/EtBr4xqaVPK8ZH4N9" target="_blank" rel="noopener noreferrer" className="br-social-link" title="Google Maps" onClick={(e) => e.stopPropagation()}>
+                      <svg viewBox="0 0 24 24" fill="none" stroke="#EA4335" strokeWidth="2"><path strokeLinecap="round" strokeLinejoin="round" d="M12 2C8.686 2 6 4.686 6 8c0 5.25 6 13 6 13s6-7.75 6-13c0-3.314-2.686-6-6-6z"/><circle cx="12" cy="8" r="2" fill="#EA4335" stroke="none"/></svg>
+                    </a>
+                  </div>
+                </div>
+
+                <svg className="br-corner-accent" viewBox="0 0 60 60" fill="currentColor"><path d="M0 60 L60 0 L60 60 Z"/></svg>
+              </div>
+            </div>
+
+          </div>
+        </section>
+
+
+
+        {/* --- UPCOMING BRANCHES --- */}
+        <section id="upcoming" className="bg-[#f8f6f0] py-10 px-6 border-b border-[#4a3426]/10 relative overflow-hidden scroll-mt-20">
+          {/* Decorative Background Elements */}
+          <div className="absolute inset-0 opacity-[0.03]" style={{ backgroundImage: 'radial-gradient(#C9A84C 1px, transparent 1px)', backgroundSize: '30px 30px' }}></div>
+          <div className="absolute top-0 right-0 w-[600px] h-[600px] bg-[#C9A84C]/5 rounded-full blur-[100px] -translate-y-1/2 translate-x-1/2"></div>
+          
+          <div className="max-w-6xl mx-auto relative z-10">
+            <div className="text-center mb-10">
+              <div className="inline-flex items-center gap-4 mb-4">
+                <span className="w-12 h-[1px] bg-[#C9A84C]/60"></span>
+                <span className="text-[#C9A84C] font-semibold text-xs tracking-[0.3em] uppercase">Future Expansion</span>
+                <span className="w-12 h-[1px] bg-[#C9A84C]/60"></span>
+              </div>
+              <h2 className="font-serif text-3xl md:text-5xl font-bold text-[#2A2A1E] mb-6">
+                আমাদের <span className="text-[#C9A84C]">আপকামিং</span> ব্রাঞ্চসমূহ
+              </h2>
+              <p className="max-w-2xl mx-auto text-[#615249] text-sm md:text-base leading-relaxed">
+                নতুন আঙ্গিকে আরও উন্নত ও আধুনিক আবাসন সুবিধা নিয়ে আমরা আসছি আপনাদের কাছাকাছি।
               </p>
             </div>
+
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-8 max-w-4xl mx-auto">
+              
+              {/* Prince Point */}
+              <motion.div 
+                initial={{ opacity: 0, y: 20 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true }}
+                transition={{ duration: 0.5, delay: 0.1 }}
+                className="group relative overflow-hidden rounded-[20px] bg-[#2A2A1E] aspect-[4/3] md:aspect-[3/2] flex flex-col justify-center items-center border border-[#C9A84C]/20 shadow-lg"
+              >
+                <img src="https://images.unsplash.com/photo-1503387762-592deb58ef4e?q=80&w=900&auto=format&fit=crop" alt="Prince Point Future Expansion" className="absolute inset-0 w-full h-full object-cover grayscale opacity-40 blur-[2px] transition-transform duration-700 group-hover:scale-105" />
+                <div className="absolute inset-0 bg-black/50 z-0 transition-colors duration-500 group-hover:bg-black/40"></div>
+                
+                {/* Decorative borders */}
+                <div className="absolute top-4 left-4 w-6 h-6 border-t border-l border-[#C9A84C]/30 z-10"></div>
+                <div className="absolute bottom-4 right-4 w-6 h-6 border-b border-r border-[#C9A84C]/30 z-10"></div>
+                
+                <div className="relative z-10 text-center flex flex-col items-center">
+                  <div className="w-14 h-14 rounded-full border border-white/20 bg-black/40 backdrop-blur-md flex items-center justify-center mb-4 transition-transform duration-500 group-hover:scale-110">
+                    <Lock className="w-6 h-6 text-white/80" />
+                  </div>
+                  <h3 className="text-2xl md:text-3xl font-serif font-bold text-white/90 mb-3 tracking-wide">Prince Point</h3>
+                  <span className="sr-only">প্রিন্স পয়েন্ট - Prince Point</span>
+                  <div className="inline-flex items-center gap-2 px-4 py-1.5 bg-black/60 rounded-full border border-white/10 backdrop-blur-md text-white/60">
+                    <span className="w-2 h-2 rounded-full bg-[#E57373] animate-pulse"></span>
+                    <span className="text-[10px] font-bold tracking-[0.2em] uppercase">Upcoming</span>
+                  </div>
+                </div>
+              </motion.div>
+
+              {/* Royal Point */}
+              <motion.div 
+                initial={{ opacity: 0, y: 20 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true }}
+                transition={{ duration: 0.5, delay: 0.2 }}
+                className="group relative overflow-hidden rounded-[20px] bg-[#2A2A1E] aspect-[4/3] md:aspect-[3/2] flex flex-col justify-center items-center border border-[#C9A84C]/20 shadow-lg"
+              >
+                <img src="https://images.unsplash.com/photo-1510627489930-0c1b0bfb6785?q=80&w=900&auto=format&fit=crop" alt="Royal Point Future Expansion" className="absolute inset-0 w-full h-full object-cover grayscale opacity-40 blur-[2px] transition-transform duration-700 group-hover:scale-105" />
+                <div className="absolute inset-0 bg-black/50 z-0 transition-colors duration-500 group-hover:bg-black/40"></div>
+                
+                {/* Decorative borders */}
+                <div className="absolute top-4 left-4 w-6 h-6 border-t border-l border-[#C9A84C]/30 z-10"></div>
+                <div className="absolute bottom-4 right-4 w-6 h-6 border-b border-r border-[#C9A84C]/30 z-10"></div>
+                
+                <div className="relative z-10 text-center flex flex-col items-center">
+                  <div className="w-14 h-14 rounded-full border border-white/20 bg-black/40 backdrop-blur-md flex items-center justify-center mb-4 transition-transform duration-500 group-hover:scale-110">
+                    <Lock className="w-6 h-6 text-white/80" />
+                  </div>
+                  <h3 className="text-2xl md:text-3xl font-serif font-bold text-white/90 mb-3 tracking-wide">Royal Point</h3>
+                  <span className="sr-only">রয়েল পয়েন্ট - Royal Point</span>
+                  <div className="inline-flex items-center gap-2 px-4 py-1.5 bg-black/60 rounded-full border border-white/10 backdrop-blur-md text-white/60">
+                    <span className="w-2 h-2 rounded-full bg-[#E57373] animate-pulse"></span>
+                    <span className="text-[10px] font-bold tracking-[0.2em] uppercase">Upcoming</span>
+                  </div>
+                </div>
+              </motion.div>
+
+            </div>
           </div>
-        </motion.div>
-
-        <div className="max-w-[95rem] mx-auto py-3 md:py-16 px-3 md:px-6 flex flex-col gap-3 md:gap-14">
-          {/* Queens Point (Female) */}
-          <motion.div 
-            id="queens-point-card"
-            initial={{ y: 80, opacity: 0 }}
-            whileInView={{ y: 0, opacity: 1 }}
-            viewport={{ once: true, margin: "-100px" }}
-            transition={{ duration: 0.8, ease: "easeOut" }}
-            className="flex flex-row bg-white rounded-2xl md:rounded-[2rem] overflow-hidden shadow-2xl shadow-[#002147]/5 border border-[#002147]/5 group cursor-pointer relative"
-            onClick={(e) => {
-              const el = e.currentTarget;
-              el.style.transition = "all 0.6s cubic-bezier(0.22, 1, 0.36, 1)";
-              el.style.transform = "scale(1.03)";
-              el.style.boxShadow = "0 30px 60px -15px rgba(0, 33, 71, 0.3)";
-              el.style.zIndex = "50";
-              setTimeout(() => {
-                el.style.transform = "";
-                el.style.boxShadow = "";
-                el.style.zIndex = "";
-                onNavigate({ type: 'female-hostel' });
-              }, 500);
-            }}
-          >
-            {/* Animated Hover Background */}
-            <div className="absolute inset-0 bg-gradient-to-r from-transparent via-[#D4AF37]/5 to-[#002147]/5 opacity-0 group-hover:opacity-100 transition-opacity duration-700 pointer-events-none"></div>
-
-            <div className="order-1 flex-1 p-2 sm:p-5 md:p-10 lg:p-12 flex flex-col justify-center relative z-10 w-[60%] md:w-auto">
-              <div className="flex items-center gap-1 md:gap-3 mb-1 md:mb-6 relative flex-wrap">
-                 <div className="bg-gradient-to-r from-[#002147] to-[#003b80] text-white px-1 sm:px-2 md:px-5 py-0.5 md:py-1.5 text-[5px] sm:text-[8px] md:text-xs font-bold uppercase tracking-widest rounded-full shadow-lg border border-white/20 whitespace-nowrap">
-                    Female Branch
-                 </div>
-                 <span className="text-[#D4AF37] font-semibold text-[5px] sm:text-[8px] md:text-xs tracking-tight md:tracking-wider animate-pulse whitespace-nowrap">AyaanAyaat Homes</span>
-              </div>
-              
-              <h3 className="text-xs sm:text-2xl md:text-5xl lg:text-7xl text-[#002147] leading-none mb-0 md:mb-3 drop-shadow-sm group-hover:-translate-y-1 transition-transform duration-500">Queens Point</h3>
-              <p className="text-[#D4AF37] text-[6px] sm:text-xs md:text-md mb-1 md:mb-8 font-bold">নিরাপদ আশ্রয়ে রাজকীয়তা</p>
-              
-              {/* Address Section */}
-              <div className="flex items-start gap-1 md:gap-4 mb-2 md:mb-8 bg-[#f8f9fa] p-1 md:p-4 rounded-md md:rounded-xl border border-gray-100 group-hover:border-[#D4AF37]/30 transition-colors">
-                <div className="bg-white p-0.5 md:p-2 rounded-full shadow-sm shrink-0">
-                  <svg xmlns="http://www.w3.org/2000/svg" className="h-2 w-2 md:h-6 md:w-6 text-[#D4AF37]" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-                    <path strokeLinecap="round" strokeLinejoin="round" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
-                    <path strokeLinecap="round" strokeLinejoin="round" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
-                  </svg>
-                </div>
-                <p className="text-[#002147] text-[5.5px] sm:text-[9px] md:text-base font-semibold pt-0.5 md:pt-1 leading-snug">বাড়ি# ১৮৯, রোড# ১৩, সেক্টর# ১০, উত্তরা, রানাভোলা এভিনিউ, ঢাকা</p>
-              </div>
-
-              {/* Quick Info Badges */}
-              <div className="flex flex-wrap gap-0.5 sm:gap-2 md:gap-3 mb-2 md:mb-10">
-                {['২৪/৭ নিরাপত্তা', 'মানসম্মত খাবার', 'AC / Non-AC', 'ওয়াই-ফাই'].map((feature, i) => (
-                  <span key={i} className="inline-flex items-center gap-0.5 sm:gap-1.5 px-1 sm:px-3 py-0.5 md:py-1 bg-[#002147]/5 text-[#002147] text-[5px] sm:text-[10px] md:text-xs font-bold rounded-sm md:rounded-lg border border-[#002147]/10 group-hover:bg-[#002147] group-hover:text-white transition-colors duration-300 whitespace-nowrap">
-                    <svg className="w-1.5 h-1.5 sm:w-2.5 sm:h-2.5 md:w-3 md:h-3" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="3" d="M5 13l4 4L19 7"></path></svg>
-                    {feature}
-                  </span>
-                ))}
-              </div>
-              
-              <div className="flex items-center gap-1 sm:gap-4 md:gap-6 mt-auto flex-wrap">
-                <button 
-                  className="relative overflow-hidden bg-[#002147] text-white px-1.5 py-0.5 sm:px-4 sm:py-2 md:px-8 md:py-3.5 text-[5px] sm:text-[8px] md:text-xs font-bold uppercase tracking-widest rounded-full transition-all shadow-[0_10px_20px_rgba(0,33,71,0.2)] group-hover:shadow-[0_15px_30px_rgba(0,33,71,0.4)] pointer-events-none animate-pulse group-hover:animate-none"
-                >
-                  <span className="relative z-10 flex items-center gap-0.5 md:gap-2 group-hover:text-[#002147] transition-colors duration-500 whitespace-nowrap">
-                    ক্লিক করে বিস্তারিত দেখুন
-                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={3} stroke="currentColor" className="w-1.5 h-1.5 sm:w-2.5 sm:h-2.5 md:w-3.5 md:h-3.5"><path strokeLinecap="round" strokeLinejoin="round" d="M13.5 4.5l7.5 7.5-7.5 7.5M21 12H3" /></svg>
-                  </span>
-                  <div className="absolute inset-0 bg-[#D4AF37] transform scale-x-0 origin-left transition-transform duration-500 ease-out group-hover:scale-x-100"></div>
-                </button>
-                <div className="flex gap-1 sm:gap-2 md:gap-3 shrink-0">
-                  <a title="Facebook Page" href="https://www.facebook.com/share/1AZyBMJreP/" onClick={(e) => e.stopPropagation()} target="_blank" rel="noopener noreferrer" className="w-3.5 h-3.5 sm:w-6 sm:h-6 md:w-11 md:h-11 rounded-full border border-[#002147]/10 flex items-center justify-center bg-white hover:bg-gray-50 transition-all shadow-sm hover:shadow-md hover:-translate-y-1">
-                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" className="w-1.5 h-1.5 sm:w-3 sm:h-3 md:w-5 md:h-5">
-                      <path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.469h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.469h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z" fill="#1877F2"/>
-                      <path d="M16.671 15.542l.532-3.469h-3.328V9.823c0-.949.465-1.874 1.956-1.874h1.514V5.006s-1.375-.235-2.686-.235c-2.741 0-4.533 1.662-4.533 4.669v2.633H7.078v3.469h3.048v8.385a12.096 12.096 0 003.75 0v-8.385h2.796z" fill="#fff"/>
-                    </svg>
-                  </a>
-                  <a title="Google Maps" href="https://maps.app.goo.gl/wAa3pBmE6b6SVWks9" onClick={(e) => e.stopPropagation()} target="_blank" rel="noopener noreferrer" className="w-3.5 h-3.5 sm:w-6 sm:h-6 md:w-11 md:h-11 rounded-full border border-[#002147]/10 flex items-center justify-center bg-white hover:bg-gray-50 transition-all shadow-sm hover:shadow-md hover:-translate-y-1">
-                    <img src="https://upload.wikimedia.org/wikipedia/commons/a/aa/Google_Maps_icon_%282020%29.svg" alt="Google Maps" className="w-1.5 h-1.5 sm:w-3 sm:h-3 md:w-5 md:h-5 object-contain" />
-                  </a>
-                </div>
-              </div>
-            </div>
-            {/* Image Parallax Effect */}
-            <div className="order-2 relative w-[40%] sm:w-[40%] md:w-[400px] lg:w-[450px] shrink-0 overflow-hidden bg-[#f8f6f0]">
-              <motion.img 
-                whileHover={{ scale: 1.1 }}
-                transition={{ duration: 1.5, ease: "easeOut" }}
-                src="https://lh3.googleusercontent.com/d/1XVpXrYorEp471NKLuuQ124m-mDd5_ah6" 
-                className="absolute inset-0 w-full h-full object-cover"
-                alt="Queens Point"
-              />
-            </div>
-          </motion.div>
-
-          {/* Bachelor Point (Male) */}
-          <motion.div 
-            id="bachelor-point-card"
-            initial={{ y: 80, opacity: 0 }}
-            whileInView={{ y: 0, opacity: 1 }}
-            viewport={{ once: true, margin: "-100px" }}
-            transition={{ duration: 0.8, ease: "easeOut" }}
-            className="flex flex-row bg-white rounded-2xl md:rounded-[2rem] overflow-hidden shadow-2xl shadow-[#002147]/5 border border-[#002147]/5 group cursor-pointer relative"
-            onClick={(e) => {
-              const el = e.currentTarget;
-              el.style.transition = "all 0.6s cubic-bezier(0.22, 1, 0.36, 1)";
-              el.style.transform = "scale(1.03)";
-              el.style.boxShadow = "0 30px 60px -15px rgba(0, 33, 71, 0.3)";
-              el.style.zIndex = "50";
-              setTimeout(() => {
-                el.style.transform = "";
-                el.style.boxShadow = "";
-                el.style.zIndex = "";
-                onNavigate({ type: 'male-hostel' });
-              }, 500);
-            }}
-          >
-            {/* Animated Hover Background */}
-            <div className="absolute inset-0 bg-gradient-to-l from-transparent via-[#D4AF37]/5 to-[#002147]/5 opacity-0 group-hover:opacity-100 transition-opacity duration-700 pointer-events-none"></div>
-
-            <div className="order-1 flex-1 p-2 sm:p-5 md:p-10 lg:p-12 flex flex-col justify-center relative z-10 w-[60%] md:w-auto">
-              <div className="flex items-center gap-1 md:gap-3 mb-1 md:mb-6 relative flex-wrap">
-                 <div className="bg-gradient-to-r from-[#D4AF37] to-[#e1bb44] text-white px-1 sm:px-2 md:px-5 py-0.5 md:py-1.5 text-[5px] sm:text-[8px] md:text-xs font-bold uppercase tracking-widest rounded-full shadow-lg border border-white/20 whitespace-nowrap">
-                    Male Branch
-                 </div>
-                 <span className="text-[#002147] font-semibold text-[5px] sm:text-[8px] md:text-xs tracking-tight md:tracking-wider animate-pulse whitespace-nowrap">AyaanAyaat Homes</span>
-              </div>
-              
-              <h3 className="text-xs sm:text-2xl md:text-5xl lg:text-7xl text-[#002147] leading-none mb-0 md:mb-3 drop-shadow-sm group-hover:-translate-y-1 transition-transform duration-500">Bachelor Point</h3>
-              <p className="text-[#D4AF37] text-[6px] sm:text-xs md:text-md mb-1 md:mb-8 font-bold">আধুনিক স্মার্ট জীবনের নিশ্চয়তা</p>
-              
-              {/* Address Section */}
-              <div className="flex items-start gap-1 md:gap-4 mb-2 md:mb-8 bg-[#f8f9fa] p-1 md:p-4 rounded-md md:rounded-xl border border-gray-100 group-hover:border-[#D4AF37]/30 transition-colors">
-                <div className="bg-white p-0.5 md:p-2 rounded-full shadow-sm shrink-0">
-                  <svg xmlns="http://www.w3.org/2000/svg" className="h-2 w-2 md:h-6 md:w-6 text-[#D4AF37]" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-                    <path strokeLinecap="round" strokeLinejoin="round" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
-                    <path strokeLinecap="round" strokeLinejoin="round" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
-                  </svg>
-                </div>
-                <p className="text-[#002147] text-[5.5px] sm:text-[9px] md:text-base font-semibold pt-0.5 md:pt-1 leading-snug">২২৭/২, রোড-২, সি-ব্লক, রূপনগর আবাসিক, মিরপুর, ঢাকা-১২১৬</p>
-              </div>
-
-              {/* Quick Info Badges */}
-              <div className="flex flex-wrap gap-0.5 sm:gap-2 md:gap-3 mb-2 md:mb-10">
-                {['২৪/৭ সিসিটিভি', 'মানসম্মত খাবার', 'AC / Non-AC', 'ওয়াই-ফাই'].map((feature, i) => (
-                  <span key={i} className="inline-flex items-center gap-0.5 sm:gap-1.5 px-1 sm:px-3 py-0.5 md:py-1 bg-[#D4AF37]/10 text-[#002147] text-[5px] sm:text-[10px] md:text-xs font-bold rounded-sm md:rounded-lg border border-[#D4AF37]/20 group-hover:bg-[#D4AF37] group-hover:text-white transition-colors duration-300 whitespace-nowrap">
-                    <svg className="w-1.5 h-1.5 sm:w-2.5 sm:h-2.5 md:w-3 md:h-3" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="3" d="M5 13l4 4L19 7"></path></svg>
-                    {feature}
-                  </span>
-                ))}
-              </div>
-              
-              <div className="flex items-center gap-1 sm:gap-4 md:gap-6 mt-auto flex-wrap">
-                <button 
-                  className="relative overflow-hidden bg-[#D4AF37] text-white px-1.5 py-0.5 sm:px-4 sm:py-2 md:px-8 md:py-3.5 text-[5px] sm:text-[8px] md:text-xs font-bold uppercase tracking-widest rounded-full transition-all shadow-[0_10px_20px_rgba(212,175,55,0.3)] group-hover:shadow-[0_15px_30px_rgba(212,175,55,0.5)] pointer-events-none animate-pulse group-hover:animate-none"
-                >
-                  <span className="relative z-10 flex items-center gap-0.5 md:gap-2 text-[#002147] group-hover:text-white transition-colors duration-500 whitespace-nowrap">
-                    ক্লিক করে বিস্তারিত দেখুন
-                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={3} stroke="currentColor" className="w-1.5 h-1.5 sm:w-2.5 sm:h-2.5 md:w-3.5 md:h-3.5"><path strokeLinecap="round" strokeLinejoin="round" d="M13.5 4.5l7.5 7.5-7.5 7.5M21 12H3" /></svg>
-                  </span>
-                  <div className="absolute inset-0 bg-[#002147] transform scale-x-0 origin-left transition-transform duration-500 ease-out group-hover:scale-x-100"></div>
-                </button>
-                <div className="flex gap-1 sm:gap-2 md:gap-3 shrink-0">
-                  <a title="Facebook Page" href="https://www.facebook.com/share/1CwaVA5WXK/" onClick={(e) => e.stopPropagation()} target="_blank" rel="noopener noreferrer" className="w-3.5 h-3.5 sm:w-6 sm:h-6 md:w-11 md:h-11 rounded-full border border-[#002147]/10 flex items-center justify-center bg-white hover:bg-gray-50 transition-all shadow-sm hover:shadow-md hover:-translate-y-1 group/fb">
-                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" className="w-1.5 h-1.5 sm:w-3 sm:h-3 md:w-5 md:h-5 group-hover/fb:text-[#1877F2]">
-                      <path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.469h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.469h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z" fill="currentColor"/>
-                      <path d="M16.671 15.542l.532-3.469h-3.328V9.823c0-.949.465-1.874 1.956-1.874h1.514V5.006s-1.375-.235-2.686-.235c-2.741 0-4.533 1.662-4.533 4.669v2.633H7.078v3.469h3.048v8.385a12.096 12.096 0 003.75 0v-8.385h2.796z" fill="#fff" className="group-hover/fb:fill-white"/>
-                    </svg>
-                  </a>
-                  <a title="Google Maps" href="https://maps.app.goo.gl/EtBr4xqaVPK8ZH4N9" onClick={(e) => e.stopPropagation()} target="_blank" rel="noopener noreferrer" className="w-3.5 h-3.5 sm:w-6 sm:h-6 md:w-11 md:h-11 rounded-full border border-[#002147]/10 flex items-center justify-center bg-white hover:bg-gray-50 transition-all shadow-sm hover:shadow-md hover:-translate-y-1 group/maps">
-                    <img src="https://upload.wikimedia.org/wikipedia/commons/a/aa/Google_Maps_icon_%282020%29.svg" alt="Google Maps" className="w-1.5 h-1.5 sm:w-3 sm:h-3 md:w-5 md:h-5 object-contain" />
-                  </a>
-                </div>
-              </div>
-            </div>
-            {/* Image Parallax Effect */}
-            <div className="order-2 relative w-[40%] sm:w-[40%] md:w-[400px] lg:w-[450px] shrink-0 overflow-hidden bg-[#f8f6f0]">
-              <motion.img 
-                whileHover={{ scale: 1.1 }}
-                transition={{ duration: 1.5, ease: "easeOut" }}
-                src="https://lh3.googleusercontent.com/d/1cjIYSZDiCig4kN1FbLxGIoEUTcdcCU1C" 
-                className="absolute inset-0 w-full h-full object-cover"
-                alt="Bachelor Point"
-              />
-            </div>
-          </motion.div>
-        </div>
-
-        {/* UPCOMING BRANCHES SECTION */}
-        <div id="upcoming" className="bg-[#002147] text-white py-8 md:py-28 px-4 md:px-6 relative overflow-hidden">
-          {/* Decorative Elements */}
-          <div className="absolute top-0 right-0 w-[500px] h-[500px] bg-[#D4AF37]/10 rounded-full blur-[80px] -translate-y-1/2 translate-x-1/2 pointer-events-none animate-pulse" style={{ animationDuration: '4s' }}></div>
-          <div className="absolute bottom-0 left-0 w-[500px] h-[500px] bg-[#D4AF37]/5 rounded-full blur-[80px] translate-y-1/2 -translate-x-1/2 pointer-events-none animate-pulse" style={{ animationDuration: '6s' }}></div>
-          
-          <div className="absolute inset-0 opacity-[0.05] pointer-events-none" style={{ backgroundImage: 'radial-gradient(#ffffff 1px, transparent 1px)', backgroundSize: '40px 40px' }}></div>
-          
-          <motion.div 
-            initial={{ y: 30, opacity: 0 }}
-            whileInView={{ y: 0, opacity: 1 }}
-            viewport={{ once: true, margin: "-100px" }}
-            transition={{ duration: 0.7 }}
-            className="max-w-7xl mx-auto relative z-10 text-center mb-6 md:mb-20"
-          >
-            <div className="inline-flex items-center gap-2 md:gap-3 justify-center mb-2 md:mb-4">
-              <div className="w-6 md:w-10 h-[2px] bg-[#D4AF37]"></div>
-              <span className="text-[#D4AF37] text-[8px] md:text-sm font-bold uppercase tracking-[0.4em]">Future expansion</span>
-              <div className="w-6 md:w-10 h-[2px] bg-[#D4AF37]"></div>
-            </div>
-            
-            <h2 className="text-xl sm:text-2xl md:text-5xl lg:text-6xl font-light mb-2 md:mb-6">আমাদের <span className="text-[#D4AF37] font-bold">আপকামিং</span> ব্রাঞ্চসমূহ</h2>
-            <p className="text-white/60 font-light max-w-2xl mx-auto text-[10px] md:text-lg leading-relaxed px-4 md:px-0">
-              নতুন আঙ্গিকে আরও উন্নত ও আধুনিক আবাসন সুবিধা নিয়ে আমরা আসছি আপনাদের কাছাকাছি।
-            </p>
-          </motion.div>
-
-          <div className="max-w-6xl mx-auto grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-12 relative z-10">
-            {/* Prince Point Upcoming */}
-            <motion.div 
-              initial={{ x: -50, opacity: 0 }}
-              whileInView={{ x: 0, opacity: 1 }}
-              viewport={{ once: true, margin: "-50px" }}
-              transition={{ duration: 0.8, delay: 0.2 }}
-              className="group relative rounded-2xl md:rounded-[2rem] overflow-hidden h-[120px] sm:h-[180px] md:h-[350px] transition-all duration-700 hover:shadow-[0_20px_40px_rgba(212,175,55,0.15)] block"
-            >
-              <div className="absolute inset-0 bg-[#002147] z-0"></div>
-              <img 
-                src="https://images.unsplash.com/photo-1595526114035-0d45ed16cfbf?auto=format&fit=crop&q=80&w=1000" 
-                className="absolute inset-0 w-full h-full object-cover opacity-60 mix-blend-overlay group-hover:opacity-80 group-hover:scale-110 transition-all duration-[2s] ease-out"
-                alt="Prince Point Upcoming"
-              />
-              {/* Overlay Gradient */}
-              <div className="absolute inset-0 bg-gradient-to-t from-[#001229] via-[#001229]/60 to-transparent"></div>
-              
-              <div className="absolute inset-0 flex flex-col items-center justify-center p-3 md:p-8 text-center z-10">
-                <div className="w-8 h-8 md:w-14 md:h-14 rounded-full border border-[#D4AF37]/40 bg-[#002147]/50 backdrop-blur-sm flex items-center justify-center mb-2 md:mb-6 group-hover:border-[#D4AF37] group-hover:scale-110 transition-all duration-500 shadow-[0_0_15px_rgba(212,175,55,0.2)]">
-                  <Lock className="w-3.5 h-3.5 md:w-6 md:h-6 text-[#D4AF37]" strokeWidth={1.5} />
-                </div>
-                <h3 className="text-xl sm:text-2xl md:text-5xl text-white tracking-wide mb-1 md:mb-3 group-hover:text-[#D4AF37] transition-colors duration-500 drop-shadow-lg">Prince Point</h3>
-                <div className="flex items-center gap-1 md:gap-2">
-                   <div className="w-1.5 h-1.5 md:w-2 md:h-2 rounded-full bg-[#ff6b6b] animate-ping"></div>
-                   <span className="text-[#ff6b6b] text-[8px] md:text-sm font-bold uppercase tracking-[0.3em] drop-shadow-md">Under Construction</span>
-                </div>
-              </div>
-              
-              {/* Decorative corner accents */}
-              <div className="absolute top-3 left-3 md:top-4 md:left-4 w-4 h-4 md:w-6 md:h-6 border-t-2 border-l-2 border-white/20 transition-all duration-500 group-hover:w-6 group-hover:h-6 md:group-hover:w-8 md:group-hover:h-8 group-hover:border-[#D4AF37]"></div>
-              <div className="absolute bottom-3 right-3 md:bottom-4 md:right-4 w-4 h-4 md:w-6 md:h-6 border-b-2 border-r-2 border-white/20 transition-all duration-500 group-hover:w-6 group-hover:h-6 md:group-hover:w-8 md:group-hover:h-8 group-hover:border-[#D4AF37]"></div>
-            </motion.div>
-
-            {/* Royal Point Upcoming */}
-            <motion.div 
-              initial={{ x: 50, opacity: 0 }}
-              whileInView={{ x: 0, opacity: 1 }}
-              viewport={{ once: true, margin: "-50px" }}
-              transition={{ duration: 0.8, delay: 0.4 }}
-              className="group relative rounded-2xl md:rounded-[2rem] overflow-hidden h-[120px] sm:h-[180px] md:h-[350px] transition-all duration-700 hover:shadow-[0_20px_40px_rgba(212,175,55,0.15)] block"
-            >
-              <div className="absolute inset-0 bg-[#002147] z-0"></div>
-              <img 
-                src="https://images.unsplash.com/photo-1522771739844-6a9f6d5f14af?auto=format&fit=crop&q=80&w=1000" 
-                className="absolute inset-0 w-full h-full object-cover opacity-60 mix-blend-overlay group-hover:opacity-80 group-hover:scale-110 transition-all duration-[2s] ease-out"
-                alt="Royal Point Upcoming"
-              />
-              {/* Overlay Gradient */}
-              <div className="absolute inset-0 bg-gradient-to-t from-[#001229] via-[#001229]/60 to-transparent"></div>
-              
-              <div className="absolute inset-0 flex flex-col items-center justify-center p-3 md:p-8 text-center z-10">
-                <div className="w-8 h-8 md:w-14 md:h-14 rounded-full border border-[#D4AF37]/40 bg-[#002147]/50 backdrop-blur-sm flex items-center justify-center mb-2 md:mb-6 group-hover:border-[#D4AF37] group-hover:scale-110 transition-all duration-500 shadow-[0_0_15px_rgba(212,175,55,0.2)]">
-                  <Lock className="w-3.5 h-3.5 md:w-6 md:h-6 text-[#D4AF37]" strokeWidth={1.5} />
-                </div>
-                <h3 className="text-xl sm:text-2xl md:text-5xl text-white tracking-wide mb-1 md:mb-3 group-hover:text-[#D4AF37] transition-colors duration-500 drop-shadow-lg">Royal Point</h3>
-                <div className="flex items-center gap-1 md:gap-2">
-                   <div className="w-1.5 h-1.5 md:w-2 md:h-2 rounded-full bg-[#ff6b6b] animate-ping"></div>
-                   <span className="text-[#ff6b6b] text-[8px] md:text-sm font-bold uppercase tracking-[0.3em] drop-shadow-md">Under Construction</span>
-                </div>
-              </div>
-              
-              {/* Decorative corner accents */}
-              <div className="absolute top-3 left-3 md:top-4 md:left-4 w-4 h-4 md:w-6 md:h-6 border-t-2 border-l-2 border-white/20 transition-all duration-500 group-hover:w-6 group-hover:h-6 md:group-hover:w-8 md:group-hover:h-8 group-hover:border-[#D4AF37]"></div>
-              <div className="absolute bottom-3 right-3 md:bottom-4 md:right-4 w-4 h-4 md:w-6 md:h-6 border-b-2 border-r-2 border-white/20 transition-all duration-500 group-hover:w-6 group-hover:h-6 md:group-hover:w-8 md:group-hover:h-8 group-hover:border-[#D4AF37]"></div>
-            </motion.div>
-          </div>
-        </div>
+        </section>
+        
       </section>
-
-      {/* Brand Promise Banner */}
+      
+{/* Brand Promise Banner */}
       <motion.section 
         initial={{ opacity: 0 }}
         whileInView={{ opacity: 1 }}
         viewport={{ once: true }}
         transition={{ duration: 1 }}
-        className="bg-[#f8f6f0] py-12 md:py-32 px-4 md:px-6 flex flex-col items-center border-t border-[#002147]/10"
+        className="bg-[#f8f6f0] py-12 md:py-32 px-4 md:px-6 flex flex-col items-center border-t border-[#4a3426]/10"
       >
         <motion.div 
           initial={{ height: 0 }}
@@ -716,7 +1705,7 @@ const Home: React.FC<HomeProps> = ({ onNavigate }) => {
           transition={{ duration: 0.8, delay: 0.4 }}
           className="max-w-4xl mx-auto text-center"
         >
-          <p className="text-lg sm:text-2xl md:text-4xl text-[#002147] leading-relaxed md:leading-relaxed">
+          <p className="text-lg sm:text-2xl md:text-4xl text-[#4a3426] leading-relaxed md:leading-relaxed">
             "ব্যাচেলরদের জন্য আমরা দিই সাশ্রয়ী মূল্যে সম্পূর্ণ আধুনিক ও নিরাপদ আবাসন ব্যবস্থা।"
           </p>
         </motion.div>

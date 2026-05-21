@@ -9,7 +9,7 @@ export const PrivacyPolicy: React.FC = () => {
           e.preventDefault();
           window.history.pushState({ type: 'home' }, '', '/');
           window.dispatchEvent(new PopStateEvent('popstate', { state: { type: 'home' }}));
-        }} className="bg-white text-[#002147] hover:bg-gray-100 p-2 md:p-3 rounded-full shadow-md border border-[#002147]/10 transition-colors inline-flex items-center justify-center group" aria-label="Close">
+        }} className="bg-white text-[#4a3426] hover:bg-gray-100 p-2 md:p-3 rounded-full shadow-md border border-[#4a3426]/10 transition-colors inline-flex items-center justify-center group" aria-label="Close">
           <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor" className="w-5 h-5 md:w-6 md:h-6 group-hover:scale-110 transition-transform">
             <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
           </svg>
@@ -21,7 +21,7 @@ export const PrivacyPolicy: React.FC = () => {
         transition={{ duration: 0.8 }}
       >
         <span className="text-[#D4AF37] text-xs font-bold uppercase tracking-[0.2em] mb-4 block">Legal</span>
-        <h1 className="text-4xl md:text-5xl text-[#002147] mb-8">Privacy Policy</h1>
+        <h1 className="text-4xl md:text-5xl text-[#4a3426] mb-8">Privacy Policy</h1>
         
         <div className="prose prose-lg prose-slate text-gray-600 space-y-6">
           <p>
@@ -30,14 +30,14 @@ export const PrivacyPolicy: React.FC = () => {
             by us and how it is used.
           </p>
 
-          <h2 className="text-2xl text-[#002147] mt-8 mb-4">1. Information Collection</h2>
+          <h2 className="text-2xl text-[#4a3426] mt-8 mb-4">1. Information Collection</h2>
           <p>
             We may collect personal information such as your name, email address, phone number, and physical
             address when you register for our hostels or interact with our website. We use this information to
             provide and improve our services, communicate with you, and process your requests.
           </p>
 
-          <h2 className="text-2xl text-[#002147] mt-8 mb-4">2. Use of Information</h2>
+          <h2 className="text-2xl text-[#4a3426] mt-8 mb-4">2. Use of Information</h2>
           <p>
             The information we collect is used to:
           </p>
@@ -48,14 +48,14 @@ export const PrivacyPolicy: React.FC = () => {
             <li>Improve our website and services.</li>
           </ul>
 
-          <h2 className="text-2xl text-[#002147] mt-8 mb-4">3. Data Security</h2>
+          <h2 className="text-2xl text-[#4a3426] mt-8 mb-4">3. Data Security</h2>
           <p>
             We implement a variety of security measures to maintain the safety of your personal information
             when you enter, submit, or access your personal information. We use state-of-the-art encryption
             technologies to protect sensitive data transmitted online.
           </p>
           
-          <h2 className="text-2xl text-[#002147] mt-8 mb-4">Contact Us</h2>
+          <h2 className="text-2xl text-[#4a3426] mt-8 mb-4">Contact Us</h2>
           <p>
             If you have any questions about this Privacy Policy, please contact us via our general hotline
             or email support.
