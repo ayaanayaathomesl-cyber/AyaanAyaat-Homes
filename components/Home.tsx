@@ -78,7 +78,7 @@ const Home: React.FC<HomeProps> = ({ onNavigate }) => {
         }
 
         // Pause state on full description
-        await new Promise(resolve => setTimeout(resolve, 2500));
+        await new Promise(resolve => setTimeout(resolve, 10000));
 
         // Erase Line 2
         for (let i = slide.l2.length; i >= 0; i--) {
@@ -462,7 +462,7 @@ const Home: React.FC<HomeProps> = ({ onNavigate }) => {
         .bg-slide img {
           width: 100%; height: 100%; object-fit: cover;
           filter: brightness(.60) saturate(.90) contrast(1.02);
-          transition: transform 9.5s cubic-bezier(0.16, 1, 0.3, 1);
+          transition: transform 14s cubic-bezier(0.16, 1, 0.3, 1);
           transform: scale(1.02);
         }
         .bg-slide.active img {

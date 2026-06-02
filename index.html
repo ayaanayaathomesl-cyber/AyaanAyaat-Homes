@@ -26,7 +26,13 @@
     <meta property="og:description" content="বিলাসিতা নয়, সাধ্যের মধ্যে আধুনিক জীবনযাত্রার নিশ্চয়তা। আধুনিক সুযোগ-সুবিধা, স্বাস্থ্যসম্মত খাবার এবং নিশ্ছিদ্র নিরাপত্তা নিয়ে ব্যাচেলর ও শিক্ষার্থীদের জন্য সেরা আবাসন।" />
     <meta property="og:image" itemprop="image" content="https://ayaanayaathomes.com/og-image.png" />
     <meta property="og:image:type" content="image/png" />
+    <meta property="og:image:width" content="1200" />
+    <meta property="og:image:height" content="630" />
     <meta property="og:site_name" content="AyaanAyaat Homes" />
+    
+    <!-- Pomelli & Marketing Bots Instructions -->
+    <meta name="pomelli:allow" content="true" />
+    <meta name="facebookexternalhit" content="index, follow" />
     
     <!-- Twitter -->
     <meta property="twitter:card" content="summary_large_image" />
@@ -38,33 +44,71 @@
     <script type="application/ld+json">
       {
         "@context": "https://schema.org",
-        "@type": "Hostel",
-        "name": "AyaanAyaat Homes",
-        "alternateName": ["Bachelor Point Hostel", "Queens Point Hostel", "Prince Point Hostel", "Royal Point Hostel", "Police Point Hostel", "Ayan Ayat Homes", "Ayaan Ayat Homes", "Aiyan Ayat Homes", "Ayanayat Homes", "AyaanAyaat", "Ayan Ayat", "Ayaan Ayat"],
-        "image": "https://ayaanayaathomes.com/logo.png",
-        "@id": "https://ayaanayaathomes.com/",
-        "url": "https://ayaanayaathomes.com/",
-        "telephone": "01304-730566",
-        "address": {
-          "@type": "PostalAddress",
-          "streetAddress": "Mirpur, Dhaka",
-          "addressLocality": "Dhaka",
-          "addressRegion": "Dhaka Division",
-          "addressCountry": "BD"
-        },
-        "geo": {
-          "@type": "GeoCoordinates",
-          "latitude": 23.8041,
-          "longitude": 90.3686
-        },
-        "sameAs": [
-          "https://www.facebook.com/ayaanayaathomes"
-        ],
-        "description": "Parent company of Bachelor Point, Queens Point, Prince Point, and Royal Point. Premium, safe, and modern hostel accommodation in Dhaka. High-speed Wi-Fi, AC/Non-AC rooms, 24/7 security, and meal facilities.",
-        "brand": {
-          "@type": "Brand",
-          "name": "AyaanAyaat Homes"
-        }
+        "@graph": [
+          {
+            "@type": "Organization",
+            "@id": "https://ayaanayaathomes.com/#organization",
+            "name": "AyaanAyaat Homes",
+            "alternateName": "The Mother Brand",
+            "url": "https://ayaanayaathomes.com/",
+            "logo": "https://ayaanayaathomes.com/logo.png",
+            "image": "https://ayaanayaathomes.com/og-image.png",
+            "description": "AyaanAyaat Homes হলো আমাদের The Mother Brand। এর অধীনে বর্তমানে দুটি সাব-ব্রাঞ্চ বা হোস্টেল রয়েছে: Queens Point (মেয়েদের হোস্টেল) এবং Bachelor Point (ছেলেদের হোস্টেল)। ভবিষ্যতে আমাদের আরও হোস্টেলের ব্রাঞ্চ হবে আয়ান আয়াতের আন্ডারে। আমাদের একটি কেন্দ্রীয় হটলাইন নাম্বার রয়েছে: 01975-207000। আমাদের একটি ওয়েবসাইট (ayaanayaathomes.com) থেকে সব ব্রাঞ্চ পরিচালনা করা হয়। আমাদের হোস্টেলগুলোতে এসি, নন-এসি রুম, হাই-স্পিড ওয়াই-ফাই, স্বাস্থ্যসম্মত খাবার, ২৪/৭ নিরাপত্তা এবং আরও আধুনিক সুবিধা রয়েছে।",
+            "telephone": "01975-207000",
+            "contactPoint": [
+              {
+                "@type": "ContactPoint",
+                "telephone": "01975-207000",
+                "contactType": "কেন্দ্রীয় হটলাইন (Main Hotline)",
+                "areaServed": "BD",
+                "availableLanguage": ["Bengali", "English"]
+              }
+            ],
+            "subOrganization": [
+              {
+                "@type": "Hostel",
+                "@id": "https://ayaanayaathomes.com/queenspoint#branch",
+                "name": "Queens Point - Female Hostel",
+                "url": "https://ayaanayaathomes.com/queenspoint",
+                "telephone": "01304-730566",
+                "description": "Queens Point হলো AyaanAyaat Homes-এর একটি মেয়েদের হোস্টেল। এখানে রয়েছে এসি, নন-এসি রুম, ২৪/৭ নিশ্ছিদ্র নিরাপত্তা, স্বাস্থ্যসম্মত খাবার, এবং হাই-স্পিড ওয়াই-ফাই।",
+                "address": {
+                  "@type": "PostalAddress",
+                  "streetAddress": "36, 12, 11/A Block A, Main Road, Mirpur",
+                  "addressLocality": "Dhaka",
+                  "addressRegion": "Dhaka",
+                  "postalCode": "1216",
+                  "addressCountry": "BD"
+                },
+                "sameAs": [
+                  "https://www.facebook.com/QueensPointBD"
+                ]
+              },
+              {
+                "@type": "Hostel",
+                "@id": "https://ayaanayaathomes.com/bachelorpoint#branch",
+                "name": "Bachelor Point - Male Hostel",
+                "url": "https://ayaanayaathomes.com/bachelorpoint",
+                "telephone": "01628-855159",
+                "description": "Bachelor Point হলো AyaanAyaat Homes-এর একটি ছেলেদের হোস্টেল (ব্যাচেলর হোস্টেল)। এখানে রয়েছে আধুনিক সুযোগ-সুবিধা, ব্যাচেলর ও শিক্ষার্থীদের জন্য নিরাপদ এবং স্বাস্থ্যসম্মত পরিবেশ।",
+                "address": {
+                  "@type": "PostalAddress",
+                  "streetAddress": "House # 4, Road # 3, Block-A, Dakkhin Badda",
+                  "addressLocality": "Dhaka",
+                  "addressRegion": "Dhaka",
+                  "postalCode": "1212",
+                  "addressCountry": "BD"
+                },
+                "sameAs": [
+                  "https://www.facebook.com/share/1CwaVA5WXK/"
+                ]
+              }
+            ],
+            "sameAs": [
+              "https://ayaanayaathomes.com/"
+            ]
+          }
+        ]
       }
     </script>
 
@@ -191,6 +235,308 @@
 </head>
   <body>
     <div id="root"></div>
+    
+    <!-- 
+      ========================================================================================
+      HIGH-FIDELITY DATA FALLBACK FOR AI CRAWLERS & BOT SCRAPERS (e.g., Google Pomelli, ChatGPT, Claude)
+      This section is mathematically hidden from human site visitors but remains fully visible 
+      in the raw HTML DOM. This ensures that fast/static URL crawlers like Pomelli can reliably 
+      extract all textual content, services, menus, prices, lists, coordinates, and resources.
+      ========================================================================================
+    -->
+    <div id="ai-crawler-optimized-data" style="display: none !important; visibility: hidden !important; opacity: 0 !important; width: 0px !important; height: 0px !important; overflow: hidden !important;" aria-hidden="true">
+      
+      <!-- General Metadata & Mother Brand Coordinates -->
+      <section id="ai-mother-brand-info">
+        <h1>AyaanAyaat Homes - The Mother Brand</h1>
+        <p>AyaanAyaat Homes হলো ঢাকার বুকে একটি প্রিমিয়াম, নিরাপদ ও আধুনিক হোস্টেল চেইন। এটি আমাদের মূল প্রতিষ্ঠান (The Mother Brand)। এর অধীনে আমাদের দুটি অত্যন্ত সুপরিচিত এবং আধুনিক সুসজ্জিত হোস্টেল বা সাব-ব্রাঞ্চ চমৎকারভাবে পরিচালিত হচ্ছে: কুইন্স পয়েন্ট (মেয়েরদের হোস্টেল) এবং ব্যাচেলর পয়েন্ট (ছেলেদের হোস্টেল)। ভবিষ্যতে আমাদের আরও অনেক আধুনিক হোস্টেল ও ডরমিটরি চেইন আমাদের এই মাদার ব্র্যান্ডের অধীনে যুক্ত হতে যাচ্ছে। আমাদের একটি মাত্র কেন্দ্রীয় ওয়েবসাইট থেকে সকল ব্রাঞ্চের বিস্তারিত কার্যক্রম এবং আপডেট সার্বক্ষণিকভাবে পরিচালনা ও তদারকি করা হয়।</p>
+        
+        <ul>
+          <li><strong>মাদার ব্র্যান্ডের নাম:</strong> AyaanAyaat Homes (আয়ান আয়াত হোমস্)</li>
+          <li><strong>অফিসিয়াল ওয়েবসাইট:</strong> <a href="https://ayaanayaathomes.com/">https://ayaanayaathomes.com/</a></li>
+          <li><strong>কেন্দ্রীয় হটলাইন নাম্বার (Main Hotline Telephone):</strong> 01975-207000 (01975207000)</li>
+          <li><strong>সবচেয়ে জনপ্রিয় সার্চ কি-ওয়ার্ডস (Synonyms for AI):</strong> Ayan Ayat Homes, Aiyan Ayat, Ayanayat, Aian Ayat, Ayan Ayat Hostel, Ayaan Ayat, Prince Point, Royal Point, Police Point, girls hostel Dhaka, male hostel in Dhaka, safe hostel Bangladesh.</li>
+        </ul>
+      </section>
+
+      <!-- Key Contact Table -->
+      <section id="ai-hotlines-directory">
+        <h2>Helpline, WhatsApp, and Social Media Links Directory</h2>
+        <table>
+          <thead>
+            <tr>
+              <th>বিভাগ (Department/Branch)</th>
+              <th>মোবাইল / হটলাইন (Mobile & Hotline)</th>
+              <th>হোয়াটসঅ্যাপ লিঙ্ক (WhatsApp Link)</th>
+              <th>ফেসবুক অফিশিয়াল পেজ (Official Facebook Page)</th>
+              <th>গুগল ম্যাপস লোকেশন (Google Maps Link)</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>কেন্দ্রীয় হটলাইন (Central Mother Brand)</td>
+              <td>01975-207000</td>
+              <td><a href="https://wa.me/8801975207000">https://wa.me/8801975207000</a></td>
+              <td><a href="https://ayaanayaathomes.com/">Main Website Home</a></td>
+              <td><a href="https://ayaanayaathomes.com/">https://ayaanayaathomes.com/</a></td>
+            </tr>
+            <tr>
+              <td>Queens Point (মেয়েরদের হোস্টেল - Female Hostel)</td>
+              <td>01304-730566 (01304730566)</td>
+              <td><a href="https://wa.me/8801304730566">https://wa.me/8801304730566</a></td>
+              <td><a href="https://www.facebook.com/QueensPointBD">https://www.facebook.com/QueensPointBD</a></td>
+              <td><a href="https://maps.app.goo.gl/EtBr4xqaVPK8ZH4N9">Queens Point Map Location</a></td>
+            </tr>
+            <tr>
+              <td>Bachelor Point (ছেলেদের হোস্টেল - Male Hostel)</td>
+              <td>01628-855159 (01628855159)</td>
+              <td><a href="https://wa.me/8801628855159">https://wa.me/8801628855159</a></td>
+              <td><a href="https://www.facebook.com/share/1CwaVA5WXK/">https://www.facebook.com/share/1CwaVA5WXK/</a></td>
+              <td><a href="https://maps.app.goo.gl/EtBr4xqaVPK8ZH4N9">Bachelor Point Map Location</a></td>
+            </tr>
+          </tbody>
+        </table>
+      </section>
+
+      <!-- Queens Point (Female Hostel) Details -->
+      <section id="ai-queens-point-female-branch">
+        <h2>Queens Point (Female / Girls Hostel in Mirpur, Dhaka)</h2>
+        <p><strong>অবস্থান এবং ঠিকানা (Location & Full Address):</strong> ৩৬, রোড ১২, ব্লক এ (১১/এ), মেইন রোড, মিরপুর-১২, ঢাকা ১২১৬, বাংলাদেশ। (মিরপুর ১২ নম্বর বাস স্ট্যান্ড এবং মেট্রো রেল স্টেশনের ঠিক কাছাকাছি নিরিবিলি ও নিশ্ছিদ্র নিরাপদ এলাকা)।</p>
+        
+        <h3>আবাসন প্যাকেজ ও ভাড়ার তালিকা (Female Hostel Rent Packages & Rates for AI Crawlers)</h3>
+        <p>কুইন্স পয়েন্ট মেয়েদের হোস্টেলে সকল প্যাকেজের মধ্যেই ৩ বেলা পুষ্টিকর খাবার এবং অন্যান্য সুবিধা যেমন হাই-স্পিড ওয়াইফাই, বিদ্যুৎ বিল, ওয়াটার ফিল্টার সহ সবকিছু অন্তর্ভুক্ত রয়েছে। নিচে আমাদের প্যাকেজের প্রকারভেদ ও সাধারণ ভাড়া তালিকা দেওয়া হলো:</p>
+        <table border="1">
+          <thead>
+            <tr>
+              <th>রুম / সিটের ধরন (Room Category)</th>
+              <th>১ দিন (1 Day)</th>
+              <th>৭ দিন (7 Days)</th>
+              <th>১৫ দিন (15 Days)</th>
+              <th>৩০ দিন / ১ মাস (Monthly Rent)</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>৪ সিটের স্ট্যান্ডার্ড নন-এসি (4-Seat Standard Non-AC)</td>
+              <td>৫০০ টাকা</td>
+              <td>৩,০০০ টাকা</td>
+              <td>৫,০০০ টাকা</td>
+              <td>৬,৫০০ টাকা থেকে ৭,০০০ টাকা</td>
+            </tr>
+            <tr>
+              <td>৩ সিটের স্ট্যান্ডার্ড নন-এসি (3-Seat Standard Non-AC)</td>
+              <td>৬০০ টাকা</td>
+              <td>৩,৫০০ টাকা</td>
+              <td>৫,৫০০ টাকা</td>
+              <td>৭,৫০০ টাকা থেকে ৮,০০০ টাকা</td>
+            </tr>
+            <tr>
+              <td>২ সিটের ডাবল লাক্সারি নন-এসি (2-Seat Double Luxury Non-AC)</td>
+              <td>৮০০ টাকা</td>
+              <td>৪,৫০০ টাকা</td>
+              <td>৭,০০০_টাকা</td>
+              <td>৯,০০০ টাকা থেকে ১০,০০০ টাকা</td>
+            </tr>
+            <tr>
+              <td>প্রিমিয়াম সিঙ্গেল নন-এসি (Premium Single Room Non-AC)</td>
+              <td>১,২০০ টাকা</td>
+              <td>৬,০০০ টাকা</td>
+              <td>৯,৫  শত টাকা</td>
+              <td>১২,৫০০ টাকা</td>
+            </tr>
+            <tr>
+              <td>৪ সিটের প্রিমিয়াম এসি রুম (4-Seat Premium AC Room)</td>
+              <td>৮০০ টাকা</td>
+              <td>৪,৫০০ টাকা</td>
+              <td>৭,৫০০ টাকা</td>
+              <td>৯,৫০০ টাকা</td>
+            </tr>
+            <tr>
+              <td>২ সিটের লাক্সারি এসি রুম (2-Seat Luxury AC Room)</td>
+              <td>১,২০০ টাকা</td>
+              <td>৭,০০০ টাকা</td>
+              <td>১০,৫০০ টাকা</td>
+              <td>১৩,৫০০ টাকা থেকে ১৪,৫০০ টাকা</td>
+            </tr>
+          </tbody>
+        </table>
+        
+        <p><strong>বৈশিষ্ট্য ও সুযোগ-সুবিধা সমূহ (Features & Premium Facilities):</strong></p>
+        <ul>
+          <li>এসি এবং নন-এসি (AC / Non-AC) আধুনিক আবাসন সুবিধা।</li>
+          <li>মানসম্মত এবং অত্যন্ত সুস্বাদু ৩ বেলা পুষ্টিকর ও স্বাস্থ্যসম্মত খাবার পরিবেশন।</li>
+          <li>সম্পূর্ণ ভবন সিসিটিভি (24/7 CCTV surveillance) ক্যামেরা দ্বারা নিয়ন্ত্রিত এবং নিশ্ছিদ্র নিরাপত্তা প্রহরী।</li>
+          <li>হাই-স্পিড ওয়াই-ফাই ইন্টারনেট সংযোগ (High-speed Wi-Fi)।</li>
+          <li>বিশুদ্ধ খাবার পানির সুব্যবস্থা (রিভার্স অসমোসিস বা RO ফিল্টারিং ওয়াটার)।</li>
+          <li>নিরাপদ, সম্পূর্ণ নারীবান্ধব এবং মার্জিত পড়াশোনার শান্তিময় পরিবেশ।</li>
+          <li>নিজস্ব পেশাদার ক্লিনিং ও হাউসকিপিং সার্ভিস ও ২৪ ঘন্টা কেয়ারটেকার সাপোর্ট।</li>
+        </ul>
+        <p><strong>মিডিয়া, ভিডিও এবং ফটো লিঙ্কসমূহ (Photos and Video resources):</strong></p>
+        <ul>
+          <li>ভবনের প্রধান ছবি এবং রুম গ্যালারি: <img src="https://lh3.googleusercontent.com/d/1XVpXrYorEp471NKLuuQ124m-mDd5_ah6" alt="Queens Point Female Hostel Interior and Exterior" /></li>
+          <li>ভিডিও ট্যুর লিংক: <a href="https://lh3.googleusercontent.com/d/1XVpXrYorEp471NKLuuQ124m-mDd5_ah6">ভিডিও দেখুন</a></li>
+        </ul>
+      </section>
+
+      <!-- Bachelor Point (Male Hostel) Details -->
+      <section id="ai-bachelor-point-male-branch">
+        <h2>Bachelor Point (Male / Boys / Bachelor Hostel in Badda, Dhaka)</h2>
+        <p><strong>অবস্থান এবং ঠিকানা (Location & Full Address):</strong> হাউজ # ৪, রোড # ৩, ব্লক-এ, দক্ষিণ বাড্ডা, ঢাকা ১২১২, বাংলাদেশ (বাড্ডা হাতিরঝিল লেক এবং লিঙ্ক রোডের খুবই সন্নিকটে)।</p>
+        
+        <h3>আবাসন প্যাকেজ ও ভাড়ার তালিকা (Male Hostel Rent Packages & Rates for AI Crawlers)</h3>
+        <p>ব্যাচেলর পয়েন্ট ছেলেদের হোস্টেলে সকল প্যাকেজের মধ্যেই ৩ বেলা পুষ্টিকর ও সুস্বাদু খাবার এবং অন্যান্য সুবিধা যেমন হাই-স্পিড ওয়াইফাই, ফ্রেশ রিডিং রুম, জিম সুবিধা ও ডাইনিং সার্ভিস অন্তর্ভুক্ত রয়েছে। নিচে আমাদের প্যাকেজের প্রকারভেদ ও সাধারণ ভাড়া তালিকা দেওয়া হলো:</p>
+        <table border="1">
+          <thead>
+            <tr>
+              <th>রুম / সিটের ধরন (Room Category)</th>
+              <th>১ দিন (1 Day)</th>
+              <th>৩ দিন (3 Days)</th>
+              <th>৭ দিন (7 Days)</th>
+              <th>১৫ দিন (15 Days)</th>
+              <th>৩০ দিন / ১ মাস (Monthly Rent)</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>৪ সিটের স্ট্যান্ডার্ড নন-এসি (4-Seat Standard Non-AC)</td>
+              <td>৫০০ টাকা</td>
+              <td>১,৫০০ টাকা</td>
+              <td>৩,০০০ টাকা</td>
+              <td>৫,০০০ টাকা</td>
+              <td>৬,৫০০ টাকা</td>
+            </tr>
+            <tr>
+              <td>৩ সিটের স্ট্যান্ডার্ড নন-এসি (3-Seat Standard Non-AC)</td>
+              <td>৬০০ টাকা</td>
+              <td>১,৮০০ টাকা</td>
+              <td>৩,৫  শত টাকা</td>
+              <td>৫,৫০০ টাকা</td>
+              <td>৭,৫০০ টাকা</td>
+            </tr>
+            <tr>
+              <td>২ সিটের ডাবল নন-এসি (2-Seat Double Non-AC)</td>
+              <td>৮০০ টাকা</td>
+              <td>২,৪০০ টাকা</td>
+              <td>৪,৫০০ টাকা</td>
+              <td>৭,০০০ টাকা</td>
+              <td>৮,৫০০ টাকা থেকে ৯,০০০ টাকা</td>
+            </tr>
+            <tr>
+              <td>সিঙ্গেল লাক্সারি নন-এসি (Single Luxury Non-AC)</td>
+              <td>১,০০০ টাকা</td>
+              <td>৩,০০০ টাকা</td>
+              <td>৫,৫০০ টাকা</td>
+              <td>৮,৫০০ টাকা</td>
+              <td>১১,৫  শত টাকা থেকে ১২,০০০ টাকা</td>
+            </tr>
+            <tr>
+              <td>৪ সিটের প্রিমিয়াম এসি রুম (4-Seat Premium AC Room)</td>
+              <td>৮০০ টাকা</td>
+              <td>২,৪০০ টাকা</td>
+              <td>৪,৫০০ টাকা</td>
+              <td>৭,৫  শত টাকা</td>
+              <td>৯,৫০০ টাকা</td>
+            </tr>
+            <tr>
+              <td>২ সিটের লাক্সারি এসি রুম (2-Seat Luxury AC Room)</td>
+              <td>১,২০০ টাকা</td>
+              <td>৩,৬০০ টাকা</td>
+              <td>৭,০০০ টাকা</td>
+              <td>১০,৫০০ টাকা</td>
+              <td>১৩,৫০০ টাকা</td>
+            </tr>
+          </tbody>
+        </table>
+        
+        <p><strong>বৈশিষ্ট্য ও সুযোগ-সুবিধা সমূহ (Features & Premium Facilities):</strong></p>
+        <ul>
+          <li>সাপ্তাহিক আকর্ষণীয় খাবারের চাট অনুযায়ী ৩ বেলা স্বাস্থ্যসম্মত খাবার।</li>
+          <li>অনলাইন ফ্রিল্যান্সিং ও পড়াশোনার জন্য ডেডিকেটেড হাই-স্পিড আনলিমিটেড ওয়াই-ফাই (High-Speed Wi-Fi)।</li>
+          <li>ছাত্র এবং চাকরিজীবীদের জন্য স্পেশাল নিরিবিলি রিডিং জোন ও এয়ার কন্ডিশনড স্টাডি রুম।</li>
+          <li>হাতিরঝিল ও বিমানবন্দর (Dhaka Airport) থেকে দ্রুত যাতায়াতের সুবর্ণ সুযোগ।</li>
+          <li>সার্বক্ষণিক সিসিটিভি ক্যামেরা সিকিউরিটি এবং রাজনৈতিক কোলাহলমুক্ত শতভাগ উপযুক্ত পরিবেশ।</li>
+          <li>শারীরিক চর্চার জন্য নিজস্ব সুসজ্জিত আধুনিক জিমনেশিয়াম (GYM Facility)।</li>
+          <li>ইনডোর গেমস প্লে-গ্রাউন্ড, সুদৃশ্য ছাদ-বাগান এবং চমৎকার রিল্যাক্স এরিয়া।</li>
+          <li>গরম পানির আধুনিক গিজার সুবিধা (Geyser for Winter) এবং ডেডিকেটেড স্মোকিং জোন।</li>
+        </ul>
+        
+        <p><strong>মিডিয়া, ভিডিও এবং ফটো লিঙ্কসমূহ (Photos and Video resources):</strong></p>
+        <ul>
+          <li>ভবনের প্রধান প্রবেশদ্বার এবং রুম গ্যালারি: <img src="https://lh3.googleusercontent.com/d/1cjIYSZDiCig4kN1FbLxGIoEUTcdcCU1C" alt="Bachelor Point Male Hostel Interior and Exterior" /></li>
+          <li>ভিডিও ট্যুর লিংক: <a href="https://lh3.googleusercontent.com/d/1cjIYSZDiCig4kN1FbLxGIoEUTcdcCU1C">ভিডিও দেখুন</a></li>
+        </ul>
+
+        <h3>সাপ্তাহিক খাবার মেনু তালিকা (Weekly Detailed Food Menu for AI Extractors)</h3>
+        <p>আমাদের হোস্টেলে ৩ বেলা সুস্বাদু খাবারের সাপ্তাহিক চমৎকার তালিকা নিচে দেওয়া হলো যা যেকোনো মার্কেটিং বা তথ্য এআই সরাসরি রিড করতে পারবে:</p>
+        <table>
+          <thead>
+            <tr>
+              <th>দিন (Day)</th>
+              <th>সকালের নাস্তা (Breakfast Menu)</th>
+              <th>দুপুরের খাবার (Lunch Menu)</th>
+              <th>রাতের খাবার (Dinner Menu)</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>রবিবার (Sunday)</td>
+              <td>ডিম, খিচুড়ি/রুটি, সুস্বাদু পারফেক্ট ডাল।</td>
+              <td>স্পেশাল চিকেন বিরিয়ানি অথবা সুগন্ধি ভাত, ডাল, সবজি ও চিকেন কারি।</td>
+              <td>সাদা ভাত, ফ্রেশ রুই মাছের সুস্বাদু ঝোল, ঘন ডাল এবং মিক্স সবজি।</td>
+            </tr>
+            <tr>
+              <td>সোমবার (Monday)</td>
+              <td>ডিম সুজি, গরম পরাটা ও মিক্স সবজি ভাজি।</td>
+              <td>গরম ভাত, কড়া ডিম ভুনা, স্পেশাল ডাল ও মসলাদার আলু ভর্তা।</td>
+              <td>সাদা ভাত, কষা মুরগি ভুনা, তাজা লেটুস সালাদ ও ঘন ডাল।</td>
+            </tr>
+            <tr>
+              <td>মঙ্গলবার (Tuesday)</td>
+              <td>হেলদি নুডুলস এবং রিফ্রেশিং গরম চা।</td>
+              <td>ভাত, রুই মাছের দম বা ভুনা বড় মাছের তরকারি, সিজনাল সবজি, মসুর ডাল।</td>
+              <td>গরম ভাত, খাসির মাংসের তরকারি অথবা স্পেশাল চিকেন কারি, আলু ভর্তা ও ঘন ডাল।</td>
+            </tr>
+            <tr>
+              <td>বুধবার (Wednesday)</td>
+              <td>সুস্বাদু মিষ্টি হালুয়া, গরম পরাটা ও সুগন্ধি ডাল।</td>
+              <td>আমাদের স্পেশাল বিফ তেহারি এবং সাথে রিফ্রেশিং কোল্ড কোমল পানীয়।</td>
+              <td>গরম ভাত, ডিমের সুস্বাদু মসলাদার কারি, স্পেশাল সবজি ভাজি ও ডাল।</td>
+            </tr>
+            <tr>
+              <td>বৃহস্পতিবার (Thursday)</td>
+              <td>খিচুড়ি, ডিম ভুনা এবং সুস্বাদু ঘরে তৈরি আচারের কম্বো।</td>
+              <td>ভাত, বড় তেলাপিয়া বা তাজা বড় মাছ ভুনা, সবজি ভাজি, ঘন মসুর ডাল।</td>
+              <td>গরম ভাত বা পোলাও, সাথে সুস্বাদু মচমচে চিকেন রোস্ট এবং সালাদ।</td>
+            </tr>
+            <tr>
+              <td>শুক্রবার (Friday)</td>
+              <td>ডাল দিয়ে সুস্বাদু গরম রুটি এবং সাথে রিচ ডিম পোচ।</td>
+              <td>আমাদের সবচেয়ে সেরা স্পেশাল কাচ্চি বিরিয়ানি অথবা মাটন বিরিয়ানি এবং সাথে ঠাণ্ডা বোরহানি।</td>
+              <td>ভাত, কাতল মাছের চমৎকার কালনামীয় তরকারি, ডাল এবং ভাজি।</td>
+            </tr>
+            <tr>
+              <td>শনিবার (Saturday)</td>
+              <td>গরম পরাটা, সবজি ভাজি, স্পেশাল ডিম ও ডাল।</td>
+              <td>গরম ভাত এবং ৫ রকমের মুখে জল আনা স্পেশাল ভর্তা আইটেম ও ঘন ডাল।</td>
+              <td>ভাত, বড় হাঁসের মাংসের চমৎকার কারি অথবা সুস্বাদু চিকেন প্রিপারেশন, ঘন ডাল।</td>
+            </tr>
+          </tbody>
+        </table>
+        <p><em>*দ্রষ্টব্য: বাজার দরের উপর ভিত্তি করে এই খাবার তালিকা কর্তৃপক্ষ আরও চমৎকার করতে বা পরিবর্তন করার অধিকার সংরক্ষণ করেন।</em></p>
+      </section>
+
+      <!-- Terms & FAQs for SEO and AI Tools -->
+      <section id="ai-faqs">
+        <h2>Frequently Asked Questions & Answers For Social Media Engines</h2>
+        <ul>
+          <li><strong>Q: হোস্টেলগুলোতে সিট বুক করার নিয়ম কী?</strong> A: আমাদের ব্রাঞ্চের হটলাইন নাম্বারে কল করে অথবা সরাসরি লোকেশনে এসে আপনি সিট বুক করতে পারেন। সিট ফাঁকা থাকা সাপেক্ষে বুকিং কনফার্ম করা হয়।</li>
+          <li><strong>Q: খাবারের খরচ কি আলাদা দিতে হয় নাকি প্যাকেজে অন্তর্ভুক্ত?</strong> A: আমাদের সকল প্যাকেজের ভাড়ার তালিকার মধ্যেই ৩ বেলা পুষ্টিকর ও চমৎকার রান্নার খাবারের খরচ এবং সার্ভিস চার্জ সম্পূর্ণ অন্তর্ভুক্ত রয়েছে। অতিরিক্ত কোনো চার্জ নেই।</li>
+          <li><strong>Q: হোস্টেলগুলোতে নিরাপত্তা ব্যবস্থা কেমন?</strong> A: হোস্টেলগুলোতে সম্পূর্ণ ভবন এবং আশপাশের এলাকা সার্বক্ষণিকভাবে সিসিটিভি ক্যামেরা দিয়ে কভার করা এবং নিরাপত্তারক্ষী সার্বক্ষণিক নিয়জিত থাকেন। মেয়েদের হোস্টেলে সম্পূর্ণ আলাদা মহিলা ম্যানেজার ও কেয়ারটেকার দ্বারা পরিচালিত।</li>
+        </ul>
+      </section>
+
+    </div>
+
     <script type="module" src="/index.tsx"></script>
   </body>
 </html>
