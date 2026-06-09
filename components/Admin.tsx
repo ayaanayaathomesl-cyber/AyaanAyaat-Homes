@@ -442,8 +442,8 @@ function HomeSettings() {
       if (doc.exists()) {
         const data = doc.data();
         if (data.images && Array.isArray(data.images)) {
-          // Exclude the bedroom with two wine glasses image (photo-1616594039964-ae9021a400a0)
-          setHomeBgImages(data.images.filter((img: string) => !img.includes("photo-1616594039964-ae9021a400a0")));
+          // Exclude the bedroom with two wine glasses image
+          setHomeBgImages(data.images.filter((img: string) => !img.includes("photo-1616594039964-ae9021a400a0") && !img.includes("r9aofhsnergefb2cxybr")));
         } else {
           setHomeBgImages([]);
         }
