@@ -4,12 +4,18 @@
  * SPDX-License-Identifier: Apache-2.0
 */
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { ViewState } from '../types';
 import { motion, AnimatePresence } from 'motion/react';
 import { Lock } from 'lucide-react';
 import { doc, getDoc, onSnapshot } from 'firebase/firestore';
 import { db } from '../src/lib/firebase';
+import gsap from 'gsap';
+import { ScrollTrigger } from 'gsap/ScrollTrigger';
+import { useGSAP } from '@gsap/react';
+import Lenis from 'lenis';
+
+gsap.registerPlugin(ScrollTrigger);
 
 interface HomeProps {
   onNavigate: (view: ViewState) => void;
@@ -38,9 +44,10 @@ const Home: React.FC<HomeProps> = ({ onNavigate }) => {
   const [typedL2, setTypedL2] = useState('');
   const [activeHighlight, setActiveHighlight] = useState('');
 
-  const canvasRef = React.useRef<HTMLCanvasElement>(null);
-  const orb1Ref = React.useRef<HTMLDivElement>(null);
-  const orb2Ref = React.useRef<HTMLDivElement>(null);
+  const canvasRef = useRef<HTMLCanvasElement>(null);
+  const orb1Ref = useRef<HTMLDivElement>(null);
+  const orb2Ref = useRef<HTMLDivElement>(null);
+  const containerRef = useRef<HTMLDivElement>(null);
   const [stats, setStats] = useState({ branches: 0, residents: 0, experience: 0 });
   const hasAnimatedRef = React.useRef(false);
 
@@ -322,7 +329,8 @@ const Home: React.FC<HomeProps> = ({ onNavigate }) => {
       if (d.exists()) {
         const data = d.data();
         if (data.images && Array.isArray(data.images)) {
-          setHomeBgImages(data.images);
+          // Exclude the bedroom with two wine glasses image (photo-1616594039964-ae9021a400a0)
+          setHomeBgImages(data.images.filter((img: string) => !img.includes("photo-1616594039964-ae9021a400a0")));
         }
       }
     });
@@ -393,7 +401,6 @@ const Home: React.FC<HomeProps> = ({ onNavigate }) => {
 
 
   const defaultBgImages = [
-    "https://images.unsplash.com/photo-1616594039964-ae9021a400a0?auto=format&fit=crop&q=80&w=1600",
     "https://images.unsplash.com/photo-1517248135467-4c7edcad34c4?auto=format&fit=crop&q=80&w=1600",
     "https://images.unsplash.com/photo-1566073771259-6a8506099945?auto=format&fit=crop&q=80&w=1600"
   ];
@@ -411,8 +418,134 @@ const Home: React.FC<HomeProps> = ({ onNavigate }) => {
     );
   };
 
+  useGSAP(() => {
+    // Scroll-based parallax for hero section background
+    gsap.to('.bg-wrap', {
+      scrollTrigger: {
+        trigger: '.hero',
+        start: 'top top',
+        end: 'bottom top',
+        scrub: true,
+      },
+      y: 150,
+      scale: 1.05,
+      ease: 'none'
+    });
+
+    // 1. Philosophy Content Parallax
+    gsap.from('.philosophy-content > *', {
+      scrollTrigger: {
+        trigger: '.philosophy-content',
+        start: 'top 85%',
+      },
+      y: 40,
+      opacity: 0,
+      stagger: 0.15,
+      duration: 1.2,
+      ease: 'power3.out'
+    });
+
+    // 2. Welcome underline smooth reveal
+    gsap.from('.welcome-underline', {
+      scrollTrigger: {
+        trigger: '.welcome',
+        start: 'top 80%',
+      },
+      width: 0,
+      duration: 1.2,
+      ease: 'power4.out'
+    });
+
+    // 3. Branches Section Title reveal
+    gsap.from('.br-section-header > *', {
+      scrollTrigger: {
+        trigger: '.br-section-header',
+        start: 'top 85%',
+      },
+      y: 40,
+      opacity: 0,
+      stagger: 0.15,
+      duration: 1,
+      ease: 'power3.out'
+    });
+
+    // 4. Branch Cards powerful stagger
+    gsap.from('.br-new-card', {
+      scrollTrigger: {
+        trigger: '.br-branches-grid',
+        start: 'top 85%',
+      },
+      y: 60,
+      opacity: 0,
+      stagger: 0.2,
+      duration: 1,
+      ease: 'back.out(1.2)'
+    });
+
+    // 5. Parallax for images inside branch cards
+    gsap.utils.toArray('.br-card-image img').forEach((img: any) => {
+      gsap.fromTo(img, 
+        { y: -15, scale: 1.05 }, 
+        {
+          y: 15,
+          scrollTrigger: {
+            trigger: img.parentElement.parentElement, // triggers on the card
+            start: 'top bottom',
+            end: 'bottom top',
+            scrub: true,
+          },
+          ease: 'none'
+        }
+      );
+    });
+
+    // 6. Upcoming Branches reveal
+    gsap.from('#upcoming .max-w-6xl > div, #upcoming .grid > div', {
+      scrollTrigger: {
+        trigger: '#upcoming',
+        start: 'top 85%',
+      },
+      y: 30,
+      opacity: 0,
+      stagger: 0.15,
+      duration: 1,
+      ease: 'power3.out'
+    });
+  }, { scope: containerRef });
+
+  useEffect(() => {
+    // Initialize Lenis for smooth scrolling
+    const lenis = new Lenis({
+      duration: 1.4,
+      easing: (t) => Math.min(1, 1.001 - Math.pow(2, -10 * t)), 
+      orientation: 'vertical',
+      smoothWheel: true,
+      wheelMultiplier: 1,
+    });
+
+    function raf(time: number) {
+      lenis.raf(time);
+      requestAnimationFrame(raf);
+    }
+    requestAnimationFrame(raf);
+
+    // Synchronize GSAP ScrollTrigger with Lenis
+    lenis.on('scroll', ScrollTrigger.update);
+    gsap.ticker.add((time) => {
+      lenis.raf(time * 1000);
+    });
+    gsap.ticker.lagSmoothing(0);
+
+    return () => {
+      lenis.destroy();
+      gsap.ticker.remove((time) => {
+        lenis.raf(time * 1000);
+      });
+    };
+  }, []);
+
   return (
-    <div className="bg-[#f8f6f0] text-[#4a3426] font-sans">
+    <div className="bg-[#f8f6f0] text-[#4a3426] font-sans w-full max-w-full overflow-x-hidden" ref={containerRef}>
       <style>{`
         /* Google Fonts provided by user */
         @import url('https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;0,900;1,400&family=Cormorant+Garamond:wght@300;400;600&family=Hind+Siliguri:wght@300;400;500;600;700&display=swap');
@@ -1013,7 +1146,7 @@ const Home: React.FC<HomeProps> = ({ onNavigate }) => {
               whileInView={{ x: 0, opacity: 1 }}
               viewport={{ once: true }}
               transition={{ duration: 0.8, delay: 0.2 }}
-              className="flex flex-col justify-center space-y-3 md:space-y-8 relative z-20 order-1 lg:order-1"
+              className="philosophy-content flex flex-col justify-center space-y-3 md:space-y-8 relative z-20 order-1 lg:order-1"
             >
               <div className="inline-flex items-center gap-3">
                 <div className="w-10 md:w-16 h-[2px] bg-gradient-to-r from-[#C9A84C] to-transparent"></div>
@@ -1283,7 +1416,6 @@ const Home: React.FC<HomeProps> = ({ onNavigate }) => {
           .br-branch-tagline {
             font-size: 12px;
             color: var(--gold);
-            font-style: italic;
             margin-bottom: 18px;
           }
 
@@ -1465,19 +1597,7 @@ const Home: React.FC<HomeProps> = ({ onNavigate }) => {
             .br-social-link svg { width: 14px; height: 14px; }
           }
 
-          /* Entry animation */
-          .br-new-card {
-            opacity: 0;
-            animation: fadeUp 0.6s ease forwards;
-          }
-
-          .br-new-card:nth-child(1) { animation-delay: 0.1s; }
-          .br-new-card:nth-child(2) { animation-delay: 0.25s; }
-
-          @keyframes fadeUp {
-            from { opacity: 0; transform: translateY(30px); }
-            to   { opacity: 1; transform: translateY(0); }
-          }
+          /* GSAP handles entry animation */
         `}</style>
 
         {/* --- NEW BRANCHES DESIGN --- */}
@@ -1497,7 +1617,7 @@ const Home: React.FC<HomeProps> = ({ onNavigate }) => {
             {/* Queens Point (Female) */}
             <div className="br-new-card female" onClick={() => onNavigate({ type: 'female-hostel' })}>
               <div className="br-card-image">
-                <img src="https://lh3.googleusercontent.com/d/1XVpXrYorEp471NKLuuQ124m-mDd5_ah6" alt="Queens Point Building" />
+                <img src="/Queens%20Point.png" alt="Queens Point Building" />
                 <div className="br-image-overlay"></div>
                 <span className="br-type-badge">FEMALE BRANCH</span>
               </div>
@@ -1547,7 +1667,7 @@ const Home: React.FC<HomeProps> = ({ onNavigate }) => {
             {/* Bachelor Point (Male) */}
             <div className="br-new-card male" onClick={() => onNavigate({ type: 'male-hostel' })}>
               <div className="br-card-image">
-                <img src="https://lh3.googleusercontent.com/d/1cjIYSZDiCig4kN1FbLxGIoEUTcdcCU1C" alt="Bachelor Point Building" />
+                <img src="/bechelor%20piont.png" alt="Bachelor Point Building" />
                 <div className="br-image-overlay"></div>
                 <span className="br-type-badge">MALE BRANCH</span>
               </div>
